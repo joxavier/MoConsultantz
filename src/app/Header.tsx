@@ -67,7 +67,7 @@ const Header = () => {
             {isMobile ? (
                 <>
                     <div style={{ marginLeft: 'auto', marginRight: '20px', cursor: 'pointer' }} onClick={toggleMenu}>
-                        <Hamburger size={24} color={isMenuOpen ? 'black' : 'white'} toggled={isMenuOpen} toggle={setMenuOpen} />
+                        <Hamburger size={24} color={'white'} toggled={isMenuOpen} toggle={setMenuOpen} />
                     </div>
                     {isMenuOpen &&
                         <div

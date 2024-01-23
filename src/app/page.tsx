@@ -73,7 +73,7 @@ export default function Home() {
           className="rounded-xl hero-image"
         />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-end text-center p-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white font-bold">
             <span className="text-shadow-black text-outline-black">
               Tech &
@@ -83,9 +83,9 @@ export default function Home() {
           </h1>
           <button
             onClick={() => window.location.href = '#contact'} // Change this to the appropriate navigation method
-            className="mt-8 px-8 py-4 bg-black text-white rounded-full transition-all hover:bg-white hover:text-black transform scale-150"
+            className="mt-8 px-8 py-4 bg-black text-white rounded-full transition-all hover:bg-white hover:text-black transform"
           >
-            Let's Connect
+            Connect
           </button>
         </div>
       </div>
