@@ -91,7 +91,7 @@ export default function Home() {
       </div>
 
       <div className={`mb-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-8`}
-        style={{ transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out', margin: '20px 0' }}>
+        style={{ transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out', margin: '20px 0', width: "100%" }}>
         <StatCard
           link="#education"
           iconSrc="icons/Award.svg"
