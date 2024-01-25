@@ -143,7 +143,6 @@ export default function Home() {
             color: '#fff',
             padding: '10px 20px',
             fontSize: '16px',
-            align: 'center',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
