@@ -2,6 +2,13 @@
 import Image from "next/image";
 import Header from './Header';
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+
+import styles from '../../global.module.css';
+
+
+import Feed from '../../components/Feed'
+import socialData from '../data/social.json'
 
 const StatCard = ({
   link,
@@ -64,7 +71,7 @@ export default function Home() {
       style={{ fontFamily: 'Anton, sans-serif' }}>
       <Header />
 
-      <div className="relative mt-8 rounded-xl overflow-hidden w-full h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[90vh] xl:h-[100vh]">
+      <div className="relative mb-8 rounded-xl overflow-hidden w-full h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[90vh] xl:h-[100vh]">
         <Image
           src="/hero.jpg"
           alt="Hero Image"
@@ -100,7 +107,7 @@ export default function Home() {
           description="Degrees"
         />
         <StatCard
-          link="#work"
+          link="#experience"
           iconSrc="icons/Target.svg"
           altText="Experienced Web Developer"
           title="9+"
@@ -114,6 +121,46 @@ export default function Home() {
           description="Satisfied Clients"
         />
       </div>
+
+      <div className={"aboutMe p-8"}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh' }}
+      >
+        <div className={"grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-8"}>
+          <div className="bio">
+            <h1>About Me</h1>
+            <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}
+            >I am a full stack web developer specializing in web3 projects.  I am pursuing my CISSP certification to demonstrate my cybersecurity expertise.
+              <br></br><strong>Growing your business in my passion</strong></p>
+          </div>
+
+          <div className="social">
+            <Feed imageData={socialData}></Feed>
+          </div>
+        </div>
+        <button className={styles.customButton}
+          style={{
+            backgroundColor: 'rgb(28, 78, 110)',
+            color: '#fff',
+            padding: '10px 20px',
+            fontSize: '16px',
+            align: 'center',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            transition: 'transform 0.3s, box-shadow 0.3s',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            marginTop: '-10px'
+          }}
+        >
+          <Link href="#contact">
+            Let Me Grow Your Business
+          </Link>
+        </button>
+      </div>
+
+
+      <div className="contact" id='Contact'></div>
+
     </main>
 
   );

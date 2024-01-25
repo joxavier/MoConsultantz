@@ -1,0 +1,95 @@
+.title img {
+  align-items: center;
+  width: 40%;
+  height: auto;
+}
+
+.carouselContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px; /* Adjust the gap between grid items */
+}
+
+.imageItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Ensure images fill the entire grid cell */
+  padding: 8px; /* Add spacing around each image (optional) */
+  transition: transform 0.2s; /* Add a smooth transition effect */
+}
+
+/* Mobile-friendly adjustments */
+@media only screen and (max-width: 768px) {
+  .carouselContainer {
+    padding: 0 10px; /* Optional padding to provide some space on the sides */
+  }
+
+  .imageGrid {
+    gap: 8px; /* Adjust the gap between grid items */
+  }
+  
+  .imageItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure images fill the entire grid cell */
+    padding: 4px; /* Add spacing around each image (optional) */
+    transition: transform 0.2s; /* Add a smooth transition effect */
+  }
+}
+.imageItem:hover {
+  transform: scale(1.1); /* Increase the scale on hover (you can adjust the value) */
+}
+
+/* Style the images to maintain their aspect ratio */
+.imageItem img {
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 10px; /* Add rounded edges to images */
+}
+
+.reviewTextBox p {
+  color: #fff;
+  margin: 18px;
+  font-size: xx-large;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.prevButton,
+.nextButton {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  outline: none;
+  color: #000;
+  margin-top: 30px;
+  margin-right: 30px;
+  margin-left: 30px;
+}
+
+.prevButton {
+  left: 10px;
+}
+
+.nextButton {
+  right: 10px;
+}
+
+.prevButton:hover,
+.nextButton:hover {
+  /* Change background color and add a subtle shadow on hover */
+  background-color: rgb(28, 78, 110);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  color: #fff; /* Change text color on hover */
+}
