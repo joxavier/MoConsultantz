@@ -67,7 +67,7 @@ const StatCard = ({
 export default function Home() {
   return (
 
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 font"
+    <main className="flex min-h-screen flex-col items-center justify-between p-10 sm:p-10 md:p-24 lg:p-32 font"
       style={{ fontFamily: 'Anton, sans-serif' }}>
       <Header />
 

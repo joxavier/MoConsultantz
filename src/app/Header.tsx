@@ -61,7 +61,7 @@ const Header = () => {
                         height={40} // Adjust the height as needed
                     />
                 </div>
-                <div style={{ marginLeft: '15px', marginRight: '30px', fontSize: '2em' }}>JOSHUA XAVIER</div>
+                <div style={{ marginLeft: '15px', marginRight: '30px', fontSize: '1.5em' }}>JOSHUA XAVIER</div>
             </div>
 
             {isMobile ? (
