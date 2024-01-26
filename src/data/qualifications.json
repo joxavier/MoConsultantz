@@ -1,0 +1,148 @@
+{
+  "degrees": [
+    {
+      "id": "UW",
+      "title": "Computer Science (BCS)",
+      "iconSrc": "/qualifications/UW.png",
+      "iconSrcLg": "/qualifications/UW-lg.png",
+      "altText": "University of Waterloo Computer Science",
+      "degree": "Bacholor of Computer Science (BCS)",
+      "institution": "University of Waterloo",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "WLU",
+      "title": "Business (BBA)",
+      "iconSrc": "/qualifications/WLU.jpg",
+      "iconSrcLg": "/qualifications/WLU-lg.png",
+      "altText": "University of Wilfred Laurier",
+      "degree": "Bacholor of Business Administration (BBA)",
+      "description": "Minor: Economics \n Concentration: Marketing",
+      "institution": "Wilfrid Laurier University",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "CISSP",
+      "title": "Certified Information Systems Security Professional (CISSP)*",
+      "iconSrc": "/qualifications/CISSP.png",
+      "iconSrcLg": "/qualifications/CISSP-lg.png",
+      "altText": "CISSP by ISC2",
+      "degree": "Certified Information Systems Security Professional (CISSP)*",
+      "description": "*In Progress",
+      "institution": "ISC2",
+      "onClose": "handleCloseModal"
+    }
+  ],
+  "skills": [
+    {
+      "id": "Java",
+      "title": "Java",
+      "iconSrc": "/qualifications/JS.png",
+      "iconSrcLg": "/qualifications/JS.png",
+      "altText": "Javascript Developer",
+      "degree": "Javascript (JS)",
+      "description": "es6",
+      "institution": "",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Python",
+      "title": "Python",
+      "iconSrc": "/qualifications/Python.svg",
+      "iconSrcLg": "/qualifications/Python.svg",
+      "altText": "Python Logo",
+      "degree": "Python",
+      "description": "Python 2/3",
+      "institution": "",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "C/C++",
+      "title": "C/C++",
+      "iconSrc": "/qualifications/c++.png",
+      "iconSrcLg": "/qualifications/c++.png",
+      "altText": "C/C++ Logo",
+      "degree": "C/C++",
+      "institution": "",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Typescript",
+      "title": "Typescript",
+      "iconSrc": "/qualifications/TS.svg",
+      "iconSrcLg": "/qualifications/TS.svg",
+      "altText": "Typescript Logo",
+      "degree": "Typescript (TS)",
+      "description": "React, Next.js, Node.js",
+      "institution": "",
+      "onClose": "handleCloseModal"
+    }
+  ],
+  "tools": [
+    {
+      "id": "GCP",
+      "title": "GCP",
+      "iconSrc": "/qualifications/GCP.png",
+      "iconSrcLg": "/qualifications/GCP-lg.png",
+      "altText": "GCP Logo",
+      "degree": "Google Cloud Platform (GCP)",
+      "description": "Hosting web servers and workspaces",
+      "institution": "Google",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Office365",
+      "title": "Office365",
+      "iconSrc": "/qualifications/office365.png",
+      "iconSrcLg": "/qualifications/office365.png",
+      "altText": "Office365 Logo",
+      "degree": "Office365",
+      "description": "Suite of enterprise software",
+      "institution": "Microsoft",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Vercel",
+      "title": "Vercel",
+      "iconSrc": "/qualifications/vercel.png",
+      "iconSrcLg": "/qualifications/vercel-lg.svg",
+      "altText": "Vercel Logo",
+      "degree": "Vercel",
+      "description":"Continous Development (CI/CD) service fro web hosting",
+      "institution": "",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Photoshop",
+      "title": "Photoshop",
+      "iconSrc": "/qualifications/PS.svg",
+      "iconSrcLg": "/qualifications/PS.svg",
+      "altText": "Photoshop Logo",
+      "degree": "Photoshop",
+      "institution": "Adobe",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Github",
+      "title": "Github",
+      "iconSrc": "/qualifications/github.png",
+      "iconSrcLg": "/qualifications/vercel.png",
+      "altText": "Github Logo",
+      "degree": "Github",
+      "Description": "Version Control management for various codebases",
+      "institution": "Microsoft",
+      "onClose": "handleCloseModal"
+    },
+    {
+      "id": "Solana",
+      "title": "Solana",
+      "iconSrc": "/qualifications/solana.svg",
+      "iconSrcLg": "/qualifications/solana-lg.svg",
+      "altText": "Solana Logo",
+      "degree": "Solana",
+      "description": "Blockchain service for Web3 integrations",
+      "institution": "Solana Foundation",
+      "onClose": "handleCloseModal"
+    }
+  ]
+}
