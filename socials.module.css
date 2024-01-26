@@ -78,6 +78,13 @@
   margin-left: 30px;
 }
 
+@media (prefers-color-scheme: dark) {
+  .prevButton,
+  .nextButton {
+    color: #fff;
+  }
+}
+
 .prevButton {
   left: 10px;
 }
