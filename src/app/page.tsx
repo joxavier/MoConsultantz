@@ -1,11 +1,11 @@
 'use client'
 import Image from "next/image";
 import Header from './Header';
+import { FaSquareEnvelope, FaCalendarDay, FaLinkedin, FaGithub, FaStackOverflow, FaInstagram, FaTiktok, FaSquareXTwitter, FaFacebook, FaSnapchat, FaPinterest, FaReddit, FaSpotify, FaYoutube, FaPlaystation } from 'react-icons/fa6';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 import styles from '../../global.module.css';
-
 
 import Feed from '../../components/Feed'
 import socialData from '../data/social.json'
@@ -111,8 +111,8 @@ const QualificationsIcon = ({
             src={iconSrc}
             alt={altText}
             style={{
-              width: '80px',
-              height: '80px',
+              width: '100px',
+              height: '100px',
               objectFit: 'contain',
             }} />
         </div>
@@ -205,6 +205,25 @@ const DegreeCard = ({
 };
 
 
+const socialMediaLinks = [
+  { icon: <FaSquareEnvelope />, url: 'mailto:joshuax47@gmail.com' },
+  { icon: <FaCalendarDay />, url: 'https://booking.setmore.com/scheduleappointment/9c25b029-94d9-4790-bf2e-4791b9dcbc2e' },
+  { icon: <FaLinkedin />, url: 'https://linkedin.com/in/joxavier-3299/' },
+  { icon: <FaGithub />, url: 'https://github.com/joxavier' },
+  { icon: <FaStackOverflow />, url: 'https://stackoverflow.com/users/18236982/joshua-xavier' },
+  { icon: <FaInstagram />, url: 'https://instagram.com/joshuax32' },
+  { icon: <FaFacebook />, url: 'https://www.facebook.com/Joshuax47' },
+  { icon: <FaSquareXTwitter />, url: 'https://twitter.com/joshuax47' },
+  { icon: <FaTiktok />, url: 'https://www.tiktok.com/@jmojx' },
+  { icon: <FaSnapchat />, url: 'https://www.snapchat.com/add/joshuax1999' },
+  { icon: <FaPinterest />, url: 'https://linkedin.com/in/joxavier-3299/' },
+  { icon: <FaReddit />, url: '' },
+  { icon: <FaSpotify />, url: 'https://open.spotify.com/user/mangoesrmyfav' },
+  { icon: <FaYoutube />, url: '' },
+  { icon: <FaPlaystation />, url: '' }
+];
+
+
 export default function Home() {
   const [activeContent, setActiveContent] = useState<'degrees' | 'skills' | 'tools'>('degrees');
 
@@ -294,7 +313,7 @@ export default function Home() {
         <div className={`mb-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-8`}
           style={{ transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out', margin: '20px 0', width: "100%" }}>
           <StatCard
-            link="#education"
+            link="#qualifications"
             iconSrc="icons/Award.svg"
             altText="Awarder Web Developer"
             title="2+"
@@ -316,7 +335,7 @@ export default function Home() {
           />
         </div>
 
-        <div className={"aboutMe mt-10"}
+        <div className={"aboutMe mt-10"} id={"about"}
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh' }}
         >
           <div className={"grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4"}>
@@ -350,7 +369,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className={"qualifications mt-10"} id='education'
+        <div className={"qualifications mt-10"} id='qualifications'
           style={{ minHeight: '50vh' }}
         >
           <div style={{ alignItems: 'center' }}>
@@ -405,7 +424,60 @@ export default function Home() {
           )}
         </div>
 
-        <div className="contact" id='Contact'></div>
+        <div className={"experience"} id='experiences'
+          style={{}}>
+
+          <h1>Experiences</h1>
+          <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}>My years of experience spans many organizations</p>
+          <ul className="skills mt-4 mb-8 grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-4" style={{}}>
+            <QualificationsIcon title="XavierAcademy" iconSrc="qualifications/XavierAcademy.svg" altText="XavierAcademy Logo" />
+            <QualificationsIcon title="Metaparlour" iconSrc="https://metaparlour.io/metaparlour.svg" altText="Metaparlour Logo" />
+            <QualificationsIcon title="LA Fitness" iconSrc="qualifications/LAFitness.png" altText="LA Fitness Logo" />
+            <QualificationsIcon title="NCR" iconSrc="qualifications/NCR.png" altText="NCR Logo" />
+            <QualificationsIcon title="Manulife" iconSrc="qualifications/manulife.png" altText="Manulife Logo" />
+            <QualificationsIcon title="Nissan" iconSrc="qualifications/nissan.jpg" altText="Nissan Logo" />
+            <QualificationsIcon title="Best Buy" iconSrc="qualifications/bestbuy.jpg" altText="BestBuy Logo" />
+          </ul>
+
+        </div>
+
+        <div className="contact" id='contact'
+          style={{ alignItems: 'center', justifyContent: 'center' }}>
+
+          <h1>Contact Me</h1>
+          <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}>Reach out to me! I am available on all platforms</p>
+          <div style={{ marginTop: "15px", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <a
+              href={'https://booking.setmore.com/scheduleappointment/9c25b029-94d9-4790-bf2e-4791b9dcbc2e'}
+              target="_blank"
+              style={{
+                textDecoration: 'none',
+                backgroundColor: '#4CAF50',
+                boxShadow: "rgba(0, 0, 0, 0.12) 11px 10px 38px 0px",
+                color: 'white',
+                padding: '10px 20px',
+                fontSize: '16px',
+                borderRadius: '5px',
+                display: 'inline-block',
+              }}
+            >
+              Book a Free Consultation
+            </a>
+            <p style={{ fontSize: '12px', color: '#555', lineHeight: "3" }}>
+              Mention "Free Consultation" in comments when booking
+            </p>
+          </div>
+
+          <div className="contactLinks flex mt-5" style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
+            {socialMediaLinks.map((link, index) => (
+              <a key={index} href={link.url} target="_blank" rel="noopener noreferrer">
+                <h2 style={{ fontSize: '32px', margin: '8px' }}>{link.icon}</h2>
+              </a>
+            ))}
+          </div>
+
+        </div>
+
       </div >
 
     </main >

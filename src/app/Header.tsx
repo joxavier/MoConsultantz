@@ -87,8 +87,8 @@ const Header = () => {
                             <nav>
                                 <ul style={{ listStyleType: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <MenuItem link="#about" text="About" onClick={toggleMenu} />
-                                    <MenuItem link="#skills" text="Skills" onClick={toggleMenu} />
-                                    <MenuItem link="#work" text="Work" onClick={toggleMenu} />
+                                    <MenuItem link="#qualifications" text="Skills" onClick={toggleMenu} />
+                                    <MenuItem link="#experiences" text="Work" onClick={toggleMenu} />
                                     <MenuItem link="#contact" text="Contact" onClick={toggleMenu} />
                                 </ul>
                             </nav>
@@ -102,8 +102,8 @@ const Header = () => {
                 <nav >
                     <ul style={{ listStyleType: 'none', margin: 0, padding: 0, display: 'flex' }}>
                         <li style={{ marginRight: '30px' }}><a href="#about" style={{ textDecoration: 'none', color: '#fff' }}>About.</a></li>
-                        <li style={{ marginRight: '30px' }}><a href="#skills" style={{ textDecoration: 'none', color: '#fff' }}>Skills.</a></li>
-                        <li style={{ marginRight: '30px' }}><a href="#work" style={{ textDecoration: 'none', color: '#fff' }}>Work.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="#qualifications" style={{ textDecoration: 'none', color: '#fff' }}>Skills.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="#experiences" style={{ textDecoration: 'none', color: '#fff' }}>Work.</a></li>
                         <li style={{ marginRight: '30px' }}><a href="#contact" style={{ textDecoration: 'none', color: '#fff' }}>Contact.</a></li>
                     </ul>
                 </nav>
