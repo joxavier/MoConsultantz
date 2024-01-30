@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import styles from '../../global.module.css';
 
-import personalPageData from '../data/PersonalPage.json';
+import personalPageData from '../data/personalPage.json';
 import socialData from '../data/social.json'
 import contactLinks from '../data/contactLinks'
 import qualificationsData from '../data/qualifications.json';
