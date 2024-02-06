@@ -1,5 +1,5 @@
 import React from 'react';
-import { HighlightData } from '../types/PersonalPage';
+import { HighlightData } from '@/data/types/PersonalPage';
 import Image from "next/image";
 
 interface HighlightsProps {
