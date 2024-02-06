@@ -54,14 +54,15 @@ const Header = () => {
         }}>
             <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px' }}>
                 <div style={{ backgroundColor: '#fff', borderRadius: '32%', padding: '5px' }}>
-                    <Image
-                        src="/mo.svg"
-                        alt="MO Logo"
-                        width={40} // Adjust the width as needed
-                        height={40} // Adjust the height as needed
-                    />
+                    <Link href="/home">
+                        <Image
+                            src="/mo.svg"
+                            alt="MO Logo"
+                            width={40} // Adjust the width as needed
+                            height={40} // Adjust the height as needed
+                        />
+                    </Link>
                 </div>
-                <div style={{ marginLeft: '15px', marginRight: '30px', fontSize: '1.5em' }}>JOSHUA XAVIER</div>
             </div>
 
             {isMobile ? (
@@ -86,10 +87,10 @@ const Header = () => {
 
                             <nav>
                                 <ul style={{ listStyleType: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <MenuItem link="#about" text="About" onClick={toggleMenu} />
-                                    <MenuItem link="#qualifications" text="Skills" onClick={toggleMenu} />
-                                    <MenuItem link="#experiences" text="Work" onClick={toggleMenu} />
-                                    <MenuItem link="#contact" text="Contact" onClick={toggleMenu} />
+                                    <MenuItem link="/home" text="Consultantz" onClick={toggleMenu} />
+                                    <MenuItem link="/vestmentz" text="Vestmentz" onClick={toggleMenu} />
+                                    <MenuItem link="/devz" text="Devz" onClick={toggleMenu} />
+                                    <MenuItem link="/team/joxavier" text="Contact" onClick={toggleMenu} />
                                 </ul>
                             </nav>
                         </div>
@@ -101,10 +102,10 @@ const Header = () => {
                 // Navigation for larger screens
                 <nav >
                     <ul style={{ listStyleType: 'none', margin: 0, padding: 0, display: 'flex' }}>
-                        <li style={{ marginRight: '30px' }}><a href="#about" style={{ textDecoration: 'none', color: '#fff' }}>About.</a></li>
-                        <li style={{ marginRight: '30px' }}><a href="#qualifications" style={{ textDecoration: 'none', color: '#fff' }}>Skills.</a></li>
-                        <li style={{ marginRight: '30px' }}><a href="#experiences" style={{ textDecoration: 'none', color: '#fff' }}>Work.</a></li>
-                        <li style={{ marginRight: '30px' }}><a href="#contact" style={{ textDecoration: 'none', color: '#fff' }}>Contact.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="/home" style={{ textDecoration: 'none', color: '#fff' }}>Consultantz.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="/vestmentz" style={{ textDecoration: 'none', color: '#fff' }}>Vestmentz.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="/devz" style={{ textDecoration: 'none', color: '#fff' }}>Devz.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="/team/joxavier" style={{ textDecoration: 'none', color: '#fff' }}>Contact.</a></li>
                     </ul>
                 </nav>
             )
@@ -118,14 +119,14 @@ interface MenuItemProps {
     link: string;
     text: string;
     onClick: () => void;
-  }
-  
-  const MenuItem: React.FC<MenuItemProps> = ({ link, text, onClick }) => (
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({ link, text, onClick }) => (
     <li style={{ marginBottom: '20px', fontSize: '4em', cursor: 'pointer' }} onClick={onClick}>
-      <Link href={link}>
-        <h1 style={{ textDecoration: 'none', color: 'black', textAlign: 'center' }}>{text}</h1>
-      </Link>
+        <Link href={link}>
+            <h1 style={{ textDecoration: 'none', color: 'black', textAlign: 'center' }}>{text}</h1>
+        </Link>
     </li>
-  );
+);
 
 export default Header;

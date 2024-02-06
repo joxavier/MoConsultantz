@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import styles from '../socials.module.css';
+import styles from '../../../socials.module.css';
 import Link from 'next/link';
 
 interface FeedProps {

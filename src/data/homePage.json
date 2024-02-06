@@ -1,0 +1,32 @@
+{
+    "hero": {
+        "imageUrl": "/mo.svg",
+        "altText": "Hero Image",
+        "title": "Grow Your Small Business",
+        "buttonText": "Connect",
+        "buttonLink": "/team/joxavier"
+    },
+    "highlights": [
+        {
+            "link": "/home",
+            "iconSrc": "/consultantz.png",
+            "altText": "Business Consulting",
+            "title": "MoConsultantz",
+            "description": "Business Consulting"
+        },
+        {
+            "link": "/vestmentz",
+            "iconSrc": "/vestmentz.png",
+            "altText": "Business Banking",
+            "title": "MoVestmentz",
+            "description": "Business Banking"
+        },
+        {
+            "link": "/devz",
+            "iconSrc": "/devz.png",
+            "altText": "Top Rated Web Developer",
+            "title": "MoDevz",
+            "description": "Software Development"
+        }
+    ]
+}

@@ -9,21 +9,21 @@
     "highlights": [
         {
             "link": "#qualifications",
-            "iconSrc": "icons/Award.svg",
+            "iconSrc": "/icons/Award.svg",
             "altText": "Awarder Web Developer",
             "title": "2+",
             "description": "Degrees"
         },
         {
             "link": "#experience",
-            "iconSrc": "icons/Target.svg",
+            "iconSrc": "/icons/Target.svg",
             "altText": "Experienced Web Developer",
             "title": "9+",
             "description": "Years of Experience"
         },
         {
             "link": "#reviews",
-            "iconSrc": "icons/Customer.svg",
+            "iconSrc": "/icons/Customer.svg",
             "altText": "Top Rated Web Developer",
             "title": "7+",
             "description": "Satisfied Clients"

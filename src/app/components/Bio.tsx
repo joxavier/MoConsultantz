@@ -1,7 +1,7 @@
 // components/Bio.tsx
 
 import React from 'react';
-import { BioData } from '@/types/PersonalPage';
+import { BioData } from '@/data/types/PersonalPage';
 
 interface BioProps {
   bioData: BioData;
