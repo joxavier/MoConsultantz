@@ -14,7 +14,7 @@ export default function Devz() {
       <Header />
 
       <div style={{ maxWidth: '1320px' }}>
-        <UnderConstructionPage redirectLink="https://www.moconsultantz.com/modevz" />
+        <UnderConstructionPage redirectLink="https://sites.google.com/view/modevz/modevz" />
       </div>
     </main>
   );

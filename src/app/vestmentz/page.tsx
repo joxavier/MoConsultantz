@@ -14,7 +14,7 @@ export default function Vestmentz() {
       <Header />
 
       <div style={{ maxWidth: '1320px' }}>
-        <UnderConstructionPage redirectLink="https://www.moconsultantz.com/movesmentz" />
+        <UnderConstructionPage redirectLink="https://sites.google.com/view/modevz/movesmentz" />
       </div>
     </main>
   );
