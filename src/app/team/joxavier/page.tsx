@@ -47,7 +47,7 @@ export default function Home() {
               <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'dark' ? 'white' : 'none', marginBottom: 4 }}>About Me</h1>
               <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}
               >I am a Full-Stack Web Developer specializing in Web3 projects.  I am pursuing my CISSP certification to demonstrate my cybersecurity expertise.
-                <br></br><strong>Growing your business in my passion</strong></p>
+                <br></br><strong>Growing your business is my passion</strong></p>
             </div>
             <div className="social">
               <Feed imageData={socialData}></Feed>

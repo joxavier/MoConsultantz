@@ -14,7 +14,7 @@ export default function Team() {
       <Header />
 
       <div style={{ maxWidth: '1320px' }}>
-        <UnderConstructionPage redirectLink="https://www.moconsultantz.com/team" />
+        <UnderConstructionPage redirectLink="https://sites.google.com/view/modevz/team" />
       </div>
     </main>
   );
