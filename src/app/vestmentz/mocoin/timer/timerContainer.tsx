@@ -15,7 +15,7 @@ export const TimerContainer = ({days, hours, minutes ,seconds }: timeProps) => {
   let hoursFlip = false;
   let minutesFlip = false;
   let secondsFlip = true;
-
+//@ts-ignore
  if (seconds <=0 && minutes <=0 && hours <=0 && days <=0){
    daysFlip =  false;
    hoursFlip =  false;
