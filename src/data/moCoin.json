@@ -1,0 +1,32 @@
+{
+    "hero": {
+        "imageUrl": "/hero.jpg",
+        "altText": "Hero Image",
+        "title": "Mo Coin",
+        "buttonText": "Swap Now!",
+        "buttonLink": "https://raydium.io/swap/?inputCurrency=sol&outputCurrency=HHVmXazRvA3VdciVG4ayE7vjgUFUn12t5r7vYm2BJ258&outputSymbol=HHVmXa&fixed=in"
+    },
+    "highlights": [
+        {
+            "link": "#qualifications",
+            "iconSrc": "/icons/Award.svg",
+            "altText": "Awarder Web Developer",
+            "title": "2+",
+            "description": "Degrees"
+        },
+        {
+            "link": "#experience",
+            "iconSrc": "/icons/Target.svg",
+            "altText": "Experienced Web Developer",
+            "title": "9+",
+            "description": "Years of Experience"
+        },
+        {
+            "link": "#reviews",
+            "iconSrc": "/icons/Customer.svg",
+            "altText": "Top Rated Web Developer",
+            "title": "7+",
+            "description": "Satisfied Clients"
+        }
+    ]
+}
