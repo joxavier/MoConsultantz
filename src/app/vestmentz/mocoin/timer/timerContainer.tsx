@@ -53,15 +53,15 @@ export const TimerContainer = ({days, hours, minutes ,seconds }: timeProps) => {
    if(days <10){
      days="0"+days
    }
-
+//@ts-ignore
    if(hours <10){
      hours="0"+hours
    }
-
+//@ts-ignore
    if(minutes <10){
      minutes="0"+minutes
    }
-
+//@ts-ignore
    if(seconds < 10){
      seconds="0"+seconds
      
