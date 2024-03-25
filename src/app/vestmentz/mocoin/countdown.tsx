@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TimerContainer } from './timer/TimerContainer';
+import { TimerContainer } from './timer/timerContainer';
 
 interface CountdownProps {
     countdownDate: number;

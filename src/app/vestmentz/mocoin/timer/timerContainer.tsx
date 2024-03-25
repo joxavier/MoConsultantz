@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMediaQuery } from 'react-responsive';
+//import { useMediaQuery } from 'react-responsive';
 import { NumberBox } from './NumberBox'
 
 interface timeProps{
@@ -67,7 +67,7 @@ export const TimerContainer = ({days, hours, minutes ,seconds }: timeProps) => {
      
    }
 
-   const isMediumScreenOrSmaller = useMediaQuery({ width: 390 });
+   const isMediumScreenOrSmaller = false;//useMediaQuery({ width: 390 });
   
     return (
         
