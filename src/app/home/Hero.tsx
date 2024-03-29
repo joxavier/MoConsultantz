@@ -1,15 +1,20 @@
 import Image from 'next/image';
 import { HeroData } from '@/data/types/PersonalPage';
 import React from 'react';
+import { useDarkMode } from 'next-dark-mode'; //mo-dark.svg.png
 
 const Hero: React.FC<HeroData> = ({ imageUrl, altText, title, buttonText, buttonLink }) => {
+  let darkModeActive = false;
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    darkModeActive = true;
+  }
   return (
     <div className="hero relative mb-8 overflow-hidden flex flex-col md:flex-row items-center justify-center w-full">
       <Image
-        src={imageUrl}
+        src={darkModeActive ? '/mo-dark.svg.png' : '/mo.svg'}
         alt={altText}
-        width={500}  // Adjust width as needed
-        height={300}  // Adjust height as needed
+        width='700'
+        height='700'
         className="mb-4 sm:mb-0 sm:mr-4 rounded-xl sm:w-full md:w-1/2 lg:w-1/2 xl:w-1/2"
       />
 

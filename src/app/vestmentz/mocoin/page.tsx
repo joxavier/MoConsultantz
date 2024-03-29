@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Countdown from './countdown';
 import Header from '../../components/Header';
-import Hero from '../../home/Hero';
+import { useTheme } from 'next-themes';
 import PreSaleInstructions from './presale';
 import pageData from '../../../data/moCoin.json';
 
@@ -11,6 +11,14 @@ export default function Mocoin() {
 
   const buyLink = 'https://raydium.io/swap/?inputCurrency=sol&outputCurrency=HHVmXazRvA3VdciVG4ayE7vjgUFUn12t5r7vYm2BJ258&outputSymbol=HHVmXa&fixed=in'
   const chartLink = 'https://www.dextools.io/app/en/solana/pair-explorer/2mz5eNLTpCk2F6CvP1y9LWdUe6LUh1zqPa7bzPFYWns8?t=1711224539477'
+
+  let darkModeActive  = (String(useTheme()) === 'dark');
+  console.log(useTheme().themes)
+
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    darkModeActive = true;
+}
+
 
   return (
 
@@ -22,7 +30,7 @@ export default function Mocoin() {
         style={{ transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out', margin: '20px 0', width: "100%", maxWidth: '1320px' }}>
         <div className="col-span-1 lg:col-span-1">
           <Image
-            src={'/mo.svg'}
+            src={darkModeActive ? '/mo-dark.svg.png' : '/mo.svg'}
             alt={'MoCoin Logo'}
             className="rounded-xl hero-image"
             width='700'
