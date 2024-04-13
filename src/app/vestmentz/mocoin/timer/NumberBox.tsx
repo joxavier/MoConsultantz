@@ -19,7 +19,7 @@ export const NumberBox = ({ num, unit, flip }: numProp) => {
                 <div className={`absolute w-2/3 h-2/5 top-0 rounded-t-lg z-5 ${flip ? 'animate-flip bg-[#2c2e3f]' : 'bg-transparent'}`}></div>
 
             </div>
-            <p className="text-lg mt-2 font-semibold text-[#000000] md:text-xl">
+            <p className="text-lg mt-2 md:text-xl">
                 {unit}
             </p>
         </div>
