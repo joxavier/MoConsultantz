@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { GoogleTagManager } from '@next/third-parties/google'
 import "./globals.css";
 import { Providers } from './providers'
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <link rel="stylesheet" href={anton} />
       </head>
       <body className={inter.className}>
+      <GoogleTagManager gtmId="G-BSBPSM99P8" />
         <Providers>
           {children}
         </Providers>
