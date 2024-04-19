@@ -29,7 +29,7 @@ export default function Mocoin() {
 
       <div className="max-w-50 flex justify-center items-center flex-col">
         <h1>
-          <span className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl ">Going Public in ...</span>
+          <span className="text-xl sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl ">Initial Coin Offering in ...</span>
         </h1>
         <Countdown countdownDate={new Date('April 20, 2024 04:20:24 EST').getTime()} />
       </div>

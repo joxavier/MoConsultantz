@@ -73,7 +73,7 @@ export const TimerContainer = ({days, hours, minutes ,seconds }: timeProps) => {
         
     <div className="rounded-xl">
       <div className={`flex gap-4 py-6 px-10  rounded-xl`}>
-        <NumberBox num={days} unit="Days" flip={daysFlip} />
+        <NumberBox num={days} unit="Day" flip={daysFlip} />
         {isMediumScreenOrSmaller && (
           <>
             <span className="hidden  md:text-7xl font-normal text-gray-50">:</span>
