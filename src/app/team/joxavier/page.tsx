@@ -46,7 +46,7 @@ export default function Home() {
             <div className="bio sm:order-first lg:order-last">
               <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'dark' ? 'white' : 'none', marginBottom: 4 }}>About Me</h1>
               <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}>
-                At 21, I was completing my second undergraduate degree and had already made my first $100,000 from various jobs. Despite initial success, I chose a different path after graduating with dual degrees in Computer Science and Business. Instead of pursuing corporate roles, I focused on empowering small businesses in the digital era. Motivated by technology's transformative potential and the COVID-19 pandemic's impact, I founded Mo on September 24th, 2023. As Nipsey Hussle said, 'The marathon continues.' My journey is about embracing challenges, making a lasting impact, and uplifting others.
+                At 21, I was completing my second undergraduate degree and had already made my first $100,000 from various jobs. Despite initial success, I chose a different path after graduating with dual degrees in Computer Science and Business. Instead of pursuing corporate roles, I focused on empowering small businesses in the digital era. Motivated by technology's transformative potential and the COVID-19 pandemic's impact, Mo was established. As Nipsey Hussle said, <strong>'The marathon continues.'</strong> This journey is not just about reaching the finish line but about embracing the challenges, staying committed to the cause, and leaving a lasting legacy that uplifts and empowers others
                 <br /><br />
               </p>
             </div>
