@@ -1,6 +1,7 @@
 'use client'
 import Image from "next/image";
 import Header from '../components/Header';
+import Footer from "../components/Footer";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import personalPageData from '../../data/homePage.json';
@@ -22,6 +23,8 @@ export default function Home() {
 
         <Highlights highlights={highlights} />
       </div >
+
+      <Footer />
     </main >
   );
 }
