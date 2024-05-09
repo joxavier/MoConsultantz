@@ -4,7 +4,6 @@ import { motion, useAnimation } from 'framer-motion';
 import Image from "next/image";
 import Header from '../components/Header';
 import UnderConstructionPage from '../components/UnderConstructionPage';
-import GetProducts from "@/actions";
 import dynamic from 'next/dynamic';
 import StripePricingTable from '../components/PricingTable';
 
