@@ -38,9 +38,6 @@ export default function Devz() {
     setIsAnimated(true);
   }, [controls]);
 
-
-  //console.log(GetProducts())
-
   return (
 
 

@@ -4,7 +4,7 @@ import Header from '../../components/Header';
 import { useTheme } from 'next-themes';
 import PreSaleInstructions from './presale';
 import pageData from '../../../data/moCoinPage.json';
-import Hero from '../../home/Hero';
+import Hero from '../../consultantz/Hero';
 
 
 export default function Mocoin() {
