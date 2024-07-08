@@ -62,7 +62,13 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (hostname === "modevz.ca" || hostname === "modevz.com") {
-    return NextResponse.rewrite(new URL(`/devz${path}`, req.url));
+    if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz")) {
+      console.log(path)
+      return NextResponse.rewrite(new URL(`${path}`, req.url));
+    }
+    else{
+      return NextResponse.rewrite(new URL(`/devz${path}`, req.url));
+    }
   }
 
   // rewrite everything else to `/_sites/[site] dynamic route
