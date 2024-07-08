@@ -7,70 +7,9 @@ import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import dynamic from 'next/dynamic';
-import Stripe from 'stripe';
-import ProductCard from '../components/ProductCard';
 import StripePricingTable from '../components/PricingTable';
 
-type Props = {
-  prices: Stripe.Price[];
-};
-
-const getServerSideProps: GetServerSideProps = async (context) => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET ?? '', {
-    apiVersion: '2020-08-27',
-  });
-
-  const featuredCollections = ['modevz'];
-
-  const productList = await stripe.products.list({
-    limit: 100,
-    active: true
-  });
-
-  console.log('a'),
-  console.log(productList)
-
-  // Filter products based on metadata collection
-  const filteredProducts = productList.data.filter(product => 
-    featuredCollections.includes(product.metadata.collection)
-  );
-
-  filteredProducts.sort((a, b) => {
-    const dateA = new Date(a.updated).getTime();
-    const dateB = new Date(b.updated).getTime();
-    return dateB - dateA;
-  });
-
-  // Retrieve prices for each filtered product and select the first price
-  const prices: Stripe.Price[] = [];
-  let price: Stripe.Price;
-  for (const product of filteredProducts) {
-    const defaultPrice = product.default_price;
-
-    // @ts-ignore
-    const res = await (await stripe.prices.list({
-      product: product.id,
-      expand: ['data.product']
-    })).data;
-
-    if (defaultPrice) {
-      // @ts-ignore
-      price = res.find(price => price.id === defaultPrice);
-    }
-
-    if (price) {
-      prices.push(price);
-    }
-  }
-
-  return {
-    props: {
-      prices
-    },
-  }
-};
-
-const Devz: NextPage<Props> = ({ prices }) => {
+export default function Devz() {
   const [isAnimated, setIsAnimated] = useState(false);
   const controls = useAnimation();
 
@@ -202,5 +141,3 @@ const Devz: NextPage<Props> = ({ prices }) => {
     </main>
   );
 };
-
-export default Devz;
