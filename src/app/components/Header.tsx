@@ -87,7 +87,7 @@ const Header = () => {
 
                             <nav>
                                 <ul style={{ listStyleType: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <MenuItem link="/home" text="Consultantz" onClick={toggleMenu} />
+                                    <MenuItem link="/consultantz" text="Consultantz" onClick={toggleMenu} />
                                     <MenuItem link="/vestmentz" text="Vestmentz" onClick={toggleMenu} />
                                     <MenuItem link="/devz" text="Devz" onClick={toggleMenu} />
                                     <MenuItem link="/team/joxavier" text="Contact" onClick={toggleMenu} />
@@ -102,7 +102,7 @@ const Header = () => {
                 // Navigation for larger screens
                 <nav >
                     <ul style={{ listStyleType: 'none', margin: 0, padding: 0, display: 'flex' }}>
-                        <li style={{ marginRight: '30px' }}><a href="/home" style={{ textDecoration: 'none', color: '#fff' }}>Consultantz.</a></li>
+                        <li style={{ marginRight: '30px' }}><a href="/consultantz" style={{ textDecoration: 'none', color: '#fff' }}>Consultantz.</a></li>
                         <li style={{ marginRight: '30px' }}><a href="/vestmentz" style={{ textDecoration: 'none', color: '#fff' }}>Vestmentz.</a></li>
                         <li style={{ marginRight: '30px' }}><a href="/devz" style={{ textDecoration: 'none', color: '#fff' }}>Devz.</a></li>
                         <li style={{ marginRight: '30px' }}><a href="/team/joxavier" style={{ textDecoration: 'none', color: '#fff' }}>Contact.</a></li>

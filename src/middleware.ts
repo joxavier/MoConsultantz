@@ -18,7 +18,7 @@ export default async function middleware(req: NextRequest) {
   const url = req.nextUrl;
 
   // Get hostname of the request (e.g. demo.metaparlour.io, demo.localhost:3000)
-  const hostname = req.headers.get("host") || "modevz.ca";
+  const hostname = req.headers.get("host") || "modevz.ca" || "modevz.com" || "localhost:3000";
 
   // Get the pathname of the request (e.g. /, /about, /blog/first-post)
   const path = url.pathname;
@@ -51,7 +51,14 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (hostname === "localhost:3000" || hostname === "moconsultantz.com") {
-    return NextResponse.rewrite(new URL(`/consultantz${path}`, req.url));
+    console.log(path)
+    if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz")) {
+      console.log(path)
+      return NextResponse.rewrite(new URL(`${path}`, req.url));
+    }
+    else{
+      return NextResponse.rewrite(new URL(`/consultantz${path}`, req.url));
+    }
   }
 
   if (hostname === "modevz.ca" || hostname === "modevz.com") {
