@@ -11,13 +11,13 @@ import qualificationsData from '@/data/qualifications.json';
 
 
 import Hero from './Hero';
-import Highlights from '../../components/Highlights';
+import Highlights from '../../../components/Highlights';
 
-import Feed from '../../components/Feed'
-import QualificationsSection from "../../components/Qualifications";
+import Feed from '../../../components/Feed'
+import QualificationsSection from "../../../components/Qualifications";
 
-import ExperiencesSection from '../../components/Experiences';
-import ContactSection from '../../components/Contact'
+import ExperiencesSection from '../../../components/Experiences';
+import ContactSection from '../../../components/Contact'
 
 
 export default function Home() {

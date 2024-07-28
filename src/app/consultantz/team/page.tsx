@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image";
-import Header from '../components/Header';
-import UnderConstructionPage from '../components/UnderConstructionPage';
+import Header from '../../components/Header';
+import UnderConstructionPage from '../../components/UnderConstructionPage';
 
 
 export default function Team() {
