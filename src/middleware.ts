@@ -30,9 +30,7 @@ export default async function middleware(req: NextRequest) {
   const currentHost =
     process.env.NODE_ENV === "production" && process.env.VERCEL === "1"
       ? hostname
-        .replace(`.moconsultantz.com`, "")
-        .replace(`.modevz.com`, "")
-        .replace(`.modevz.ca`, "")
+        .replace(`.moconsultantz.com`, "").replace(`.modevz.com`, "").replace(`.modevz.ca`, "")
       : hostname.replace(`.localhost:3000`, "");
 
   // rewrites for app pages
