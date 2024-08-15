@@ -30,9 +30,10 @@ export default async function middleware(req: NextRequest) {
   const currentHost =
     process.env.NODE_ENV === "production" && process.env.VERCEL === "1"
       ? hostname
-        .replace(`.moconsultantz.com` || `.modevz.ca` || `.modevz.com`, "")
+        .replace(`.moconsultantz.com`, "")
+        .replace(`.modevz.com`, "")
+        .replace(`.modevz.ca`, "")
       : hostname.replace(`.localhost:3000`, "");
-
 
   // rewrites for app pages
   if (currentHost == "consultantz") {
@@ -45,7 +46,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  if (currentHost == "vestmentz" || currentHost == "hodl" || currentHost == "whitepaper" || currentHost == "token") {
+  if (currentHost == "vestmentz" || currentHost == "hodl" || currentHost == "whitepaper" || currentHost == "mocoin") {
     url.pathname = `/vestmentz/mocoin${url.pathname}`;
     return NextResponse.rewrite(url);
   }
