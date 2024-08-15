@@ -33,6 +33,8 @@ export default async function middleware(req: NextRequest) {
         .replace(`.moconsultantz.com`, "").replace(`.modevz.com`, "").replace(`.modevz.ca`, "")
       : hostname.replace(`.localhost:3000`, "");
 
+  currentHost = currentHost.replace(`.modevz.com`, "").replace(`.modevz.ca`, "")
+
   // rewrites for app pages
   if (currentHost == "consultantz") {
     url.pathname = `/consultantz${url.pathname}`;
