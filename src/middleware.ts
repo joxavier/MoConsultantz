@@ -10,7 +10,7 @@ export const config = {
      * 4. all root files inside /public (e.g. /favicon.ico)
      * 5. /products routes
      */
-    "/((?!api/|_next/|_static/|examples/|[\\w-]+\\.\\w+|products/).*)",
+    "/((?!api/|_next/|_static/|examples/|[\\w-]+\\.\\w+|products/|icons/|qualifications/).*)",
   ],
 };
 
