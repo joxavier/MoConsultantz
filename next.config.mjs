@@ -2,6 +2,6 @@
 
 export default {
     images: {
-      domains: ['scontent-dfw5-2.cdninstagram.com'],
+      domains: ['scontent.cdninstagram.com', 'instagram.fyzd1-3.fna.fbcdn.net', 'instagram.fyzd1-2.fna.fbcdn.net']
     },
   }
