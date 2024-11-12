@@ -7,6 +7,7 @@ import Link from 'next/link';
 import personalPageData from '../../data/homePage.json';
 import Hero from './Hero';
 import Highlights from '../components/Highlights';
+import TrustedBySlider from "../components/Slider";
 
 export default function Home() {
 
@@ -22,7 +23,14 @@ export default function Home() {
         <Hero {...hero} />
 
         <Highlights highlights={highlights} />
+
+
       </div >
+
+      <div style={{ maxWidth: '620px'}}>
+
+        <TrustedBySlider/>
+      </div>
 
       <Footer />
     </main >
