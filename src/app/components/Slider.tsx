@@ -4,15 +4,9 @@ import Slider from 'react-slick';
 import Image from 'next/image';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { EmblaOptionsType } from 'embla-carousel'
+//import { EmblaOptionsType } from 'embla-carousel'
 //import Autoplay from 'embla-carousel-autoplay'
-import useEmblaCarousel from 'embla-carousel-react'
-
-
-type PropType = {
-  slides: number[]
-  options?: EmblaOptionsType
-}
+//import useEmblaCarousel from 'embla-carousel-react'
 
 const TrustedBySlider: React.FC = () => {
   const settings = {
