@@ -5,9 +5,11 @@ import { motion, useAnimation } from 'framer-motion';
 import Image from "next/image";
 import Head from 'next/head';
 import Header from '../components/Header';
+import Hero from '../consultantz/Hero';
 import Footer from '../components/Footer';
 import dynamic from 'next/dynamic';
 import StripePricingTable from '../components/PricingTable';
+import TrustedBySlider from "../components/Slider";
 
 export default function Devz() {
   const [isAnimated, setIsAnimated] = useState(false);
@@ -43,6 +45,14 @@ export default function Devz() {
     setIsAnimated(true);
   }, [controls]);
 
+  const hero = {
+    "imageUrl": "/mo.svg",
+    "altText": "Hero Image",
+    "title": "Grow Your Small Business",
+    "buttonText": "Connect",
+    "buttonLink": "/team/joxavier"
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10 sm:p-10 md:p-24 lg:p-32 font"
       style={{ fontFamily: 'Anton, sans-serif' }}>
@@ -74,6 +84,8 @@ export default function Devz() {
             margin: '0px auto'
           }}
         >
+          <Hero {...hero} />
+
           <motion.div animate={{ opacity: isAnimated ? 1 : 0 }} style={{ textAlign: 'center' }}>
             <div className="font-bold text-4xl">
               MoDevz
@@ -82,6 +94,7 @@ export default function Devz() {
               Software Development
             </div>
           </motion.div>
+
           <motion.p
             style={{
               opacity: isAnimated ? 1 : 0,
@@ -127,6 +140,11 @@ export default function Devz() {
           {/* Products */}
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8">
 
+          </div>
+
+          <div className="  items-center justify-between p-10 sm:p-6 md:p-24 lg:p-32" style={{  justifyContent: 'space-around', margin: ' 0 auto', maxWidth: '80vw' }}>
+
+            <TrustedBySlider />
           </div>
 
           {/* Pricing Table */}

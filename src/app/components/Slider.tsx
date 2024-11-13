@@ -38,6 +38,7 @@ const TrustedBySlider: React.FC = () => {
           <div key={index} style={{
           }}>
             <Image src={logo} alt={`Logo ${index + 1}`} width={100} height={50} style={{
+              margin: ' 0 auto',
             }} />
           </div>
         ))}

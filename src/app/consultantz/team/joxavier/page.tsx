@@ -37,6 +37,9 @@ export default function Home() {
 
         <Highlights highlights={highlights} />
 
+        <Image src={'/mo.svg'} alt={'s'} width={45} height={45} />
+        <Image src={'/images/mo.svg'} alt={'s'} width={45} height={45} />
+
 
 
         <div className={"aboutMe mt-10"} id={"about"}
@@ -46,8 +49,10 @@ export default function Home() {
             <div className="bio sm:order-first lg:order-last">
               <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'dark' ? 'white' : 'none', marginBottom: 4 }}>About Me</h1>
               <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}>
-                At 21, I was completing my second undergraduate degree and had already made my first $100,000 from various jobs. Despite initial success, I chose a different path after graduating with dual degrees in Computer Science and Business. Instead of pursuing corporate roles, I focused on empowering small businesses in the digital era. Motivated by technology's transformative potential and the COVID-19 pandemic's impact, Mo was established. As Nipsey Hussle said, <strong>'The marathon continues.'</strong> This journey is not just about reaching the finish line but about embracing the challenges, staying committed to the cause, and leaving a lasting legacy that uplifts and empowers others
+                I am an entrepreneurial innovator with a keen eye for detail and a commitment to excellence. My experience spans high-fashion branding, where I develop exclusive, luxury-focused projects, to strategic leadership in the music industry, creating platforms that empower artists through technology and creative services. With a strong foundation in web development and tech solutions, I craft interactive, client-centric digital experiences using the latest frameworks.
+
                 <br /><br />
+                I am deeply invested in community building and mentorship, exploring ways to drive blockchain adoption by integrating it into business operations to create efficiencies and enhance customer loyalty. Known for my strategic foresight, I create impactful plans that blend business acumen with technological integration. Guided by an ambitious vision, I consistently pursue unique opportunities that push the boundaries of innovation and align with long-term success.
               </p>
             </div>
             <div className="social">
