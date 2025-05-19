@@ -110,10 +110,10 @@ export default function Devz() {
             ))}
           </div>
 
-          <div>
+          {/*<div>
             <motion.div className={`font-bold text-3xl text-center`}>Plans</motion.div>
             <StripePricingTable />
-          </div>
+          </div>*/}
 
 
         </motion.div>
