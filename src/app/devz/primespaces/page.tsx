@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from 'react';
 import { MapPin, Wifi, Clock, Printer, Users, Mail, Phone, Check, Star, ArrowRight, Building, Coffee } from 'lucide-react';
 
