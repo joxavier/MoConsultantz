@@ -54,6 +54,11 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  else if (currentHost === "primespaces") {
+    url.pathname = `/devz/primespaces${path}`;
+    return NextResponse.rewrite(url);
+  }
+
   if (hostname === "localhost:3000" || hostname === "moconsultantz.com") {
     console.log(path)
     if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz")) {
