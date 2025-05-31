@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import Image from "next/image";
 import Head from 'next/head';
-import Header from '../components/Header';
 import Hero from '../consultantz/Hero';
-import Footer from '../components/Footer';
+
 import dynamic from 'next/dynamic';
 import StripePricingTable from '../components/PricingTable';
 import TrustedBySlider from "../components/Slider";
@@ -71,8 +70,6 @@ export default function Devz() {
         <meta property="og:linkedin" content="https://www.linkedin.com/company/mo0430" />
       </Head>
 
-      <Header />
-
       <div style={{ maxWidth: '1320px' }}>
         <motion.div
           initial={{ opacity: 0 }}
@@ -90,7 +87,7 @@ export default function Devz() {
             <div className="font-bold text-4xl">
               MoDevz
             </div>
-            <div className="font-bold text-2xl" style={{ lineHeight: '1', marginTop: '-0.5rem' }}>
+            <div className="font-bold text-2xl" style={{ lineHeight: '1', marginTop: '0rem' }}>
               Software Development
             </div>
           </motion.div>
@@ -149,13 +146,11 @@ export default function Devz() {
 
           {/* Pricing Table */}
           <div>
-            <motion.div className="font-bold text-3xl text-center">Plans</motion.div>
-            <StripePricingTable />
+           {/* <motion.div className="font-bold text-3xl text-center">Plans</motion.div>
+            <StripePricingTable />*/}
           </div>
         </motion.div>
       </div>
-
-      <Footer />
     </main>
   );
 };
