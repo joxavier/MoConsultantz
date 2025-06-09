@@ -38,15 +38,15 @@ const mockNewsPosts: NewsPost[] = [
     tags: ['Finance', 'Markets', 'Economy'],
     imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400'
   },
-  {
+{
     id: '3',
-    title: 'Sustainable Energy Solutions Gain Momentum Across Industries',
-    excerpt: 'Companies worldwide are adopting renewable energy sources at an unprecedented rate, driving innovation in clean technology.',
-    content: 'Full article content would go here...',
-    author: 'Emily Rodriguez',
-    date: '2025-05-28',
-    tags: ['Energy', 'Sustainability', 'Industries'],
-    imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400'
+    title: 'From Ethereum to Exodus: Canada’s Blockchain Boom—and Bust?',
+    excerpt: 'Canada helped launch the blockchain revolution with Ethereum, but regulatory uncertainty now threatens its position in the global crypto economy.',
+    content: `    `,
+    author: 'Joshua Xavier',
+    date: '2025-06-09',
+    tags: ['Blockchain', 'Canada', 'Innovation'],
+    imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400',
   },
   {
     id: '4',
@@ -67,7 +67,17 @@ const mockNewsPosts: NewsPost[] = [
     date: '2025-05-26',
     tags: ['Manufacturing', 'Industries', 'Technology'],
     imageUrl: 'https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=400'
-  }
+  },
+    {
+    id: '6',
+    title: 'Sustainable Energy Solutions Gain Momentum Across Industries',
+    excerpt: 'Companies worldwide are adopting renewable energy sources at an unprecedented rate, driving innovation in clean technology.',
+    content: 'Full article content would go here...',
+    author: 'Emily Rodriguez',
+    date: '2025-05-28',
+    tags: ['Energy', 'Sustainability', 'Industries'],
+    imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400'
+  },
 ];
 
 const Feed: React.FC = () => {

@@ -11,6 +11,7 @@ interface App {
   id: string;
   name: string;
   description: string;
+  link?: string;
   icon: string;
   isActive: boolean;
   category: "ecosystem" | "launchpad";
@@ -23,15 +24,17 @@ const apps: App[] = [
     name: "MoCoin",
     description: "Offical Coin of the ecosystem",
     icon: "⚓",
+    link: "https://mocoin.modevz.ca",
     isActive: true,
     category: "ecosystem",
   },
   {
     id: "1",
-    name: "Ank",
-    description: "Coming soon to ecosystem",
-    icon: "⚓",
-    isActive: false,
+    name: "Metaparlour",
+    description: "Wellness Platform",
+    icon: "🏛️",
+    link: "https://metaparlour.io", 
+    isActive: true,
     category: "ecosystem",
   },
   /*{
@@ -78,12 +81,22 @@ const apps: App[] = [
   // LaunchPad Apps
   {
     id: "7",
-    name: "Metaparlour",
-    description: "Wellness Platform",
-    icon: "🏛️",
+    name: "Ank",
+    description: "Coming soon to ecosystem",
+    icon: "⚓",
     isActive: false,
     category: "launchpad",
   },
+    {
+    id: "7",
+    name: "6Cylndr",
+    description: "Coming soon to ecosystem",
+    icon: "⚓",
+    link: "https://6cylndr.com",
+    isActive: true,
+    category: "launchpad",
+  },
+  
 ];
 
 const MoOS: React.FC = () => {
@@ -168,19 +181,19 @@ const MoOS: React.FC = () => {
                 >
                   <div
                     className={`
-                    bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20
-                    ${
-                      app.isActive
-                        ? "hover:shadow-2xl hover:bg-white/20"
-                        : "bg-gray-400/10"
-                    }
-                  `}
+                      bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20
+                      ${app.isActive ? "hover:shadow-2xl hover:bg-white/20" : "bg-gray-400/10"}
+                    `}
+                    onClick={() => {
+                      if (app.isActive && app.link) {
+                        window.open(app.link, "_blank", "noopener,noreferrer");
+                      }
+                    }}
+                    style={app.isActive && app.link ? { cursor: "pointer" } : undefined}
                   >
                     <div className="text-center">
                       <div
-                        className={`text-4xl mb-4 ${
-                          !app.isActive ? "grayscale" : ""
-                        }`}
+                        className={`text-4xl mb-4 ${!app.isActive ? "grayscale" : ""}`}
                       >
                         {app.icon}
                       </div>

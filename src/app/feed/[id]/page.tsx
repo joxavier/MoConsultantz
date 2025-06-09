@@ -64,7 +64,31 @@ const mockArticles: { [key: string]: Article } = {
     tags: ['Finance', 'Markets', 'Economy'],
     imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
     readTime: '4 min read'
-  }
+  },
+  '3': {
+    id: '3',
+    title: 'From Ethereum to Exodus: Canada’s Blockchain Boom—and Bust?',
+    content: `
+      <p>In the early days of blockchain innovation, Canada stood proudly at the frontier. The world’s second-largest blockchain platform, <strong>Ethereum</strong>, was co-founded in 2013 by <strong>Vitalik Buterin</strong>, a Russian-Canadian programmer raised in Toronto. Buterin’s contributions, rooted in academic rigor and visionary thinking, sparked a global revolution in decentralized computing. Ethereum laid the foundation for what we now call <strong>Web3</strong>—a decentralized internet of smart contracts, NFTs, DeFi, and DAOs.</p>
+
+      <p>Canada was also home to early Bitcoin adopters and miners. It hosted some of the first crypto-focused meetups and conferences. Canadian exchanges like <strong>QuadrigaCX</strong>—before its infamous collapse—were among the first platforms where crypto was traded at scale in North America. Innovation hubs in cities like Toronto, Vancouver, and Montreal once buzzed with blockchain startups, protocol builders, and investor interest.</p>
+
+      <h2>Canada's Crypto Conundrum</h2>
+      <p>While countries like the UAE, Singapore, and even the United States have moved quickly to develop regulatory frameworks and attract blockchain talent, <strong>Canada’s regulatory uncertainty and lack of institutional support have stifled growth</strong>. Federal agencies have been slow to provide clear guidance. Banks remain reluctant to serve blockchain businesses. Even some provincial securities commissions treat crypto firms with suspicion, creating a patchwork of confusing and often contradictory policies.</p>
+
+      <p>As a result, <strong>Canadian innovators are leaving</strong>. Developers, founders, and capital are migrating to more crypto-friendly environments. Companies that were born in Canada—such as <strong>Dapper Labs</strong> (creators of NBA Top Shot)—have increasingly looked abroad for partnerships, funding, and operational freedom.</p>
+
+      <h2>The Risk of Missed Opportunity</h2>
+      <p>Blockchain isn’t just about cryptocurrency. It’s about redefining how we manage trust, ownership, and value in a digital world. Canada has the talent. It has the academic institutions, the multicultural edge, and the technical depth to lead. But without <strong>strategic investment, clear regulation, and active public-private partnerships</strong>, we risk becoming spectators in a field we helped create.</p>
+
+      <p>Vitalik Buterin once said, “<em>The purpose of blockchain is not to cut costs. It’s to redefine systems.</em>” Canada helped ignite that spark. Now it must decide: Will it continue to lead, or will it watch from the sidelines as others build the next great decentralized future?</p>
+    `,
+    author: 'Joshua Xavier',
+    date: '2025-06-09',
+    tags: ['Blockchain', 'Canada', 'Innovation'],
+    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
+    readTime: '5 min read'
+  },
   // Add more mock articles as needed
 };
 
