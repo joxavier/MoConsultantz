@@ -54,8 +54,8 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  else if (currentHost === "primespaces") {
-    url.pathname = `/devz/primespaces${path}`;
+  else if (currentHost === "primaspaces") {
+    url.pathname = `/devz/primaspaces${path}`;
     return NextResponse.rewrite(url);
   }
 
