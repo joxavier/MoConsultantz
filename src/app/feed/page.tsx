@@ -5,11 +5,12 @@ import Link from 'next/link';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import articlesData from './articles.json'; // <-- Import your articles here
 
 interface NewsPost {
   id: string;
   title: string;
-  excerpt: string;
+  excerpt?: string;
   content: string;
   author: string;
   date: string;
@@ -17,68 +18,8 @@ interface NewsPost {
   imageUrl?: string;
 }
 
-const mockNewsPosts: NewsPost[] = [
-  {
-    id: '1',
-    title: 'Revolutionary AI Technology Transforms Healthcare Industry',
-    excerpt: 'New breakthrough in machine learning algorithms promises to revolutionize patient care and medical diagnostics worldwide.',
-    content: 'Full article content would go here...',
-    author: 'Sarah Johnson',
-    date: '2025-05-30',
-    tags: ['Technology', 'Healthcare', 'AI'],
-    imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400'
-  },
-  {
-    id: '2',
-    title: 'Global Markets Show Strong Recovery Amid Economic Optimism',
-    excerpt: 'Stock markets worldwide experience significant gains as investors show renewed confidence in economic recovery.',
-    content: 'Full article content would go here...',
-    author: 'Michael Chen',
-    date: '2025-05-29',
-    tags: ['Finance', 'Markets', 'Economy'],
-    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400'
-  },
-{
-    id: '3',
-    title: 'From Ethereum to Exodus: Canada’s Blockchain Boom—and Bust?',
-    excerpt: 'Canada helped launch the blockchain revolution with Ethereum, but regulatory uncertainty now threatens its position in the global crypto economy.',
-    content: `    `,
-    author: 'Joshua Xavier',
-    date: '2025-06-09',
-    tags: ['Blockchain', 'Canada', 'Innovation'],
-    imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400',
-  },
-  {
-    id: '4',
-    title: 'Digital Assets Market Sees Major Institutional Investment',
-    excerpt: 'Traditional financial institutions are increasingly investing in digital assets, signaling mainstream adoption.',
-    content: 'Full article content would go here...',
-    author: 'David Park',
-    date: '2025-05-27',
-    tags: ['Assets', 'Crypto', 'Finance'],
-    imageUrl: 'https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=400'
-  },
-  {
-    id: '5',
-    title: 'Manufacturing Industry Embraces Automation and Robotics',
-    excerpt: 'Smart factories and automated production lines are reshaping the manufacturing landscape globally.',
-    content: 'Full article content would go here...',
-    author: 'Lisa Thompson',
-    date: '2025-05-26',
-    tags: ['Manufacturing', 'Industries', 'Technology'],
-    imageUrl: 'https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=400'
-  },
-    {
-    id: '6',
-    title: 'Sustainable Energy Solutions Gain Momentum Across Industries',
-    excerpt: 'Companies worldwide are adopting renewable energy sources at an unprecedented rate, driving innovation in clean technology.',
-    content: 'Full article content would go here...',
-    author: 'Emily Rodriguez',
-    date: '2025-05-28',
-    tags: ['Energy', 'Sustainability', 'Industries'],
-    imageUrl: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=400'
-  },
-];
+// Use the imported articles as your posts
+const mockNewsPosts: NewsPost[] = articlesData as NewsPost[];
 
 const Feed: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string>('All');

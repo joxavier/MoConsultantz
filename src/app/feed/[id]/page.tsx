@@ -4,6 +4,7 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Head from 'next/head';
+import articlesData from '../articles.json';
 
 interface Article {
   id: string;
@@ -16,88 +17,13 @@ interface Article {
   readTime: string;
 }
 
-const mockArticles: { [key: string]: Article } = {
-  '1': {
-    id: '1',
-    title: 'Revolutionary AI Technology Transforms Healthcare Industry',
-    content: `
-      <p>The healthcare industry is experiencing a paradigm shift with the introduction of groundbreaking artificial intelligence technologies that promise to revolutionize patient care and medical diagnostics worldwide.</p>
-      
-      <h2>Breaking Down Barriers</h2>
-      <p>Traditional diagnostic methods, while effective, often require significant time and resources. The new AI-powered systems can analyze complex medical data in minutes rather than hours, providing healthcare professionals with rapid, accurate insights that can be critical in emergency situations.</p>
-      
-      <h2>Enhanced Accuracy</h2>
-      <p>Studies show that these AI systems can identify patterns and anomalies in medical imaging with up to 95% accuracy, often detecting issues that might be missed by human analysis alone. This level of precision is particularly valuable in early-stage disease detection.</p>
-      
-      <h2>Patient Impact</h2>
-      <p>For patients, this means faster diagnoses, more personalized treatment plans, and ultimately better health outcomes. The technology is being implemented in hospitals worldwide, with early adopters reporting significant improvements in patient satisfaction and treatment effectiveness.</p>
-      
-      <h2>Looking Forward</h2>
-      <p>As this technology continues to evolve, we can expect even more sophisticated applications in areas such as drug discovery, personalized medicine, and preventive care. The future of healthcare is becoming increasingly intelligent, and patients worldwide stand to benefit.</p>
-    `,
-    author: 'Sarah Johnson',
-    date: '2025-05-30',
-    tags: ['Technology', 'Healthcare', 'AI'],
-    imageUrl: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800',
-    readTime: '5 min read'
-  },
-  '2': {
-    id: '2',
-    title: 'Global Markets Show Strong Recovery Amid Economic Optimism',
-    content: `
-      <p>Stock markets worldwide are experiencing significant gains as investors show renewed confidence in economic recovery, with major indices reaching new highs across multiple regions.</p>
-      
-      <h2>Market Performance</h2>
-      <p>The S&P 500, FTSE 100, and Nikkei 225 have all posted substantial gains over the past quarter, driven by strong corporate earnings and positive economic indicators. Technology and healthcare sectors are leading the charge, with many companies exceeding analyst expectations.</p>
-      
-      <h2>Economic Indicators</h2>
-      <p>Key economic metrics including employment rates, consumer spending, and manufacturing output all point to a robust recovery. Central banks have maintained supportive monetary policies while gradually adjusting interest rates to manage inflation concerns.</p>
-      
-      <h2>Investor Sentiment</h2>
-      <p>Professional investors and retail traders alike are displaying increased confidence, with trading volumes reaching levels not seen since the peak of the previous bull market. This enthusiasm is being tempered by cautious optimism about geopolitical factors.</p>
-      
-      <h2>Future Outlook</h2>
-      <p>Analysts predict continued growth but emphasize the importance of monitoring global economic trends and policy changes. The consensus remains positive for the remainder of the year, with expectations of sustained but measured growth.</p>
-    `,
-    author: 'Michael Chen',
-    date: '2025-05-29',
-    tags: ['Finance', 'Markets', 'Economy'],
-    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
-    readTime: '4 min read'
-  },
-  '3': {
-    id: '3',
-    title: 'From Ethereum to Exodus: Canada’s Blockchain Boom—and Bust?',
-    content: `
-      <p>In the early days of blockchain innovation, Canada stood proudly at the frontier. The world’s second-largest blockchain platform, <strong>Ethereum</strong>, was co-founded in 2013 by <strong>Vitalik Buterin</strong>, a Russian-Canadian programmer raised in Toronto. Buterin’s contributions, rooted in academic rigor and visionary thinking, sparked a global revolution in decentralized computing. Ethereum laid the foundation for what we now call <strong>Web3</strong>—a decentralized internet of smart contracts, NFTs, DeFi, and DAOs.</p>
-
-      <p>Canada was also home to early Bitcoin adopters and miners. It hosted some of the first crypto-focused meetups and conferences. Canadian exchanges like <strong>QuadrigaCX</strong>—before its infamous collapse—were among the first platforms where crypto was traded at scale in North America. Innovation hubs in cities like Toronto, Vancouver, and Montreal once buzzed with blockchain startups, protocol builders, and investor interest.</p>
-
-      <h2>Canada's Crypto Conundrum</h2>
-      <p>While countries like the UAE, Singapore, and even the United States have moved quickly to develop regulatory frameworks and attract blockchain talent, <strong>Canada’s regulatory uncertainty and lack of institutional support have stifled growth</strong>. Federal agencies have been slow to provide clear guidance. Banks remain reluctant to serve blockchain businesses. Even some provincial securities commissions treat crypto firms with suspicion, creating a patchwork of confusing and often contradictory policies.</p>
-
-      <p>As a result, <strong>Canadian innovators are leaving</strong>. Developers, founders, and capital are migrating to more crypto-friendly environments. Companies that were born in Canada—such as <strong>Dapper Labs</strong> (creators of NBA Top Shot)—have increasingly looked abroad for partnerships, funding, and operational freedom.</p>
-
-      <h2>The Risk of Missed Opportunity</h2>
-      <p>Blockchain isn’t just about cryptocurrency. It’s about redefining how we manage trust, ownership, and value in a digital world. Canada has the talent. It has the academic institutions, the multicultural edge, and the technical depth to lead. But without <strong>strategic investment, clear regulation, and active public-private partnerships</strong>, we risk becoming spectators in a field we helped create.</p>
-
-      <p>Vitalik Buterin once said, “<em>The purpose of blockchain is not to cut costs. It’s to redefine systems.</em>” Canada helped ignite that spark. Now it must decide: Will it continue to lead, or will it watch from the sidelines as others build the next great decentralized future?</p>
-    `,
-    author: 'Joshua Xavier',
-    date: '2025-06-09',
-    tags: ['Blockchain', 'Canada', 'Innovation'],
-    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
-    readTime: '5 min read'
-  },
-  // Add more mock articles as needed
-};
-
 const ArticlePage: React.FC = () => {
   const params = useParams();
   const id = params?.id as string;
-  
-  const article = mockArticles[id];
-  
+
+  // articlesData is an array, so find the article by id
+  const article = (articlesData as Article[]).find((a) => a.id === id);
+
   if (!article) {
     return (
       <div className="min-h-screen mt-12 flex items-center justify-center">
