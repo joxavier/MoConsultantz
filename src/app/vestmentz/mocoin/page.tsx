@@ -170,10 +170,10 @@ export default function Mocoin() {
   };
 
   const marketData = {
-    marketCap: "$45.2M",
-    tvl: "$12.8M",
-    volume24h: "$2.1M",
-    holders: "15,847",
+    marketCap: "$21.33M",
+    tvl: "$12.8k",
+    volume24h: "$2.1k",
+    holders: "27",
   };
 
   useEffect(() => {
