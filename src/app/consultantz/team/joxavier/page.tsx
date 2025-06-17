@@ -3,6 +3,8 @@ import { useState, useRef } from "react";
 import Head from "next/head";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import Highlights from "./Highlights";
+import personalPageData from "@/data/personalPage.json";
 
 export default function PersonalPage() {
   const [showBookingForm, setShowBookingForm] = useState(false);
@@ -15,6 +17,7 @@ export default function PersonalPage() {
     service: "consultation",
   });
   const moreInfoRef = useRef<HTMLDivElement>(null);
+  const { hero, highlights } = personalPageData;
 
   const handleSaveContact = () => {
     const contact = {
@@ -57,9 +60,17 @@ END:VCARD`;
   };
 
   const socialLinks = [
-    { name: "LinkedIn", url: "https://www.linkedin.com/in/joxavier-3299/", icon: "💼" },
+    {
+      name: "LinkedIn",
+      url: "https://www.linkedin.com/in/joxavier-3299/",
+      icon: "💼",
+    },
     { name: "Twitter", url: "#", icon: "🐦" },
-    { name: "Instagram", url: "https://www.instagram.com/joshuax32/", icon: "📸" },
+    {
+      name: "Instagram",
+      url: "https://www.instagram.com/joshuax32/",
+      icon: "📸",
+    },
     { name: "Email", url: "mailto:josh@modevz.ca", icon: "✉️" },
   ];
 
@@ -140,7 +151,7 @@ END:VCARD`;
             />
           </div>
         </div>
-        
+
         <div
           className="mobile-profile-overlap"
           style={{
@@ -231,7 +242,7 @@ END:VCARD`;
               margin: "0 0 8px 0",
             }}
           >
-            Founder & CEO
+            Chief Technology Officer
           </h2>
 
           <p
@@ -419,8 +430,44 @@ END:VCARD`;
                 backgroundClip: "text",
               }}
             >
-              About Mo
+              About Me
             </h2>
+
+            <Highlights highlights={highlights} />
+
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.05)",
+                padding: "40px",
+                borderRadius: "20px",
+                textAlign: "left",
+                lineHeight: "1.8",
+                color: "#e0e0e0",
+              }}
+            >
+              <p style={{ marginBottom: "20px" }}>
+                I am an entrepreneurial innovator passionate about leveraging
+                next-generation technologies to fulfill evolving consumer needs.
+                With a detail-oriented mindset and a commitment to excellence, I
+                specialize in crafting interactive, client-centric digital
+                solutions that drive real-world impact.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                My background in business and technology allows me to bridge
+                strategy with execution—developing tools, systems, and platforms
+                that help small businesses grow. I’m especially interested in
+                integrating blockchain, automation, and AI to enhance customer
+                experiences and operational efficiency.
+              </p>
+              <p>
+                I’m known for my strategic foresight and my ability to build
+                plans that align with long-term success. Outside of work, I
+                enjoy catching up on basketball, blockchain developments, and
+                hip-hop culture. My drive for success is rooted in empowering
+                communities and helping businesses scale with purpose and
+                precision.
+              </p>
+            </div>
 
             <div
               style={{
@@ -431,6 +478,7 @@ END:VCARD`;
               }}
             >
               <div
+                id="qualifications"
                 style={{
                   background: "rgba(138, 43, 226, 0.1)",
                   padding: "30px",
@@ -448,12 +496,14 @@ END:VCARD`;
                   🎓 Education
                 </h3>
                 <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
-                  2+ Degrees in entrepreneurial innovation with expertise in
-                  high-fashion branding and strategic leadership.
+                  4+ degrees with majors in Business and Computer Science,
+                  minors in Marketing and Economics, and certified in
+                  Cybersecurity and AI/ML technologies.
                 </p>
               </div>
 
               <div
+                id="experience"
                 style={{
                   background: "rgba(65, 105, 225, 0.1)",
                   padding: "30px",
@@ -475,40 +525,6 @@ END:VCARD`;
                   platforms, and blockchain integration.
                 </p>
               </div>
-            </div>
-
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.05)",
-                padding: "40px",
-                borderRadius: "20px",
-                textAlign: "left",
-                lineHeight: "1.8",
-                color: "#e0e0e0",
-              }}
-            >
-              <p style={{ marginBottom: "20px" }}>
-                I am an entrepreneurial innovator with a keen eye for detail and
-                a commitment to excellence. My experience spans high-fashion
-                branding, where I develop exclusive, luxury-focused projects, to
-                strategic leadership in the music industry, creating platforms
-                that empower artists through technology and creative services.
-              </p>
-              <p style={{ marginBottom: "20px" }}>
-                With a strong foundation in web development and tech solutions,
-                I craft interactive, client-centric digital experiences using
-                the latest frameworks. I am deeply invested in community
-                building and mentorship, exploring ways to drive blockchain
-                adoption by integrating it into business operations to create
-                efficiencies and enhance customer loyalty.
-              </p>
-              <p>
-                Known for my strategic foresight, I create impactful plans that
-                blend business acumen with technological integration. Guided by
-                an ambitious vision, I consistently pursue unique opportunities
-                that push the boundaries of innovation and align with long-term
-                success.
-              </p>
             </div>
 
             <div
