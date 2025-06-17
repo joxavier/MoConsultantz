@@ -181,11 +181,36 @@ END:VCARD`;
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "48px",
-                color: "#ffffff",
+                overflow: "hidden",
               }}
             >
-              👨‍💼
+              <Image
+                src="/hero.jpg"
+                alt="Joshua Xavier"
+                width={112}
+                height={112}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  display: "block",
+                }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  const fallback = document.createElement("div");
+                  fallback.style.width = "100%";
+                  fallback.style.height = "100%";
+                  fallback.style.display = "flex";
+                  fallback.style.alignItems = "center";
+                  fallback.style.justifyContent = "center";
+                  fallback.style.fontSize = "48px";
+                  fallback.style.color = "#ffffff";
+                  fallback.textContent = "👨‍💼";
+                  target.parentNode?.appendChild(fallback);
+                }}
+              />
             </div>
           </div>
         </div>
@@ -224,11 +249,36 @@ END:VCARD`;
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "40px",
-                color: "#ffffff",
+                overflow: "hidden",
               }}
             >
-              👨‍💼
+              <Image
+                src="/hero.jpg"
+                alt="Joshua Xavier"
+                width={112}
+                height={112}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  display: "block",
+                }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  const fallback = document.createElement("div");
+                  fallback.style.width = "100%";
+                  fallback.style.height = "100%";
+                  fallback.style.display = "flex";
+                  fallback.style.alignItems = "center";
+                  fallback.style.justifyContent = "center";
+                  fallback.style.fontSize = "48px";
+                  fallback.style.color = "#ffffff";
+                  fallback.textContent = "👨‍💼";
+                  target.parentNode?.appendChild(fallback);
+                }}
+              />
             </div>
           </div>
 
