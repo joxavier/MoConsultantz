@@ -54,7 +54,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (currentHost == "joxavier" || currentHost == "josh") {
-    url.pathname = `/consultantz/team/joxavier/${url.pathname}`;
+    url.pathname = `/consultantz/team/josh/${url.pathname}`;
     return NextResponse.rewrite(url);
   }
 
