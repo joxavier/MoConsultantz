@@ -489,6 +489,7 @@ END:VCARD`;
               style={{
                 background: "rgba(255, 255, 255, 0.05)",
                 padding: "40px",
+                marginBottom: "20px",
                 borderRadius: "20px",
                 textAlign: "left",
                 lineHeight: "1.8",
