@@ -50,7 +50,47 @@
         "role": "Software Architect",
         "tagline": "Where Small Business Happens",
         "bio": [
-            "I am an entrepreneurial innovator with a keen eye for detail and a commitment to excellence. My experience spans high-fashion branding, where I develop exclusive, luxury-focused projects, to strategic leadership in the music industry, creating platforms that empower artists through technology and creative services.",
+            "I am an entrepreneurial innovator with a keen eye for detail and a commitment to excellence. My experience spans branding, where I develop exclusive, tech-focused projects, to strategic leadership in the blockchain industry, creating platforms that empower artists through technology and creative services.",
+            "With a strong foundation in web development and tech solutions, I craft interactive, client-centric digital experiences using the latest frameworks. I am deeply invested in community building and mentorship, exploring ways to drive blockchain adoption by integrating it into business operations to create efficiencies and enhance customer loyalty.",
+            "Known for my strategic foresight, I create impactful plans that blend business acumen with technological integration. Guided by an ambitious vision, I consistently pursue unique opportunities that push the boundaries of innovation and align with long-term success."
+        ],
+        "education": "2+ Degrees in entrepreneurial innovation with expertise in high-fashion branding and strategic leadership.",
+        "experience": "Years of experience spanning web development, music industry platforms, and blockchain integration.",
+        "socialLinks": [
+            {
+                "name": "LinkedIn",
+                "url": "#",
+                "icon": "💼"
+            },
+            {
+                "name": "Twitter",
+                "url": "#",
+                "icon": "🐦"
+            },
+            {
+                "name": "Instagram",
+                "url": "#",
+                "icon": "📸"
+            },
+            {
+                "name": "Email",
+                "url": "mailto:mo@modevz.ca",
+                "icon": "✉️"
+            }
+        ]
+    },
+        {
+        "id": "kellman",
+        "displayPicture": "/kellmanHero.jpg",
+        "name": "Kellman",
+        "company": "MoDevz",
+        "email": "mo@modevz.ca",
+        "phone": "+1-XXX-XXX-XXXX",
+        "website": "https://josh.modevz.ca",
+        "role": "Tech Sales Professionalt",
+        "tagline": "Where Small Business Happens",
+        "bio": [
+            "Success in sales isn’t just about closing deals—it’s about building trust and fostering meaningful relationships. As a tech sales professional, I believe in acting as a consultant first, understanding client needs deeply, and delivering solutions that drive real impact.",
             "With a strong foundation in web development and tech solutions, I craft interactive, client-centric digital experiences using the latest frameworks. I am deeply invested in community building and mentorship, exploring ways to drive blockchain adoption by integrating it into business operations to create efficiencies and enhance customer loyalty.",
             "Known for my strategic foresight, I create impactful plans that blend business acumen with technological integration. Guided by an ambitious vision, I consistently pursue unique opportunities that push the boundaries of innovation and align with long-term success."
         ],

@@ -1,0 +1,933 @@
+"use client";
+import { useState, useRef } from "react";
+import Head from "next/head";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import Highlights from "./Highlights";
+import personalPageData from "@/data/kellmanPersonalPage.json";
+
+export default function PersonalPage() {
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    date: "",
+    time: "",
+    service: "consultation",
+  });
+  const moreInfoRef = useRef<HTMLDivElement>(null);
+  const { hero, highlights } = personalPageData;
+
+  const handleSaveContact = () => {
+    const contact = {
+      name: "Kellman Gnanapragasam",
+      company: "Mo - Where Small Business Happens",
+      email: "kellman@modevz.ca",
+      phone: "+1-647-525-3344",
+      website: "https://kellman.modevz.ca",
+    };
+
+    const vCard = `BEGIN:VCARD
+VERSION:3.0
+FN:${contact.name}
+ORG:${contact.company}
+EMAIL:${contact.email}
+TEL:${contact.phone}
+URL:${contact.website}
+END:VCARD`;
+
+    const blob = new Blob([vCard], { type: "text/vcard" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Kellman-G-MoDevz-contact.vcf";
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleBookingSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    // Here you would integrate with your payment processor
+    alert(
+      "Booking form submitted! This would integrate with your payment system."
+    );
+    setShowBookingForm(false);
+  };
+
+  const scrollToMoreInfo = () => {
+    moreInfoRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const socialLinks = [
+    {
+      name: "LinkedIn",
+      url: "https://www.linkedin.com/in/kellman-gnanapragasam-11615b161/",
+      icon: "💼",
+    },
+    { name: "Twitter", url: "#", icon: "🐦" },
+    {
+      name: "Instagram",
+      url: "https://www.instagram.com/kmang1998/",
+      icon: "📸",
+    },
+    { name: "Email", url: "mailto:kellman@modevz.ca", icon: "✉️" },
+  ];
+
+  let darkModeActive = useTheme().systemTheme === "dark"; //false;
+
+  return (
+    <>
+      <Head>
+        <title>Mo | Where Small Business Happens</title>
+        <meta
+          name="description"
+          content="Entrepreneurial innovator specializing in high-fashion branding, music industry leadership, and web development."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+
+      <div
+        style={{
+          minHeight: "100vh",
+          background:
+            "linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d1b69 100%)",
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        }}
+      >
+        <style jsx>{`
+          @media (max-width: 768px) {
+            .desktop-profile {
+              display: none !important;
+            }
+            .mobile-profile-overlap {
+              display: flex !important;
+            }
+          }
+
+          @media (min-width: 769px) {
+            .desktop-profile {
+              display: flex !important;
+            }
+            .mobile-profile-overlap {
+              display: none !important;
+            }
+          }
+        `}</style>
+
+        {/* Top Half - SVG Image */}
+        <div
+          style={{
+            height: "50vh",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background:
+              "linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d1b69 100%)",
+            padding: "20px",
+            boxSizing: "border-box",
+            position: "relative", // required for Image fill
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <Image
+              src="/mo.svg"
+              alt="Mo Logo"
+              fill
+              style={{
+                objectFit: "contain",
+                filter: darkModeActive ? "invert(100%)" : "none",
+              }}
+              className="rounded-xl"
+            />
+          </div>
+        </div>
+
+        <div
+          className="mobile-profile-overlap"
+          style={{
+            position: "relative",
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "-60px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              width: "120px",
+              height: "120px",
+              borderRadius: "50%",
+              background: "linear-gradient(45deg, #8a2be2, #4169e1)",
+              padding: "4px",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                background: "#333",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src="/kellmanHero.jpg"
+                alt="Kellman Gnanapragasam"
+                width={112}
+                height={112}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  display: "block",
+                }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  const fallback = document.createElement("div");
+                  fallback.style.width = "100%";
+                  fallback.style.height = "100%";
+                  fallback.style.display = "flex";
+                  fallback.style.alignItems = "center";
+                  fallback.style.justifyContent = "center";
+                  fallback.style.fontSize = "48px";
+                  fallback.style.color = "#ffffff";
+                  fallback.textContent = "👨‍💼";
+                  target.parentNode?.appendChild(fallback);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Half - Content Section */}
+        <div
+          style={{
+            minHeight: "50vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px 20px 40px",
+            textAlign: "center",
+            background: "linear-gradient(135deg, #1a1a1a 0%, #000000 100%)",
+          }}
+        >
+          {/* Desktop Profile Picture */}
+          <div
+            className="desktop-profile"
+            style={{
+              width: "100px",
+              height: "100px",
+              borderRadius: "50%",
+              background: "linear-gradient(45deg, #8a2be2, #4169e1)",
+              padding: "3px",
+              marginBottom: "20px",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                background: "#333",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src="/kellmanhero.jpg"
+                alt="Kellman Gnanapragasam"
+                width={112}
+                height={112}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  display: "block",
+                }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = "none";
+                  const fallback = document.createElement("div");
+                  fallback.style.width = "100%";
+                  fallback.style.height = "100%";
+                  fallback.style.display = "flex";
+                  fallback.style.alignItems = "center";
+                  fallback.style.justifyContent = "center";
+                  fallback.style.fontSize = "48px";
+                  fallback.style.color = "#ffffff";
+                  fallback.textContent = "👨‍💼";
+                  target.parentNode?.appendChild(fallback);
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Title */}
+          <h2
+            style={{
+              color: "#ffffff",
+              fontSize: "18px",
+              fontWeight: "600",
+              marginBottom: "8px",
+              margin: "0 0 8px 0",
+            }}
+          >
+            Tech Sales Professional
+          </h2>
+
+          <p
+            style={{
+              color: "#cccccc",
+              fontSize: "16px",
+              marginBottom: "30px",
+              margin: "0 0 30px 0",
+            }}
+          >
+            Where Small Business Happens
+          </p>
+
+          {/* Social Links */}
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              marginBottom: "40px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
+            {socialLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link.url}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  color: "#ffffff",
+                  textDecoration: "none",
+                  fontSize: "20px",
+                  transition: "all 0.3s ease",
+                  border: "1px solid rgba(138, 43, 226, 0.3)",
+                }}
+                onMouseEnter={(e) => {
+                  const target = e.target as HTMLAnchorElement;
+                  target.style.background =
+                    "linear-gradient(45deg, #8a2be2, #4169e1)";
+                  target.style.transform = "scale(1.1)";
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.target as HTMLAnchorElement;
+                  target.style.background = "rgba(255, 255, 255, 0.1)";
+                  target.style.transform = "scale(1)";
+                }}
+              >
+                {link.icon}
+              </a>
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              width: "100%",
+              maxWidth: "300px",
+            }}
+          >
+            <button
+              onClick={handleSaveContact}
+              style={{
+                padding: "16px 24px",
+                borderRadius: "50px",
+                border: "2px solid #8a2be2",
+                background: "linear-gradient(45deg, #8a2be2, #4169e1)",
+                color: "#ffffff",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                textAlign: "center",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLButtonElement).style.transform =
+                  "translateY(-2px)";
+                (e.target as HTMLButtonElement).style.boxShadow =
+                  "0 10px 25px rgba(138, 43, 226, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLButtonElement).style.transform =
+                  "translateY(0)";
+                (e.target as HTMLButtonElement).style.boxShadow = "none";
+              }}
+            >
+              💾 Save Contact
+            </button>
+
+            <button
+              onClick={() => setShowBookingForm(true)}
+              style={{
+                padding: "16px 24px",
+                borderRadius: "50px",
+                border: "2px solid #4169e1",
+                background: "transparent",
+                color: "#4169e1",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                textAlign: "center",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLButtonElement).style.background = "#4169e1";
+                (e.target as HTMLButtonElement).style.color = "#ffffff";
+                (e.target as HTMLButtonElement).style.transform =
+                  "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLButtonElement).style.background =
+                  "transparent";
+                (e.target as HTMLButtonElement).style.color = "#4169e1";
+                (e.target as HTMLButtonElement).style.transform =
+                  "translateY(0)";
+              }}
+            >
+              📅 Book Now
+            </button>
+
+            <button
+              onClick={scrollToMoreInfo}
+              style={{
+                padding: "16px 24px",
+                borderRadius: "50px",
+                border: "2px solid rgba(255, 255, 255, 0.3)",
+                background: "transparent",
+                color: "#ffffff",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                textAlign: "center",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLButtonElement).style.background =
+                  "rgba(255, 255, 255, 0.1)";
+                (e.target as HTMLButtonElement).style.transform =
+                  "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLButtonElement).style.background =
+                  "transparent";
+                (e.target as HTMLButtonElement).style.transform =
+                  "translateY(0)";
+              }}
+            >
+              ℹ️ More Info
+            </button>
+          </div>
+        </div>
+
+        {/* More Info Section */}
+        <div
+          ref={moreInfoRef}
+          style={{
+            padding: "80px 20px",
+            background: "linear-gradient(135deg, #1a1a1a 0%, #000000 100%)",
+            color: "#ffffff",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "800px",
+              margin: "0 auto",
+              textAlign: "center",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "32px",
+                fontWeight: "700",
+                marginBottom: "40px",
+                background: "linear-gradient(45deg, #8a2be2, #4169e1)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              About Me
+            </h2>
+
+            <Highlights highlights={highlights} />
+
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.05)",
+                padding: "40px",
+                marginBottom: "20px",
+                borderRadius: "20px",
+                textAlign: "left",
+                lineHeight: "1.8",
+                color: "#e0e0e0",
+              }}
+            >
+              <p style={{ marginBottom: "20px" }}>
+                Success in sales isn’t just about closing deals—it’s about
+                building trust and fostering meaningful relationships. As a tech
+                sales professional, I believe in acting as a consultant first,
+                understanding client needs deeply, and delivering solutions that
+                drive real impact.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                With a proven track record in Customer Success, Account
+                Management, and Business Development, I’ve helped businesses
+                grow by leveraging data-driven strategies, consultative selling,
+                and a customer-first approach. From surpassing sales targets by
+                149% to contributing over $800,000 in ARR, I thrive on creating
+                win-win outcomes for clients and companies alike.
+              </p>
+              <p>
+                Let’s connect to collaborate, innovate, and drive success
+                together!
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+                gap: "30px",
+                marginBottom: "50px",
+              }}
+            >
+              {/*<div
+                id="qualifications"
+                style={{
+                  background: "rgba(138, 43, 226, 0.1)",
+                  padding: "30px",
+                  borderRadius: "20px",
+                  border: "1px solid rgba(138, 43, 226, 0.3)",
+                }}
+              >
+                <h3
+                  style={{
+                    color: "#8a2be2",
+                    marginBottom: "15px",
+                    fontSize: "20px",
+                  }}
+                >
+                  🎓 Education
+                </h3>
+                <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
+                  4+ degrees with majors in Business and Computer Science,
+                  minors in Marketing and Economics, and certified in
+                  Cybersecurity and AI/ML technologies.
+                </p>
+              </div>*/}
+
+              <div
+                id="experience"
+                style={{
+                  background: "rgba(65, 105, 225, 0.1)",
+                  padding: "30px",
+                  borderRadius: "20px",
+                  border: "1px solid rgba(65, 105, 225, 0.3)",
+                }}
+              >
+                <h3
+                  style={{
+                    color: "#4169e1",
+                    marginBottom: "15px",
+                    fontSize: "20px",
+                  }}
+                >
+                  💼 Experience
+                </h3>
+                <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
+                  Years of experience spanning web development, music industry
+                  platforms, and blockchain integration.
+                </p>
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: "50px",
+                padding: "30px",
+                background:
+                  "linear-gradient(45deg, rgba(138, 43, 226, 0.2), rgba(65, 105, 225, 0.2))",
+                borderRadius: "20px",
+                border: "1px solid rgba(138, 43, 226, 0.3)",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "24px",
+                  marginBottom: "15px",
+                  color: "#ffffff",
+                }}
+              >
+                🎯 New Here?
+              </h3>
+              <p
+                style={{
+                  color: "#cccccc",
+                  marginBottom: "20px",
+                  fontSize: "16px",
+                }}
+              >
+                Mention &quot;Free Consultation&quot; in comments when booking
+              </p>
+              <button
+                onClick={() => setShowBookingForm(true)}
+                style={{
+                  padding: "16px 32px",
+                  borderRadius: "50px",
+                  border: "none",
+                  background: "linear-gradient(45deg, #8a2be2, #4169e1)",
+                  color: "#ffffff",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.target as HTMLButtonElement).style.transform =
+                    "scale(1.05)";
+                  (e.target as HTMLButtonElement).style.boxShadow =
+                    "0 10px 25px rgba(138, 43, 226, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.target as HTMLButtonElement).style.transform = "scale(1)";
+                  (e.target as HTMLButtonElement).style.boxShadow = "none";
+                }}
+              >
+                Get Started Today
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Booking Form Modal */}
+        {showBookingForm && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.8)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              padding: "20px",
+            }}
+          >
+            <div
+              style={{
+                background: "linear-gradient(135deg, #1a1a1a, #2d1b69)",
+                padding: "40px",
+                borderRadius: "20px",
+                width: "100%",
+                maxWidth: "500px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                border: "1px solid rgba(138, 43, 226, 0.3)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "30px",
+                }}
+              >
+                <h2
+                  style={{
+                    color: "#ffffff",
+                    fontSize: "24px",
+                    margin: 0,
+                  }}
+                >
+                  Book Consultation
+                </h2>
+                <button
+                  onClick={() => setShowBookingForm(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#ffffff",
+                    fontSize: "24px",
+                    cursor: "pointer",
+                    padding: "5px",
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleBookingSubmit}>
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      color: "#ffffff",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={bookingData.name}
+                    onChange={(e) =>
+                      setBookingData({ ...bookingData, name: e.target.value })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(138, 43, 226, 0.3)",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      color: "#ffffff",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      color: "#ffffff",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={bookingData.email}
+                    onChange={(e) =>
+                      setBookingData({ ...bookingData, email: e.target.value })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(138, 43, 226, 0.3)",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      color: "#ffffff",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      color: "#ffffff",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={bookingData.phone}
+                    onChange={(e) =>
+                      setBookingData({ ...bookingData, phone: e.target.value })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(138, 43, 226, 0.3)",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      color: "#ffffff",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
+                    }}
+                  />
+                </div>
+
+                <div
+                  style={{ display: "flex", gap: "15px", marginBottom: "20px" }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <label
+                      style={{
+                        display: "block",
+                        color: "#ffffff",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={bookingData.date}
+                      onChange={(e) =>
+                        setBookingData({ ...bookingData, date: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "12px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(138, 43, 226, 0.3)",
+                        background: "rgba(255, 255, 255, 0.1)",
+                        color: "#ffffff",
+                        fontSize: "16px",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label
+                      style={{
+                        display: "block",
+                        color: "#ffffff",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Time *
+                    </label>
+                    <input
+                      type="time"
+                      required
+                      value={bookingData.time}
+                      onChange={(e) =>
+                        setBookingData({ ...bookingData, time: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "12px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(138, 43, 226, 0.3)",
+                        background: "rgba(255, 255, 255, 0.1)",
+                        color: "#ffffff",
+                        fontSize: "16px",
+                        boxSizing: "border-box",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: "30px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      color: "#ffffff",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    Service Type
+                  </label>
+                  <select
+                    value={bookingData.service}
+                    onChange={(e) =>
+                      setBookingData({
+                        ...bookingData,
+                        service: e.target.value,
+                      })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: "1px solid rgba(138, 43, 226, 0.3)",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      color: "#ffffff",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <option value="consultation">Free Consultation</option>
+                    <option value="branding">Branding Strategy</option>
+                    <option value="web-dev">Web Development</option>
+                    <option value="blockchain">Blockchain Integration</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  style={{
+                    width: "100%",
+                    padding: "16px",
+                    borderRadius: "50px",
+                    border: "none",
+                    background: "linear-gradient(45deg, #8a2be2, #4169e1)",
+                    color: "#ffffff",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLButtonElement).style.transform =
+                      "translateY(-2px)";
+                    (e.target as HTMLButtonElement).style.boxShadow =
+                      "0 10px 25px rgba(138, 43, 226, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLButtonElement).style.transform =
+                      "translateY(0)";
+                    (e.target as HTMLButtonElement).style.boxShadow = "none";
+                  }}
+                >
+                  Book & Pay Now
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

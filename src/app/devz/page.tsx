@@ -25,7 +25,7 @@ export default function Devz() {
       title: "E-Commerce",
       description: "Elevate your e-commerce venture with our comprehensive package. From online payment processing to inventory management, we ensure a seamless journey. Specializing in custom designs and social media content to boost your digital footprint."
     },
-    {
+    /*{
       title: "Digital Marketing",
       description: "Amplify your online presence with our Digital Marketing solutions. Our expert team crafts tailored strategies to boost your brand visibility, engage your audience, and drive conversions, helping you reach your business goals effectively."
     },
@@ -36,7 +36,15 @@ export default function Devz() {
     {
       title: "Cybersecurity",
       description: "Protect your business from online threats with our Cybersecurity services. We offer comprehensive solutions to safeguard your digital assets, including data encryption, threat detection, and proactive security measures, ensuring peace of mind in an increasingly interconnected world."
-    }
+    },
+    {
+      title: "Bookkeeping & Accounting",
+      description: "Simplify your financial operations using open-source accounting tools. We provide transparent, cost-effective bookkeeping and accounting services designed for small businesses, helping you stay compliant and financially informed."
+    },
+    {
+      title: "Small Business Consulting & Financing",
+      description: "Unlock your business’s potential with expert consulting and access to funding. Whether you're starting out or scaling up, we offer personalized guidance, strategic planning, and financing support to help you achieve your goals."
+    }*/
   ];
 
   useEffect(() => {
