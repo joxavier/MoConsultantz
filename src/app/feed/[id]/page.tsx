@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Head from 'next/head';
 import articlesData from '../articles.json';
+import CanadaEconomicOutlook from './canada_economic_outlook';
 
 interface Article {
   id: string;
@@ -17,12 +18,23 @@ interface Article {
   readTime: string;
 }
 
+const slugify = (title: string) =>
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "") // remove non-alphanumeric
+    .trim()
+    .replace(/\s+/g, "-");
+
+
 const ArticlePage: React.FC = () => {
   const params = useParams();
-  const id = params?.id as string;
+   const routeParam = params?.id as string; // could be id OR slug
 
   // articlesData is an array, so find the article by id
-  const article = (articlesData as Article[]).find((a) => a.id === id);
+  //const article = (articlesData as Article[]).find((a) => a.id === id);
+  const article = (articlesData as Article[]).find(
+    (a) => a.id === routeParam || slugify(a.title) === routeParam
+  );
 
   if (!article) {
     return (
@@ -33,6 +45,15 @@ const ArticlePage: React.FC = () => {
             Return to Feed
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  if (article.id === "6") {
+    console.warn(slugify(article.title));
+    return (
+      <div className="min-h-screen mt-12 flex items-center justify-center">
+        <CanadaEconomicOutlook />
       </div>
     );
   }
