@@ -65,73 +65,73 @@ const CanadaEconomyChart: React.FC<CanadaEconomyChartProps> = ({ height = 500 })
     const cpiData = [100, 102, 104, 107, 110, 112, 117, 122, 126, 129, 132];
     
     // Bitcoin closing prices from CSV data
-    const btcPrices = {
-      2015: 430.566986084,
-      2016: 963.742980957,
-      2017: 14156.400390625,
-      2018: 3742.70033544,
-      2019: 7193.59897843,
-      2020: 29001.71982218,
-      2021: 46306.4461226996,
-      2022: 16547.4953660162,
-      2023: 42265.185654866,
-      2024: 67489.6117770498,
-      2025: 115758.2039287926
+    const btcPrices: Record<string, number> = {
+      "2015": 430.566986084,
+      "2016": 963.742980957,
+      "2017": 14156.400390625,
+      "2018": 3742.70033544,
+      "2019": 7193.59897843,
+      "2020": 29001.71982218,
+      "2021": 46306.4461226996,
+      "2022": 16547.4953660162,
+      "2023": 42265.185654866,
+      "2024": 67489.6117770498,
+      "2025": 115758.2039287926
     };
 
     // META stock prices (estimated based on historical data and FB IPO in 2012)
-    const metaPrices = {
-      2015: 102.0,  // Post-IPO growth period
-      2016: 115.0,  // Steady growth
-      2017: 176.0,  // Strong user growth
-      2018: 131.0,  // Privacy concerns impact
-      2019: 205.0,  // Recovery
-      2020: 273.0,  // COVID boost
-      2021: 338.0,  // Peak metaverse hype
-      2022: 123.0,  // Reality Labs losses
-      2023: 353.0,  // AI recovery
-      2024: 504.0,  // Based on search results
-      2025: 770.0   // Current approximate price from search
+    const metaPrices: Record<string, number> = {
+      "2015": 102.0,  // Post-IPO growth period
+      "2016": 115.0,  // Steady growth
+      "2017": 176.0,  // Strong user growth
+      "2018": 131.0,  // Privacy concerns impact
+      "2019": 205.0,  // Recovery
+      "2020": 273.0,  // COVID boost
+      "2021": 338.0,  // Peak metaverse hype
+      "2022": 123.0,  // Reality Labs losses
+      "2023": 353.0,  // AI recovery
+      "2024": 504.0,  // Based on search results
+      "2025": 770.0   // Current approximate price from search
     };
 
     // Gold prices (USD per troy ounce, estimated historical averages)
-    const goldPrices = {
-      2015: 1160,
-      2016: 1250,
-      2017: 1270,
-      2018: 1270,
-      2019: 1390,
-      2020: 1770,  // COVID flight to safety
-      2021: 1800,
-      2022: 1940,
-      2023: 1970,
-      2024: 2350,
-      2025: 3400   // Based on search results showing recent highs
+    const goldPrices: Record<string, number> = {
+      "2015": 1160,
+      "2016": 1250,
+      "2017": 1270,
+      "2018": 1270,
+      "2019": 1390,
+      "2020": 1770,  // COVID flight to safety
+      "2021": 1800,
+      "2022": 1940,
+      "2023": 1970,
+      "2024": 2350,
+      "2025": 3400   // Based on search results showing recent highs
     };
 
     // Oil prices (WTI crude, USD per barrel, estimated historical averages)
-    const oilPrices = {
-      2015: 48,
-      2016: 43,
-      2017: 51,
-      2018: 65,
-      2019: 57,
-      2020: 39,   // COVID crash
-      2021: 68,   // Recovery
-      2022: 95,   // Ukraine war spike
-      2023: 78,
-      2024: 77,
-      2025: 63    // Based on search results showing recent decline
+    const oilPrices: Record<string, number> = {
+      "2015": 48,
+      "2016": 43,
+      "2017": 51,
+      "2018": 65,
+      "2019": 57,
+      "2020": 39,   // COVID crash
+      "2021": 68,   // Recovery
+      "2022": 95,   // Ukraine war spike
+      "2023": 78,
+      "2024": 77,
+      "2025": 63    // Based on search results showing recent decline
     };
 
     return years.map((year, index) => ({
       year,
       gdp: gdpData[index],
       cpi: cpiData[index],
-      btc: btcPrices[year],
-      meta: metaPrices[year],
-      gold: goldPrices[year],
-      oil: oilPrices[year]
+      btc: btcPrices[String(year)],
+      meta: metaPrices[String(year)],
+      gold: goldPrices[String(year)],
+      oil: oilPrices[String(year)]
     }));
   }, []);
 
@@ -141,7 +141,11 @@ const CanadaEconomyChart: React.FC<CanadaEconomyChartProps> = ({ height = 500 })
     
     if (!baseYearData) return [];
 
-    const calculateBaseYearChange = (current, base) => {
+    interface CalculateBaseYearChange {
+      (current: number, base: number): number;
+    }
+
+    const calculateBaseYearChange: CalculateBaseYearChange = (current, base) => {
       return base !== 0 ? ((current - base) / base) * 100 : 0;
     };
 
@@ -272,7 +276,7 @@ const CanadaEconomyChart: React.FC<CanadaEconomyChartProps> = ({ height = 500 })
                   <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={() => handleAssetToggle(asset)}
+                    onChange={() => handleAssetToggle(asset as keyof SelectedAssets)}
                     className="mr-2 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: assetConfig[asset].color }}></div>
