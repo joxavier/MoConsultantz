@@ -6,6 +6,7 @@ import Head from "next/head";
 // If your file exists at src/components/CanadaEconomyChart.tsx, keep this import.
 // Otherwise, update the path below to the correct relative path, for example:
 import CanadaEconomyChart from "../../components/CanadaEconomyChart2";
+import EventTimeline from "./event-timeline";
 // Or, if your tsconfig.json does not support '@' alias, use a relative path.
 import Recommendation from "./recommendations";
 
@@ -197,7 +198,7 @@ Published by Joshua Xavier - August 9, 2025
 
             {/* Title */}
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
-              Canada&apos;s Post-Pandemic Economic Outlook
+              Economic Outlook: Canada&apos;s Post-Pandemic Reality
             </h1>
             <h2 className="text-xl md:text-2xl font-medium text-red-100 mb-8 opacity-90">
               Challenges and Opportunities in a New World
@@ -210,14 +211,23 @@ Published by Joshua Xavier - August 9, 2025
                   JX
                 </div>
                 <div>
-                  <p className="font-semibold text-white">Joshua Xavier</p>
+                  <p className="font-semibold text-white">
+                    <a
+                      href="https://josh.modevz.ca/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-red-200 transition-colors"
+                    >
+                      Joshua Xavier
+                    </a>
+                  </p>
                   <p className="text-sm">Technical Consultant</p>
                 </div>
               </div>
               <div className="hidden md:block w-px h-8 bg-white/30"></div>
               <div className="text-sm">
-                <p>Published: August 9, 2025</p>
-                <p>Reading time: 6 minutes</p>
+                <p>Published: October 1st, 2025</p>
+                <p>Reading time: 8 minutes</p>
               </div>
             </div>
 
@@ -233,22 +243,31 @@ Published by Joshua Xavier - August 9, 2025
             {/* Introduction Text */}
             <div className="prose prose-lg max-w-none text-red-50 leading-relaxed">
               <p className="text-xl font-medium mb-4">
-                As the world steadily moves beyond the shadows of the COVID-19
-                pandemic, Canada stands at a pivotal economic crossroads. While
-                the country has demonstrated remarkable resilience during an
-                unprecedented global crisis, the path ahead is marked by both
-                significant challenges and promising opportunities.
+                The COVID-19 pandemic tested Canada’s economic resilience and
+                reshaped the way businesses operate. From disrupted supply
+                chains to labor shortages and surging costs, small businesses
+                were forced to adapt quickly. At the same time, the crisis
+                accelerated trends in digital adoption, consumer behavior, and
+                workforce expectations.
+              </p>
+              <p className="text-xl font-medium mb-4">
+                As the Canadian economy transitions to the post-pandemic era,
+                small business owners and decision makers face a defining
+                question: how can they position themselves not just to recover,
+                but to thrive in a more dynamic, unpredictable market?
               </p>
               <p className="text-lg">
-                In this analysis, we explore Canada&apos;s post-pandemic
-                economic outlook, highlighting the sectors under pressure,
-                emerging growth drivers, and strategic actions needed to foster
-                long-term prosperity.
+                This article highlights the short- and long-term impacts of the
+                pandemic on Canada&apos;s business landscape and provides
+                actionable strategies for entrepreneurs, illustrated by Canadian
+                companies already leading the way.
               </p>
             </div>
           </div>
 
           {/* Body Content */}
+          <EventTimeline />
+
           <section className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/20 mb-8">
             <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
               <svg
@@ -264,250 +283,80 @@ Published by Joshua Xavier - August 9, 2025
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              Canada&apos;s Economic Performance Overview
+              Economic Performance Overview
             </h3>
 
-            <p className="text-lg mb-4">
-              Canada entered the COVID-19 crisis on relatively strong footing,
-              but the pandemic triggered sharp contractions in GDP, steep
-              unemployment surges (peaking at 13.7% in May 2020), and economic
-              disruption. The combined monetary and fiscal response was swift
-              and robust: the Bank of Canada slashed its policy rate to
-              near-zero, initiated quantitative easing, while the federal
-              government rolled out groundbreaking income and wage-support
-              programs (CERB, CEWS) alongside public-health restrictions.
-            </p>
-            <p className="text-lg mb-4">
-              These actions helped stabilize household incomes and preserve the
-              business-labour connection — enabling a powerful rebound in GDP
-              during 2021–2022. However, reopening-driven demand, global supply
-              constraints, and energy shocks fueled inflation. From late 2022
-              through 2024, monetary tightening and easing external pressures
-              gradually brought inflation toward target while growth cooled and
-              unemployment edged back toward pre-pandemic averages (~6–7%).
-            </p>
-            <p className="text-lg mb-4">
-              Meanwhile, climate-related economic risks — including natural
-              disasters damaging infrastructure and disrupting output — are
-              becoming increasingly material, underscoring the importance of
-              sustainable, resilient policy frameworks for the future.
-            </p>
-          </section>
+            <div className="space-y-4 text-lg">
+              <h4 className="text-xl font-semibold text-white mb-3">
+                Canada&apos;s Pandemic Response and Business Implications
+              </h4>
+              <p>
+                Government intervention was decisive in preventing widespread
+                economic collapse through Emergency Support Programs such as
+                CERB and wage subsidies that kept households afloat and allowed
+                businesses to retain employees. Low Interest Rates made
+                borrowing easier, encouraging investment and survival through
+                credit, while Digital Acceleration saw companies rapidly adopt
+                e-commerce, remote work, and virtual services.
+              </p>
 
-          <section className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/20 mb-8">
-            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 17l6-6 4 4 8-8"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 5h6v6"
-                />
-              </svg>
-              Economic trajectory (2015–2025)
-            </h3>
+              <p>
+                These measures created breathing room, but also set the stage
+                for today&apos;s challenges: inflationary pressure, housing
+                affordability crises, and structural labor market shifts.
+              </p>
 
-            <h4 className="text-lg text-red-200 mb-4">
-              Policy actions and what drove the swings
-            </h4>
+              <div className="bg-white/5 rounded-xl p-6 mt-6">
+                <h4 className="text-xl font-semibold text-white mb-3">
+                  Short-Term Effects Business Owners Must Manage
+                </h4>
+                <ul className="space-y-2 text-white/90">
+                  <li>
+                    <strong>Rising Operating Costs</strong> – Higher input
+                    prices, rent, and wages are squeezing margins
+                  </li>
+                  <li>
+                    <strong>Talent Competition</strong> – Recruiting and
+                    retaining skilled workers remains difficult
+                  </li>
+                  <li>
+                    <strong>Supply Chain Volatility</strong> – Global
+                    disruptions continue to impact delivery times and costs
+                  </li>
+                  <li>
+                    <strong>Shifting Consumer Spending</strong> – With housing
+                    and essentials consuming more income, discretionary spending
+                    is under pressure
+                  </li>
+                </ul>
+              </div>
 
-            <p className="text-lg mb-4">
-              Between 2015 and 2019, Canada’s{" "}
-              <a
-                href="https://www150.statcan.gc.ca/n1/daily-quotidien/200228/dq200228a-eng.htm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-300"
-              >
-                GDP
-              </a>{" "}
-              growth averaged around 2%, supported by strong global demand and
-              resource exports. The{" "}
-              <a
-                href="https://tradingeconomics.com/canada/stock-market"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-300"
-              >
-                TSX
-              </a>{" "}
-              rose steadily, reflecting business confidence and stable commodity
-              prices.
-            </p>
-
-            <p className="text-lg mb-4">
-              The COVID-19 pandemic in 2020 caused an{" "}
-              <a
-                href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3610022201"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-300"
-              >
-                unprecedented GDP contraction
-              </a>
-              , while the TSX plunged in March 2020 before rebounding on
-              stimulus measures and record-low interest rates.
-            </p>
-
-            <p className="text-lg mb-4">
-              By 2021–2022, recovery was underway, driven by fiscal stimulus,
-              commodity rebounds, and reopening effects. However, rising
-              inflation led the{" "}
-              <a
-                href="https://www.bankofcanada.ca/core-functions/monetary-policy/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-300"
-              >
-                Bank of Canada
-              </a>{" "}
-              to raise rates aggressively in 2022–2023, cooling housing markets
-              and slowing growth.
-            </p>
-
-            <p className="text-lg mb-4">
-              As of 2024–2025, growth is projected to remain modest, with
-              ongoing global uncertainty, tighter credit conditions, and shifts
-              toward green-energy investment shaping Canada’s economic path.
-            </p>
-          </section>
-
-          {/* Economic Data Table */}
-          <section className="bg-gradient-to-r from-white/15 to-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/20 mb-8">
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  fill="none"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h8M12 8v8"
-                />
-                <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-              </svg>
-              Event Timline
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-red-100">
-                <thead>
-                  <tr className="border-b border-white/30">
-                    <th className="text-left p-3 font-semibold text-white">
-                      Year
-                    </th>
-                    <th className="text-left p-3 font-semibold text-white">
-                      GDP Growth
-                    </th>
-                    <th className="text-left p-3 font-semibold text-white">
-                      Unemployment
-                    </th>
-                    <th className="text-left p-3 font-semibold text-white">
-                      CPI/Inflation
-                    </th>
-                    <th className="text-left p-3 font-semibold text-white">
-                      Key Policy & Economic Context
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2015–19</td>
-                    <td className="p-3">Moderate, commodity-sensitive</td>
-                    <td className="p-3">~6.9% decreasing</td>
-                    <td className="p-3">~1–2% steady</td>
-                    <td className="p-3">
-                      Pre-pandemic normalcy, stable housing and employment
-                    </td>
-                  </tr>
-                  <tr className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2020</td>
-                    <td className="p-3 text-red-300">–5.0%</td>
-                    <td className="p-3 text-red-300">13.7% peak</td>
-                    <td className="p-3">Initial dip → rising</td>
-                    <td className="p-3">
-                      Pandemic years: full lockdowns hit output; CERB & CEWS
-                      protected incomes; BoC slashed rates to 0.25% and launched
-                      QE
-                    </td>
-                  </tr>
-                  <tr className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2021</td>
-                    <td className="p-3 text-green-300">+5.3%</td>
-                    <td className="p-3 text-green-300">Falling from peak</td>
-                    <td className="p-3 text-yellow-300">Rising sharply</td>
-                    <td className="p-3">
-                      Reopening demand boosts growth; supply shocks + energy
-                      driven inflation; stimulus amplifies demand
-                    </td>
-                  </tr>
-                  <tr className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2022</td>
-                    <td className="p-3">~3.8%</td>
-                    <td className="p-3">Continued recovery</td>
-                    <td className="p-3 text-red-300">High inflation</td>
-                    <td className="p-3">
-                      BoC begins tightening, reducing QE; fiscal policy
-                      transitions from emergency to investment-oriented
-                    </td>
-                  </tr>
-                  <tr className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2023</td>
-                    <td className="p-3">~1.3%</td>
-                    <td className="p-3">~5–6%</td>
-                    <td className="p-3 text-green-300">
-                      Inflation eases (2–3%)
-                    </td>
-                    <td className="p-3">
-                      Further rate hikes, inflation moderates; Budget 2024
-                      begins clean tech and housing affordability tax credits
-                    </td>
-                  </tr>
-                  <tr className="border-b border-white/20 hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2024</td>
-                    <td className="p-3">Sluggish</td>
-                    <td className="p-3">~6–7%</td>
-                    <td className="p-3 text-green-300">
-                      Inflation near target
-                    </td>
-                    <td className="p-3">
-                      Rate cuts possible; spending continues on housing and
-                      zero-carbon investment
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-white/10 transition-colors">
-                    <td className="p-3 font-medium">2025</td>
-                    <td className="p-3">Stabilizing</td>
-                    <td className="p-3">~6.6–7.0%</td>
-                    <td className="p-3 text-green-300">~2.4%</td>
-                    <td className="p-3">
-                      Balanced policy stance; fiscal deficits narrowing;
-                      sustainable growth focus
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="bg-white/5 rounded-xl p-6">
+                <h4 className="text-xl font-semibold text-white mb-3">
+                  Long-Term Economic Shifts to Anticipate
+                </h4>
+                <ul className="space-y-2 text-white/90">
+                  <li>
+                    <strong>Digital-First Economy</strong> – Online presence and
+                    digital tools are now non-negotiable
+                  </li>
+                  <li>
+                    <strong>Sustainability and Health Priorities</strong> –
+                    Consumers demand greener, healthier, and more socially
+                    responsible offerings
+                  </li>
+                  <li>
+                    <strong>Demographic Transition</strong> – Aging populations
+                    create both labor shortages and opportunities in health and
+                    wellness
+                  </li>
+                  <li>
+                    <strong>Policy-Driven Opportunities</strong> – Government
+                    focus on housing, digital infrastructure, and clean energy
+                    opens new business niches
+                  </li>
+                </ul>
+              </div>
             </div>
           </section>
 
@@ -815,6 +664,152 @@ Published by Joshua Xavier - August 9, 2025
                   priority shifts.
                 </p>
               </div>
+            </div>
+          </section>
+
+          <section className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/20 mb-8">
+            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 17l6-6 4 4 8-8"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 5h6v6"
+                />
+              </svg>
+              Positioning Strategies for Small Business Owners
+            </h3>
+            <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-6 mt-6">
+              <div className="space-y-4">
+                <div>
+                  <h5 className="font-semibold text-white mb-2">
+                    1. Invest in Inclusive Workforce Development
+                  </h5>
+                  <p className="text-white/90 mb-2">
+                    Upskilling and reskilling will define long-term
+                    competitiveness. Businesses that create entry points for
+                    low-skill workers will benefit from loyalty and productivity
+                    gains.
+                  </p>
+                  <p className="text-sm text-blue-200">
+                    <em>
+                      Example: Metaparlour Academy provides wellness-oriented,
+                      entry-level courses that combine soft skills with health
+                      and well-being, creating a model small businesses can
+                      adopt.
+                    </em>
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="font-semibold text-white mb-2">
+                    2. Align With Consumer Needs in Critical Markets
+                  </h5>
+                  <p className="text-white/90 mb-2">
+                    Affordability, transparency, and consumer-first solutions
+                    are gaining ground. Businesses that position themselves as
+                    advocates for consumer well-being build trust and long-term
+                    loyalty.
+                  </p>
+                  <p className="text-sm text-blue-200">
+                    <em>
+                      Example: JustListed.today empowers Canadians—especially
+                      first-time buyers and newcomers—to understand
+                      affordability and connect with certified agents.
+                    </em>
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="font-semibold text-white mb-2">
+                    3. Embrace Digital Tools to Support Essential Sectors
+                  </h5>
+                  <p className="text-white/90 mb-2">
+                    The pandemic highlighted the importance of logistics, supply
+                    chains, and critical services. Small businesses supporting
+                    these infrastructures can anchor themselves in the
+                    economy&apos;s backbone.
+                  </p>
+                  <p className="text-sm text-blue-200">
+                    <em>
+                      Example: MoDevz provides digital solutions tailored to
+                      small logistics and operations businesses that underpin
+                      pandemic resilience.
+                    </em>
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="font-semibold text-white mb-2">
+                    4. Build for Long-Term Resilience
+                  </h5>
+                  <ul className="text-white/90 text-sm space-y-1 ml-4">
+                    <li>
+                      • Diversify suppliers and revenue streams to reduce
+                      vulnerabilities
+                    </li>
+                    <li>
+                      • Use automation and digital marketing to control costs
+                    </li>
+                    <li>
+                      • Monitor fiscal and housing policy for business
+                      opportunities
+                    </li>
+                    <li>
+                      • Communicate authenticity and values—trust has become a
+                      competitive advantage
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-xl border border-white/20 mb-8">
+            <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 17l6-6 4 4 8-8"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 5h6v6"
+                />
+              </svg>
+              Key Takeaway
+            </h3>
+
+            <div className="bg-green-500/10 rounded-xl p-6 border border-green-500/20">
+              <p className="text-white/90">
+                Canada&apos;s post-pandemic economy presents both headwinds and
+                opportunities. Small businesses that embrace digital tools,
+                align with shifting consumer values, and invest in inclusive
+                workforce strategies will not only survive but become leaders in
+                their sectors. Agility, purpose, and consumer focus are the
+                defining traits of resilient Canadian enterprises in this new
+                era.
+              </p>
             </div>
           </section>
 
