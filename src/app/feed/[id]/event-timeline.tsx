@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface TimelineData {
   year: string;
@@ -116,15 +115,20 @@ const timelineData: TimelineData[] = [
     details: {
       title: "Monetary Tightening Begins (2022)",
       content: [
-        <>Rising inflation led the{" "}
-              <a
-                href="https://www.bankofcanada.ca/core-functions/monetary-policy/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-300"
-              >
-                Bank of Canada
-              </a>{" "}to raise rates aggressively in 2022, cooling housing markets and beginning to slow growth. The transition from emergency fiscal support to longer-term investment-oriented policies marked a key shift in government approach.
+        <>
+          Rising inflation led the{" "}
+          <a
+            href="https://www.bankofcanada.ca/core-functions/monetary-policy/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-blue-300"
+          >
+            Bank of Canada
+          </a>{" "}
+          to raise rates aggressively in 2022, cooling housing markets and
+          beginning to slow growth. The transition from emergency fiscal support
+          to longer-term investment-oriented policies marked a key shift in
+          government approach.
         </>,
         "Global supply chain disruptions and energy price volatility continued to impact the Canadian economy during this period.",
       ],
@@ -263,11 +267,21 @@ const EventTimeline: React.FC = () => {
                       onClick={() => toggleDetails(item.year)}
                       className="text-blue-300 hover:text-blue-200 flex items-center justify-center w-full"
                     >
-                      <ChevronDownIcon
+                      <svg
                         className={`w-4 h-4 transition-transform duration-200 ${
                           expandedRows.has(item.year) ? "rotate-180" : ""
                         }`}
-                      />
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
                     </button>
                   </td>
                 </tr>
