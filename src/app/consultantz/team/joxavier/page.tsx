@@ -292,7 +292,7 @@ END:VCARD`;
               margin: "0 0 8px 0",
             }}
           >
-            Chief Technology Officer
+            Technical Consultant
           </h2>
 
           <p
