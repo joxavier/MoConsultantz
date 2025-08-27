@@ -145,7 +145,7 @@ END:VCARD`;
               fill
               style={{
                 objectFit: "contain",
-                filter: darkModeActive ? "invert(100%)" : "none",
+                filter: darkModeActive ?  "none" : "invert(100%)",
               }}
               className="rounded-xl"
             />
