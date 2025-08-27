@@ -65,7 +65,7 @@ END:VCARD`;
       url: "https://www.linkedin.com/in/joxavier-3299/",
       icon: "💼",
     },
-    { name: "Twitter", url: "#", icon: "🐦" },
+    { name: "Twitter", url: "https://x.com/joshuax47", icon: "🐦" },
     {
       name: "Instagram",
       url: "https://www.instagram.com/joshuax32/",
