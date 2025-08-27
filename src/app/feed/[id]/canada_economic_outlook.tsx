@@ -126,13 +126,13 @@ Published by Joshua Xavier - August 9, 2025
           href="/article/canadas-post-pandemic-economic-outlook"
         />
       </Head>
-      <div className="min-h-screen mt-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700">
+      <div className="min-h-screen mx-auto px-4 py-8 max-w-md md:max-w-6xl lg:max-w-full sm:p-6 md:p-8 lg:p-32 mt-16 sm:mt-20 md:mt-24 lg:mt-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700">
         {/* Canadian Flag Accent */}
         <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
           <div className="w-full h-full bg-gradient-to-br from-red-600 to-white transform rotate-45"></div>
         </div>
 
-        <div className="container mx-auto px-4 py-8 max-w-5xl relative">
+        <div className="container mx-auto px-4 py-8 relative">
           {/* Back Button & Download */}
           <div className="mb-8 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <Link
