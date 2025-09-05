@@ -110,7 +110,7 @@ Published by Joshua Xavier - August 9, 2025
         <meta property="og:type" content="article" />
         <meta
           property="og:image"
-          content="/Canadas-Post-Pandemic-Economic-Outlook.png"
+          content="https://modevz.ca/Canadas-Post-Pandemic-Economic-Outlook.png"
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
@@ -123,10 +123,47 @@ Published by Joshua Xavier - August 9, 2025
         />
         <link
           rel="canonical"
-          href="/article/canadas-post-pandemic-economic-outlook"
+          href="https://modevz.ca/feed/canadas-post-pandemic-economic-outlook"
         />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline:
+              "Canada Economic Outlook 2025: Post-Pandemic Recovery & Opportunities",
+            description:
+              "Comprehensive analysis of Canada's economic outlook 2025, covering post-pandemic recovery, housing crisis, green economy growth, inflation trends, and digital transformation opportunities.",
+            author: {
+              "@type": "Person",
+              name: "Joshua Xavier",
+              url: "https://josh.modevz.ca/",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "MoDevz",
+              url: "https://modevz.ca",
+            },
+            datePublished: "2025-10-01T00:00:00Z",
+            dateModified: "2025-10-01T00:00:00Z",
+            image:
+              "https://modevz.ca/Canadas-Post-Pandemic-Economic-Outlook.png",
+            url: "https://modevz.ca/feed/6",
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": "https://modevz.ca/feed/6",
+            },
+            keywords: [
+              "Canada",
+              "Economic Outlook",
+              "Post-Pandemic",
+              "Housing Crisis",
+              "Green Economy",
+              "Digital Transformation",
+            ],
+          })}
+        </script>
       </Head>
-      <div className="min-h-screen mx-auto px-4 py-8 max-w-md md:max-w-6xl lg:max-w-full sm:p-6 md:p-8 lg:p-32 mt-16 sm:mt-20 md:mt-24 lg:mt-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700">
+      <article className="min-h-screen mx-auto px-4 py-8 max-w-md md:max-w-6xl lg:max-w-full sm:p-6 md:p-8 lg:p-32 mt-16 sm:mt-20 md:mt-24 lg:mt-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700">
         {/* Canadian Flag Accent */}
         <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
           <div className="w-full h-full bg-gradient-to-br from-red-600 to-white transform rotate-45"></div>
@@ -155,7 +192,7 @@ Published by Joshua Xavier - August 9, 2025
               Back to Feed
             </Link>
 
-            <button
+            {/*<button
               onClick={handleDownloadPDF}
               className="inline-flex items-center gap-2 bg-white text-red-700 hover:bg-red-50 transition-colors duration-200 px-4 py-2 rounded-full font-semibold shadow-lg"
             >
@@ -173,7 +210,7 @@ Published by Joshua Xavier - August 9, 2025
                 />
               </svg>
               Download Article
-            </button>
+            </button>*/}
           </div>
 
           {/* Hero Section */}
@@ -236,6 +273,7 @@ Published by Joshua Xavier - August 9, 2025
               <img
                 src="/Canadas-Post-Pandemic-Economic-Outlook.png"
                 alt="Canada's Economic Outlook"
+                loading="eager"
                 className="w-full h-64 md:h-96 object-cover rounded-xl shadow-lg"
               />
             </div>
@@ -424,10 +462,10 @@ Published by Joshua Xavier - August 9, 2025
               </a>
               — impose direct costs (infrastructure damage, lost production,
               health care)and indirect effects (higher insurance costs, supply
-              chain disruption, labour productivity losses). Canada&apos;s reliance
-              on fossil-fuel exports and resource sectors creates transition
-              risks: shifting to low-carbon output incurs adjustment costs for
-              regions reliant on extraction, while also{" "}
+              chain disruption, labour productivity losses). Canada&apos;s
+              reliance on fossil-fuel exports and resource sectors creates
+              transition risks: shifting to low-carbon output incurs adjustment
+              costs for regions reliant on extraction, while also{" "}
               <a
                 href="https://news.ontario.ca/en/release/1005717/ontario-doubling-hydrogen-innovation-fund-to-30-million-to-protect-ontario-jobs"
                 target="_blank"
@@ -1011,7 +1049,7 @@ Published by Joshua Xavier - August 9, 2025
             </div>
           </div>
         </div>
-      </div>
+      </article>
     </>
   );
 };
