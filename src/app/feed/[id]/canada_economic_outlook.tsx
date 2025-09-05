@@ -411,7 +411,7 @@ Published by Joshua Xavier - August 9, 2025
               </svg>
               Environmental Shocks and Longer-Run Economic Impacts
             </h3>
-            <p className="text-lg mb-4">
+            <p className="text-lg text-white mb-4">
               Environmental factors are increasingly material to the macro
               picture. Climate-driven events —{" "}
               <a
@@ -424,7 +424,7 @@ Published by Joshua Xavier - August 9, 2025
               </a>
               — impose direct costs (infrastructure damage, lost production,
               health care)and indirect effects (higher insurance costs, supply
-              chain disruption, labour productivity losses). Canada’s reliance
+              chain disruption, labour productivity losses). Canada&apos;s reliance
               on fossil-fuel exports and resource sectors creates transition
               risks: shifting to low-carbon output incurs adjustment costs for
               regions reliant on extraction, while also{" "}
