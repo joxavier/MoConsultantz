@@ -70,8 +70,8 @@ export default async function middleware(req: NextRequest) {
 
   if (hostname === "localhost:3000" || hostname === "moconsultantz.com") {
     console.log(path)
-    if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz") || path.startsWith("/feed") || path.startsWith("/moos") || path.startsWith("/josh")) {
-      console.log(path)
+    if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz") || path.startsWith("/feed") || path.startsWith("/moos") || path.startsWith("/josh") || path.startsWith("/services")) {
+      console.log("cechk" + path)
       return NextResponse.rewrite(new URL(`${path}`, req.url));
     }
     else{
@@ -80,7 +80,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (hostname === "modevz.ca" || hostname === "modevz.com") {
-    if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz") || path.startsWith("/feed") || path.startsWith("/moos")) {
+    if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz") || path.startsWith("/feed") || path.startsWith("/moos") || path.startsWith("/services")) {
       console.log(path)
       return NextResponse.rewrite(new URL(`${path}`, req.url));
     }
