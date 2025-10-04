@@ -63,7 +63,12 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  else if (currentHost === "primaspaces") {
+  else if (currentHost === "domin8ai") {
+    url.pathname = `/moos/domin8AI${path}`;
+    return NextResponse.rewrite(url);
+  }
+
+    else if (currentHost === "primaspaces") {
     url.pathname = `/devz/primaspaces${path}`;
     return NextResponse.rewrite(url);
   }
