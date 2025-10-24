@@ -47,7 +47,7 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ className = "" }) => {
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full"></div>
               )}
             </div>
-            <span className="text-sm font-medium">Feed</span>
+            <span className="text-sm font-medium">Vibes</span>
           </Link>
         </div>
 
