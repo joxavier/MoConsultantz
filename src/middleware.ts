@@ -92,7 +92,9 @@ export default async function middleware(req: NextRequest) {
       console.log(path)
       return NextResponse.rewrite(new URL(`${path}`, req.url));
     }
-    else{
+    if (path.startsWith("/articles")) {
+      return NextResponse.rewrite(new URL(`/feed/0${path}`, req.url));
+    }
       return NextResponse.rewrite(new URL(`/devz${path}`, req.url));
     }
   }
