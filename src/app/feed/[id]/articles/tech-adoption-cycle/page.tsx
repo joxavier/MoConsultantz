@@ -3,6 +3,7 @@ import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
 import { Metadata } from "next";
+import VideoToggle from "./VideoToggle";
 
 export const metadata: Metadata = {
   title: "Understanding the Technology Adoption Cycle | MoDevz",
@@ -10,8 +11,11 @@ export const metadata: Metadata = {
     "Learn how the technology adoption cycle shapes digital products. Discover why adoption matters more than technology and how to move from early users to mass market adoption.",
   keywords:
     "technology adoption cycle, innovation, digital products, early adopters, mass market, MoDevz, business strategy, tech innovation, product adoption, crossing the chasm",
-  authors: [{ name: "MoDevz Editorial Team" }],
-  creator: "MoDevz",
+authors: [{ 
+  name: "Joshua Xavier", 
+  url: "https://josh.modevz.ca/" 
+}],
+creator: "Joshua Xavier",
   publisher: "MoDevz",
   robots: {
     index: true,
@@ -51,7 +55,7 @@ export const metadata: Metadata = {
     description:
       "Innovation doesn't win on technology alone—it wins on adoption. Learn how to cross the chasm from early adopters to mass market.",
     images: ["https://modevz.com/tech-adoption-cycle.png"],
-    creator: "@modevz",
+    creator: "@movestmentzz",
   },
   alternates: {
     canonical: "https://modevz.com/article/technology-adoption-cycle",
@@ -140,17 +144,7 @@ const TechAdoptionCycle = () => {
 
             <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950">
               <div className="max-w-6xl mx-auto px-6 py-16">
-                {/* Hero Image with Overlay Effect */}
-                <div className="relative mb-16 group">
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 rounded-2xl" />
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
-                  <img
-                    src="/tech-adoption-cycle.png"
-                    alt="Technology Adoption Cycle"
-                    className="relative w-full h-72 md:h-[32rem] object-cover rounded-2xl shadow-2xl ring-1 ring-white/10"
-                  />
-                </div>
-
+                <VideoToggle />
                 {/* Headline Section with Animated Gradient */}
                 <div className="mb-16 space-y-6">
                   <div className="inline-block">
@@ -183,49 +177,6 @@ const TechAdoptionCycle = () => {
                       </span>
                       <span className="text-gray-400">bring new ideas</span>
                     </p>
-                  </div>
-                </div>
-
-                {/* Stats Grid with Hover Effects */}
-                <div className="mb-16 relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-3xl blur-3xl" />
-                  <div className="relative bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-purple-500/20 shadow-2xl">
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
-                      {[
-                        { value: "2.5%", label: "Innovators", color: "purple" },
-                        {
-                          value: "13.5%",
-                          label: "Early Adopters",
-                          color: "blue",
-                        },
-                        {
-                          value: "34%",
-                          label: "Early Majority",
-                          color: "cyan",
-                        },
-                        { value: "34%", label: "Late Majority", color: "teal" },
-                        { value: "16%", label: "Laggards", color: "gray" },
-                      ].map((stat, i) => (
-                        <div
-                          key={i}
-                          className="text-center group cursor-default transform transition-all duration-300 hover:scale-110"
-                        >
-                          <div
-                            className={`text-4xl md:text-5xl font-bold text-${stat.color}-400 mb-3 transition-all duration-300 group-hover:text-${stat.color}-300`}
-                          >
-                            {stat.value}
-                          </div>
-                          <div
-                            className={`text-xs md:text-sm font-medium text-gray-400 group-hover:text-${stat.color}-400 transition-colors duration-300`}
-                          >
-                            {stat.label}
-                          </div>
-                          <div
-                            className={`mt-2 h-1 w-0 group-hover:w-full bg-gradient-to-r from-${stat.color}-400 to-transparent transition-all duration-500 mx-auto rounded-full`}
-                          />
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
@@ -274,63 +225,63 @@ const TechAdoptionCycle = () => {
               </div>
             </div>
 
-            <div className="mb-12 bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-2xl p-8 border border-purple-500/30">
-              <div className="flex items-center justify-center gap-8 flex-wrap">
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-purple-400 mb-2">
-                    2.5%
-                  </div>
-                  <div className="text-sm text-gray-300">Innovators</div>
+            
+                {/* Hero Image with Overlay Effect */}
+                <div className="relative mb-16 group">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 rounded-2xl" />
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
+                  <img
+                    src="/tech-adoption-cycle.png"
+                    alt="Technology Adoption Cycle"
+                    className="relative w-full h-72 md:h-[32rem] object-cover rounded-2xl shadow-2xl ring-1 ring-white/10"
+                  />
                 </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-blue-400 mb-2">
-                    13.5%
-                  </div>
-                  <div className="text-sm text-gray-300">Early Adopters</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-cyan-400 mb-2">
-                    34%
-                  </div>
-                  <div className="text-sm text-gray-300">Early Majority</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-teal-400 mb-2">
-                    34%
-                  </div>
-                  <div className="text-sm text-gray-300">Late Majority</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-400 mb-2">
-                    16%
-                  </div>
-                  <div className="text-sm text-gray-300">Laggards</div>
+
+            {/* Stats Grid with Hover Effects */}
+            <div className="mb-16 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-3xl blur-3xl" />
+              <div className="relative bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-purple-500/20 shadow-2xl">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
+                  {[
+                    { value: "2.5%", label: "Innovators", color: "purple" },
+                    {
+                      value: "13.5%",
+                      label: "Early Adopters",
+                      color: "blue",
+                    },
+                    {
+                      value: "34%",
+                      label: "Early Majority",
+                      color: "cyan",
+                    },
+                    { value: "34%", label: "Late Majority", color: "teal" },
+                    { value: "16%", label: "Laggards", color: "gray" },
+                  ].map((stat, i) => (
+                    <div
+                      key={i}
+                      className="text-center group cursor-default transform transition-all duration-300 hover:scale-110"
+                    >
+                      <div
+                        className={`text-4xl md:text-5xl font-bold text-${stat.color}-400 mb-3 transition-all duration-300 group-hover:text-${stat.color}-300`}
+                      >
+                        {stat.value}
+                      </div>
+                      <div
+                        className={`text-xs md:text-sm font-medium text-gray-400 group-hover:text-${stat.color}-400 transition-colors duration-300`}
+                      >
+                        {stat.label}
+                      </div>
+                      <div
+                        className={`mt-2 h-1 w-0 group-hover:w-full bg-gradient-to-r from-${stat.color}-400 to-transparent transition-all duration-500 mx-auto rounded-full`}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
             {/* Article Content */}
             <div className="prose prose-lg prose-invert max-w-none">
-              {/* Introduction */}
-              <section className="mb-12">
-                <p className="text-xl text-gray-300 leading-relaxed mb-6">
-                  Innovation doesn't win on technology alone—it wins on{" "}
-                  <span className="text-purple-400 font-semibold">
-                    adoption
-                  </span>
-                  . The most brilliant products can fail if they never reach the
-                  hands of everyday users. Understanding the technology adoption
-                  cycle is the roadmap every digital product must follow to go
-                  from niche curiosity to mass-market dominance.
-                </p>
-                <p className="text-lg text-gray-400 leading-relaxed">
-                  For founders, businesses, and creators building in the Mo
-                  ecosystem, this framework isn't just theory—it's the
-                  difference between building something cool and building
-                  something that changes the world.
-                </p>
-              </section>
-
               {/* Section 1 */}
               <section className="mb-12">
                 <h2 className="text-3xl font-bold text-purple-400 mb-6 flex items-center gap-3">

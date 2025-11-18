@@ -6,6 +6,9 @@ import Link from 'next/link';
 import Head from 'next/head';
 import articlesData from '../articles.json';
 import CanadaEconomicOutlook from './canada_economic_outlook';
+import TechAdoptionCycle from './tech-adoption-cycle';
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface Article {
   id: string;
@@ -57,6 +60,16 @@ const ArticlePage: React.FC = () => {
       </div>
     );
   }
+
+if (article.id === "7") {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/articles/tech-adoption-cycle");
+  }, []);
+
+  return null; // prevent rendering anything before redirect
+}
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
