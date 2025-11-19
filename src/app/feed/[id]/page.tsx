@@ -6,7 +6,6 @@ import Link from 'next/link';
 import Head from 'next/head';
 import articlesData from '../articles.json';
 import CanadaEconomicOutlook from './canada_economic_outlook';
-import TechAdoptionCycle from './tech-adoption-cycle';
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
