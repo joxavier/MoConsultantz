@@ -20,16 +20,35 @@ const Footer = () => {
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Add your newsletter subscription logic here
-    // For now, just showing success message
-    if (email && email.includes('@')) {
-      setSubscribeStatus('success');
-      setEmail('');
+    if (!email || !email.includes('@')) {
+      setSubscribeStatus('error');
       setTimeout(() => setSubscribeStatus('idle'), 3000);
-    } else {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      console.log('Subscription response:', response);
+
+      if (response.ok) {
+        setSubscribeStatus('success');
+        setEmail('');
+        setTimeout(() => setSubscribeStatus('idle'), 3000);
+      } else {
+        setSubscribeStatus('error');
+        setTimeout(() => setSubscribeStatus('idle'), 3000);
+      }
+    } catch (error) {
       setSubscribeStatus('error');
       setTimeout(() => setSubscribeStatus('idle'), 3000);
     }
