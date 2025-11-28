@@ -338,7 +338,7 @@ export default function Unsubscribe() {
                   </button>
                 </Link>
 
-                <Link href="/aboutus">
+                <Link href="/about">
                   <button
                     style={{
                       padding: '14px 32px',
