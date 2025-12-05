@@ -31,6 +31,19 @@ const TypewriterEffect = ({ strings, className, speed = 70 }: { strings: string[
     return () => clearTimeout(timeout);
   }, [currentText, isDeleting, currentStringIndex, strings, speed]);
 
+    useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://js.stripe.com/v3/pricing-table.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   return (
     <span className={className}>
       {currentText}
@@ -512,6 +525,64 @@ export default function MoCoin() {
               style={{ width: '100%', height: '400px', border: 'none' }}
               allowFullScreen
             />
+          </div>
+        </div>
+      </section>
+
+            {/* MoPass DCA Section */}
+      <section id="MoPass" style={{ padding: '5rem 1.5rem', background: '#000' }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
+          <div style={{ 
+            background: 'linear-gradient(135deg, rgba(60, 165, 222, 0.2), rgba(135, 67, 247, 0.2))', 
+            border: '3px solid #3ca5de', 
+            borderRadius: '12px', 
+            padding: '2.5rem',
+            textAlign: 'center' as const
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💎</div>
+            
+            <h2 style={{ 
+              margin: '0 0 1rem 0', 
+              color: '#ffffff', 
+              fontSize: 'clamp(1.75rem, 4vw, 2rem)', 
+              fontWeight: 'bold' 
+            }}>
+              Ready to Stack?
+            </h2>
+            
+            <p style={{ 
+              margin: '0 0 1.5rem 0', 
+              color: '#d1d5db', 
+              fontSize: 'clamp(1rem, 2vw, 1.125rem)', 
+              lineHeight: 1.7,
+              maxWidth: '48rem',
+              marginLeft: 'auto',
+              marginRight: 'auto'
+            }}>
+              <strong style={{ color: '#3ca5de' }}>MoPass</strong> lets you dollar-cost average your MoCoin holdings by setting up recurring buys. Build your position automatically, month after month.
+            </p>
+            
+            <p style={{ 
+              margin: '0 0 2rem 0', 
+              color: '#86efac', 
+              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)', 
+              fontWeight: 600 
+            }}>
+              ✅ Automated purchases • ✅ No volatility stress • ✅ Build wealth consistently
+            </p>
+            
+            {/* Stripe Pricing Table */}
+            <div style={{ 
+              background: '#ffffff', 
+              borderRadius: '8px', 
+              padding: '1.25rem', 
+              marginTop: '1.25rem' 
+            }}>
+              {React.createElement("stripe-pricing-table", {
+                "pricing-table-id": "prctbl_1SamQfD06hPxM9TKz04yWprx",
+                "publishable-key": "pk_live_51MhzlfD06hPxM9TKX3bZ25Op6Wv6xxKQFROtQx3BiJei2e1Ijw2g2nXWBppVkikTf72gjZXJe5qL9LlElTreOHnS003DwnnGIL",
+              })}
+            </div>
           </div>
         </div>
       </section>
