@@ -291,7 +291,7 @@ const Domin8AIInvestorPage: React.FC = () => {
       </section>
 
       {/* Investment Tiers */}
-      <section id = "Investor" className="py-20 bg-black/40">
+      <section id = "Invest" className="py-20 bg-black/40">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">Investment Partnership Tiers</h2>
