@@ -291,7 +291,7 @@ const Domin8AIInvestorPage: React.FC = () => {
       </section>
 
       {/* Investment Tiers */}
-      <section className="py-20 bg-black/40">
+      <section id = "Investor" className="py-20 bg-black/40">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">Investment Partnership Tiers</h2>
@@ -522,12 +522,12 @@ const Domin8AIInvestorPage: React.FC = () => {
             
             <div>
               <h3 className="text-white font-semibold mb-4">Contact</h3>
-              <ul className="space-y-2 text-gray-400 text-sm">
+              {/*<ul className="space-y-2 text-gray-400 text-sm">
                 <li>investors@domin8ai.com</li>
                 <li>+1 (555) 123-4567</li>
                 <li>123 Innovation Drive</li>
                 <li>San Francisco, CA 94105</li>
-              </ul>
+              </ul>*/}
             </div>
           </div>
         </div>
