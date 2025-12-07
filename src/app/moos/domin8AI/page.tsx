@@ -58,44 +58,46 @@ const Domin8AIInvestorPage: React.FC = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
 
   const investmentTiers: InvestmentTier[] = [
-    {
-      name: 'Seed Partner',
-      range: '$10K - $50K',
-      description: 'Early equity allocation',
-      color: 'purple',
-      benefits: [
-        'Early equity participation',
-        'Quarterly progress reports',
-        'Investor community access',
-        'Product beta testing'
-      ]
-    },
-    {
-      name: 'Growth Partner',
-      range: '$50K - $250K',
-      description: 'Priority equity terms',
-      color: 'pink',
-      popular: true,
-      benefits: [
-        'Priority equity allocation',
-        'Board observer rights',
-        'Monthly executive calls',
-        'Advisory opportunities'
-      ]
-    },
-    {
-      name: 'Strategic Partner',
-      range: '$250K+',
-      description: 'Custom deal structure',
-      color: 'blue',
-      benefits: [
-        'Custom equity terms',
-        'Direct board advisory',
-        'Strategic partnership',
-        'Co-investment opportunities'
-      ]
-    }
-  ];
+  {
+    name: '💎 Seed Partner',
+    range: '$20K - $80K | Distributor',
+    description: 'Early access & distribution entry tier',
+    color: 'purple',
+    benefits: [
+      'Distribution licences',
+      'Quarterly progress reports',
+      'Investor community access',
+      'Product beta testing'
+    ]
+  },
+  {
+    name: '🚀 Growth Partner',
+    range: '$70K - $250K | Product Owner & Exclusive Distributor',
+    description: 'Most popular tier with deeper influence & product involvement',
+    color: 'pink',
+    popular: true,
+    benefits: [
+      'Exclusive distributor rights',
+      'Product Owner responsibilities (Domin8Ai)',
+      'Board observer rights',
+      'Monthly executive calls',
+      'Advisory opportunities'
+    ]
+  },
+  {
+    name: '⭐ Strategic Partner',
+    range: '$250K+ | Director-Level Partnership',
+    description: 'Custom equity structure and long-term strategic influence',
+    color: 'blue',
+    benefits: [
+      'Custom equity terms',
+      'Direct board advisory',
+      'Strategic partnership',
+      'Co-investment opportunities'
+    ]
+  }
+];
+
 
   const paymentMethods: PaymentMethod[] = [
     {
