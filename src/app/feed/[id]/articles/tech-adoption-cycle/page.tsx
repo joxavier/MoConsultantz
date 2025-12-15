@@ -4,6 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { Metadata } from "next";
 import VideoToggle from "./VideoToggle";
+import AdoptionCurveSection from "./adoption_curve";
 
 export const metadata: Metadata = {
   title: "Understanding the Technology Adoption Cycle | MoDevz",
@@ -11,11 +12,13 @@ export const metadata: Metadata = {
     "Learn how the technology adoption cycle shapes digital products. Discover why adoption matters more than technology and how to move from early users to mass market adoption.",
   keywords:
     "technology adoption cycle, innovation, digital products, early adopters, mass market, MoDevz, business strategy, tech innovation, product adoption, crossing the chasm",
-authors: [{ 
-  name: "Joshua Xavier", 
-  url: "https://josh.modevz.ca/" 
-}],
-creator: "Joshua Xavier",
+  authors: [
+    {
+      name: "Joshua Xavier",
+      url: "https://josh.modevz.ca/",
+    },
+  ],
+  creator: "Joshua Xavier",
   publisher: "MoDevz",
   robots: {
     index: true,
@@ -55,7 +58,7 @@ creator: "Joshua Xavier",
     description:
       "Innovation doesn't win on technology alone—it wins on adoption. Learn how to cross the chasm from early adopters to mass market.",
     images: ["https://modevz.com/tech-adoption-cycle.png"],
-    creator: "@movestmentzz",
+    creator: "@movestmentz",
   },
   alternates: {
     canonical: "https://modevz.com/article/technology-adoption-cycle",
@@ -186,7 +189,8 @@ const TechAdoptionCycle = () => {
                     <div className="relative">
                       <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-500 via-blue-500 to-transparent rounded-full" />
                       <p className="text-xl md:text-2xl text-gray-200 leading-relaxed pl-6">
-                        Innovation doesn&apos;t win on technology alone—it wins on{" "}
+                        Innovation doesn&apos;t win on technology alone—it wins
+                        on{" "}
                         <span className="relative inline-block">
                           <span className="relative z-10 text-purple-400 font-semibold">
                             adoption
@@ -207,9 +211,9 @@ const TechAdoptionCycle = () => {
                         <span className="text-blue-400 font-semibold">
                           Mo ecosystem
                         </span>
-                        , this framework isn&apos;t just theory—it&apos;s the difference
-                        between building something cool and building something
-                        that{" "}
+                        , this framework isn&apos;t just theory—it&apos;s the
+                        difference between building something cool and building
+                        something that{" "}
                         <span className="text-purple-400 font-semibold italic">
                           changes the world
                         </span>
@@ -225,59 +229,15 @@ const TechAdoptionCycle = () => {
               </div>
             </div>
 
-            
-                {/* Hero Image with Overlay Effect */}
-                <div className="relative mb-16 group">
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 rounded-2xl" />
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
-                  <img
-                    src="/tech-adoption-cycle.png"
-                    alt="Technology Adoption Cycle"
-                    className="relative w-full h-72 md:h-[32rem] object-cover rounded-2xl shadow-2xl ring-1 ring-white/10"
-                  />
-                </div>
-
-            {/* Stats Grid with Hover Effects */}
-            <div className="mb-16 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-blue-600/10 to-cyan-600/10 rounded-3xl blur-3xl" />
-              <div className="relative bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-slate-900/90 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-purple-500/20 shadow-2xl">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
-                  {[
-                    { value: "2.5%", label: "Innovators", color: "purple" },
-                    {
-                      value: "13.5%",
-                      label: "Early Adopters",
-                      color: "blue",
-                    },
-                    {
-                      value: "34%",
-                      label: "Early Majority",
-                      color: "cyan",
-                    },
-                    { value: "34%", label: "Late Majority", color: "teal" },
-                    { value: "16%", label: "Laggards", color: "gray" },
-                  ].map((stat, i) => (
-                    <div
-                      key={i}
-                      className="text-center group cursor-default transform transition-all duration-300 hover:scale-110"
-                    >
-                      <div
-                        className={`text-4xl md:text-5xl font-bold text-${stat.color}-400 mb-3 transition-all duration-300 group-hover:text-${stat.color}-300`}
-                      >
-                        {stat.value}
-                      </div>
-                      <div
-                        className={`text-xs md:text-sm font-medium text-gray-400 group-hover:text-${stat.color}-400 transition-colors duration-300`}
-                      >
-                        {stat.label}
-                      </div>
-                      <div
-                        className={`mt-2 h-1 w-0 group-hover:w-full bg-gradient-to-r from-${stat.color}-400 to-transparent transition-all duration-500 mx-auto rounded-full`}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {/* Hero Image with Overlay Effect */}
+            <div className="relative mb-16 group">
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 rounded-2xl" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
+              <img
+                src="/tech-adoption-cycle.png"
+                alt="Technology Adoption Cycle"
+                className="relative w-full h-72 md:h-[32rem] object-cover rounded-2xl shadow-2xl ring-1 ring-white/10"
+              />
             </div>
 
             {/* Article Content */}
@@ -294,43 +254,8 @@ const TechAdoptionCycle = () => {
                   segments based on when they embrace new technology:
                 </p>
 
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                  <div className="bg-purple-900/30 rounded-xl p-6 border border-purple-500/30">
-                    <h3 className="text-xl font-bold text-purple-300 mb-3">
-                      Innovators (2.5%)
-                    </h3>
-                    <p className="text-gray-400">
-                      Risk-takers who try new tech first. They&apos;re comfortable
-                      with bugs and incomplete features.
-                    </p>
-                  </div>
-                  <div className="bg-blue-900/30 rounded-xl p-6 border border-blue-500/30">
-                    <h3 className="text-xl font-bold text-blue-300 mb-3">
-                      Early Adopters (13.5%)
-                    </h3>
-                    <p className="text-gray-400">
-                      Opinion leaders who see the vision. They provide crucial
-                      feedback and social proof.
-                    </p>
-                  </div>
-                  <div className="bg-cyan-900/30 rounded-xl p-6 border border-cyan-500/30">
-                    <h3 className="text-xl font-bold text-cyan-300 mb-3">
-                      Early Majority (34%)
-                    </h3>
-                    <p className="text-gray-400">
-                      Pragmatists who adopt after seeing proven value. They need
-                      reliability and clear benefits.
-                    </p>
-                  </div>
-                  <div className="bg-teal-900/30 rounded-xl p-6 border border-teal-500/30">
-                    <h3 className="text-xl font-bold text-teal-300 mb-3">
-                      Late Majority (34%)
-                    </h3>
-                    <p className="text-gray-400">
-                      Skeptics who wait until adoption is necessary. They need
-                      strong peer pressure and support.
-                    </p>
-                  </div>
+                <div>
+                  <AdoptionCurveSection />
                 </div>
 
                 <div className="bg-gray-900/50 rounded-xl p-6 border-l-4 border-red-500 mb-6">
@@ -340,7 +265,9 @@ const TechAdoptionCycle = () => {
                   <p className="text-gray-300">
                     The gap between Early Adopters and the Early Majority is
                     called{" "}
-                    <strong className="text-red-300">&quot;the chasm.&quot;</strong>
+                    <strong className="text-red-300">
+                      &quot;the chasm.&quot;
+                    </strong>
                     This is where most innovations die. Early adopters love
                     novelty, but the majority needs proven, simple, trustworthy
                     solutions. Crossing this chasm is the difference between
@@ -457,9 +384,9 @@ const TechAdoptionCycle = () => {
                     </h3>
                     <p className="text-gray-300 mb-3">
                       The internet existed for innovators in the 1980s and early
-                      adopters in the 1990s, but majority adoption didn&apos;t happen
-                      until broadband infrastructure, smartphones, and social
-                      media converged in the mid-2000s.
+                      adopters in the 1990s, but majority adoption didn&apos;t
+                      happen until broadband infrastructure, smartphones, and
+                      social media converged in the mid-2000s.
                     </p>
                     <div className="text-sm text-gray-400 italic">
                       Timeline: ARPANET (1960s) → Web 1.0 (1990s) → Mass
@@ -484,46 +411,6 @@ const TechAdoptionCycle = () => {
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 rounded-xl p-8 border border-purple-500/30 mt-8">
-                  <h3 className="text-2xl font-bold text-purple-300 mb-4">
-                    🔑 What These All Have in Common
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4 text-gray-300">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🛡️</span>
-                      <span>
-                        <strong className="text-purple-300">Trust:</strong>{" "}
-                        Users needed proof it was safe
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">⚡</span>
-                      <span>
-                        <strong className="text-blue-300">Convenience:</strong>{" "}
-                        Easier than existing solutions
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🏗️</span>
-                      <span>
-                        <strong className="text-cyan-300">
-                          Infrastructure:
-                        </strong>{" "}
-                        Support systems in place
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🌍</span>
-                      <span>
-                        <strong className="text-teal-300">
-                          Cultural Acceptance:
-                        </strong>{" "}
-                        Society was ready
-                      </span>
-                    </div>
-                  </div>
-                </div>
               </section>
 
               {/* Section 4 - Modern Digital Products */}
@@ -545,8 +432,8 @@ const TechAdoptionCycle = () => {
                       clarity and trust
                     </h3>
                     <p className="text-gray-400">
-                      Don&apos;t assume what works for tech enthusiasts will work for
-                      everyone. Simplify your messaging as you scale.
+                      Don&apos;t assume what works for tech enthusiasts will
+                      work for everyone. Simplify your messaging as you scale.
                     </p>
                   </div>
 
@@ -673,13 +560,24 @@ const TechAdoptionCycle = () => {
                         <li className="flex items-start gap-3">
                           <span className="text-orange-400 mt-1">•</span>
                           <span>
-                            As of 2025, only about <strong className="text-orange-300">4% of the global population</strong> holds Bitcoin — despite its prominence, there remains a vast addressable market.
+                            As of 2025, only about{" "}
+                            <strong className="text-orange-300">
+                              4% of the global population
+                            </strong>{" "}
+                            holds Bitcoin — despite its prominence, there
+                            remains a vast addressable market.
                           </span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="text-orange-400 mt-1">•</span>
                           <span>
-                            According to River Financial, Bitcoin&apos;s current global ownership puts it at roughly <strong className="text-orange-300">3% of its total estimated adoption potential</strong>, meaning we&apos;re still in the early innings of a long growth curve.
+                            According to River Financial, Bitcoin&apos;s current
+                            global ownership puts it at roughly{" "}
+                            <strong className="text-orange-300">
+                              3% of its total estimated adoption potential
+                            </strong>
+                            , meaning we&apos;re still in the early innings of a
+                            long growth curve.
                           </span>
                         </li>
                       </ul>
@@ -694,19 +592,33 @@ const TechAdoptionCycle = () => {
                         <li className="flex items-start gap-3">
                           <span className="text-blue-400 mt-1">•</span>
                           <span>
-                            The highest individual ownership rates are in <strong className="text-blue-300">North America</strong>, with the United States leading at an estimated ~14% BTC ownership among individuals.
+                            The highest individual ownership rates are in{" "}
+                            <strong className="text-blue-300">
+                              North America
+                            </strong>
+                            , with the United States leading at an estimated
+                            ~14% BTC ownership among individuals.
                           </span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="text-blue-400 mt-1">•</span>
                           <span>
-                            Growing grassroots adoption is visible in <strong className="text-blue-300">Latin America, Africa, and parts of Asia</strong>, where Bitcoin is often used for remittances, inflation hedging, or as an alternative to unstable fiat — especially where traditional financial infrastructure is weak.
+                            Growing grassroots adoption is visible in{" "}
+                            <strong className="text-blue-300">
+                              Latin America, Africa, and parts of Asia
+                            </strong>
+                            , where Bitcoin is often used for remittances,
+                            inflation hedging, or as an alternative to unstable
+                            fiat — especially where traditional financial
+                            infrastructure is weak.
                           </span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="text-blue-400 mt-1">•</span>
                           <span>
-                            Emerging markets lead in per-capita and peer-to-peer usage, while developed markets dominate institutional holdings and merchant adoption.
+                            Emerging markets lead in per-capita and peer-to-peer
+                            usage, while developed markets dominate
+                            institutional holdings and merchant adoption.
                           </span>
                         </li>
                       </ul>
@@ -718,31 +630,55 @@ const TechAdoptionCycle = () => {
                         🚧 Current Barriers to Wider Adoption
                       </h4>
                       <p className="text-gray-300 mb-4">
-                        Despite the growth and promise, Bitcoin still faces significant hurdles:
+                        Despite the growth and promise, Bitcoin still faces
+                        significant hurdles:
                       </p>
                       <ul className="space-y-3 text-gray-300">
                         <li className="flex items-start gap-3">
                           <span className="text-red-400 mt-1">•</span>
                           <span>
-                            <strong className="text-red-300">Low global penetration</strong> — with only ~4% of people worldwide owning BTC, there is large room for mainstream adoption, but also a long road ahead.
+                            <strong className="text-red-300">
+                              Low global penetration
+                            </strong>{" "}
+                            — with only ~4% of people worldwide owning BTC,
+                            there is large room for mainstream adoption, but
+                            also a long road ahead.
                           </span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="text-red-400 mt-1">•</span>
                           <span>
-                            <strong className="text-red-300">Volatility and risk perception</strong> — Bitcoin&apos;s price swings and macro-economic uncertainty make many potential users and institutions hesitant to adopt it as a store of value or medium of exchange.
+                            <strong className="text-red-300">
+                              Volatility and risk perception
+                            </strong>{" "}
+                            — Bitcoin&apos;s price swings and macro-economic
+                            uncertainty make many potential users and
+                            institutions hesitant to adopt it as a store of
+                            value or medium of exchange.
                           </span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="text-red-400 mt-1">•</span>
                           <span>
-                            <strong className="text-red-300">Regulatory uncertainty</strong> — differences in regulation, enforcement, and legal frameworks across countries complicate global mainstream use, especially in regions where citizens lack trust in local financial institutions.
+                            <strong className="text-red-300">
+                              Regulatory uncertainty
+                            </strong>{" "}
+                            — differences in regulation, enforcement, and legal
+                            frameworks across countries complicate global
+                            mainstream use, especially in regions where citizens
+                            lack trust in local financial institutions.
                           </span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="text-red-400 mt-1">•</span>
                           <span>
-                            <strong className="text-red-300">Infrastructure & education gaps</strong> — lack of awareness, limited access to crypto-friendly platforms or stable internet/financial infrastructure, especially in developing countries, continues to limit adoption.
+                            <strong className="text-red-300">
+                              Infrastructure & education gaps
+                            </strong>{" "}
+                            — lack of awareness, limited access to
+                            crypto-friendly platforms or stable
+                            internet/financial infrastructure, especially in
+                            developing countries, continues to limit adoption.
                           </span>
                         </li>
                       </ul>
@@ -754,7 +690,14 @@ const TechAdoptionCycle = () => {
                         ✅ What This Means: Bitcoin Is Still Early in the Curve
                       </h4>
                       <p className="text-gray-300 leading-relaxed mb-4">
-                        Because Bitcoin is still owned by a small fraction of the world&apos;s population — and many barriers remain — it behaves like a technology in the <strong className="text-orange-300">&quot;Early Adopter → Early Majority&quot;</strong> transitional phase. The potential is huge, but adoption growth will likely require continued improvements in:
+                        Because Bitcoin is still owned by a small fraction of
+                        the world&apos;s population — and many barriers remain —
+                        it behaves like a technology in the{" "}
+                        <strong className="text-orange-300">
+                          &quot;Early Adopter → Early Majority&quot;
+                        </strong>{" "}
+                        transitional phase. The potential is huge, but adoption
+                        growth will likely require continued improvements in:
                       </p>
                       <ul className="grid md:grid-cols-2 gap-3 text-gray-300">
                         <li className="flex items-start gap-2">
@@ -763,11 +706,16 @@ const TechAdoptionCycle = () => {
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-orange-400">✓</span>
-                          <span>Regulatory clarity and institutional backing</span>
+                          <span>
+                            Regulatory clarity and institutional backing
+                          </span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-orange-400">✓</span>
-                          <span>Stability (or hedging mechanisms) to offset volatility</span>
+                          <span>
+                            Stability (or hedging mechanisms) to offset
+                            volatility
+                          </span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-orange-400">✓</span>
@@ -775,7 +723,10 @@ const TechAdoptionCycle = () => {
                         </li>
                       </ul>
                       <p className="text-gray-300 leading-relaxed mt-4 italic">
-                        In other words: Bitcoin may have overcome the &quot;innovators&quot; stage — but it still needs to prove value, reliability, and ease-of-use to cross the chasm into mass adoption.
+                        In other words: Bitcoin may have overcome the
+                        &quot;innovators&quot; stage — but it still needs to
+                        prove value, reliability, and ease-of-use to cross the
+                        chasm into mass adoption.
                       </p>
                     </div>
                   </div>
@@ -850,10 +801,10 @@ const TechAdoptionCycle = () => {
                       5. Build Community
                     </h3>
                     <p className="text-gray-300">
-                      Early adopters don&apos;t just use products—they evangelize
-                      them. Give them a platform, a voice, and a reason to
-                      spread the word. Communities create network effects that
-                      accelerate adoption.
+                      Early adopters don&apos;t just use products—they
+                      evangelize them. Give them a platform, a voice, and a
+                      reason to spread the word. Communities create network
+                      effects that accelerate adoption.
                     </p>
                   </div>
 
@@ -862,10 +813,10 @@ const TechAdoptionCycle = () => {
                       6. Timing Is Everything
                     </h3>
                     <p className="text-gray-300">
-                      Launch too early, and the market isn&apos;t ready. Launch too
-                      late, and you&apos;re competing with established players.
-                      Understanding where your market is on the adoption curve
-                      helps you time your strategy perfectly.
+                      Launch too early, and the market isn&apos;t ready. Launch
+                      too late, and you&apos;re competing with established
+                      players. Understanding where your market is on the
+                      adoption curve helps you time your strategy perfectly.
                     </p>
                   </div>
                 </div>
@@ -882,7 +833,8 @@ const TechAdoptionCycle = () => {
                   <p className="text-xl text-gray-200 leading-relaxed mb-6">
                     At <strong className="text-purple-300">MoDevz</strong> and{" "}
                     <strong className="text-blue-300">MoVestmentz</strong>, we
-                    don&apos;t just build technology—we build adoption strategies.
+                    don&apos;t just build technology—we build adoption
+                    strategies.
                   </p>
                   <p className="text-gray-300 leading-relaxed">
                     Our cybersecurity tools, financial dashboards, and digital
@@ -954,8 +906,8 @@ const TechAdoptionCycle = () => {
                   </p>
                   <p className="text-lg text-gray-300 leading-relaxed mb-6">
                     Every digital product today sits somewhere on this curve.
-                    Whether you&apos;re launching an AI tool, a mobile app, a SaaS
-                    platform, or a Web3 solution, your success depends on
+                    Whether you&apos;re launching an AI tool, a mobile app, a
+                    SaaS platform, or a Web3 solution, your success depends on
                     knowing where you are and what it takes to move forward.
                   </p>
                   <p className="text-lg text-gray-300 leading-relaxed">
@@ -977,9 +929,15 @@ const TechAdoptionCycle = () => {
                     digital product sits on the adoption curve and build a
                     roadmap to mass-market success.
                   </p>
-                  <button className="bg-white text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 shadow-lg">
-                    Schedule Your Strategy Call
-                  </button>
+                  <a
+                    href="https://calendar.app.google/aFihqP8f53maMz9v8"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <button className="bg-white text-purple-700 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all duration-200 transform hover:scale-105 shadow-lg">
+                      Schedule Your Strategy Call
+                    </button>
+                  </a>
                 </div>
               </section>
             </div>
