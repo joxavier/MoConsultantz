@@ -503,7 +503,7 @@ export default function StrategicReserve() {
                 borderRadius: '8px',
                 color: '#fff'
               }}
-              formatter={(value: number) => `${value.toFixed(2)}%`}
+              formatter={(value: any) => `${value.toFixed(2)}%`}
             />
             <Legend />
             <Line 
