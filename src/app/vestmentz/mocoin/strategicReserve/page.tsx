@@ -332,7 +332,7 @@ export default function StrategicReserve() {
                     color: '#fff',
                     padding: '4px 0'
                   }}
-                  formatter={(value: any, name: string, entry: any) => {
+                  formatter={(value: any, name: any, entry: any) => {
                     return [
                       <div key="tooltip-content" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <span style={{ color: entry.payload.color, fontWeight: 'bold', fontSize: '14px' }}>
