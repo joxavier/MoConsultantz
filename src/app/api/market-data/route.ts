@@ -1,5 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || '';
+const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
+
+async function getFinnhubQuote(symbol: string) {
+    const response = await fetch(
+        `${FINNHUB_BASE_URL}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to fetch quote for ${symbol}`);
+    }
+    return response.json();
+}
+
+async function getFinnhubCandles(symbol: string, resolution: string, from: number, to: number) {
+    const response = await fetch(
+        `${FINNHUB_BASE_URL}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to fetch candles for ${symbol}`);
+    }
+    return response.json();
+}
+
 export async function POST(request: NextRequest) {
     try {
         const { symbols } = await request.json();
@@ -12,9 +35,6 @@ export async function POST(request: NextRequest) {
         }
 
         console.log('Fetching data from Finnhub for symbols:', symbols);
-
-        const finnhub = require('finnhub');
-        const finnhubClient = new finnhub.DefaultApi(process.env.FINNHUB_API_KEY || '');
 
         const results: Record<string, any> = {};
 
@@ -48,32 +68,20 @@ export async function POST(request: NextRequest) {
                 }
 
                 // Get current quote
-                const quote: any = await new Promise((resolve, reject) => {
-                    finnhubClient.quote(finnhubSymbol, (error: any, data: any) => {
-                        if (error) reject(error);
-                        else resolve(data);
-                    });
-                });
+                const quote = await getFinnhubQuote(finnhubSymbol);
 
                 console.log("Retrieved:", finnhubSymbol, quote);
 
                 // Get historical candles for change calculations
                 const now = Math.floor(Date.now() / 1000);
                 const thirtyDaysAgo = now - (30 * 24 * 60 * 60);
-                const oneYearAgo = now - (365 * 24 * 60 * 60);
 
-                const candles30d: any = await new Promise((resolve, reject) => {
-                    finnhubClient.stockCandles(
-                        finnhubSymbol,
-                        'D',
-                        thirtyDaysAgo,
-                        now,
-                        (error: any, data: any) => {
-                            if (error) reject(error);
-                            else resolve(data);
-                        }
-                    );
-                });
+                const candles30d = await getFinnhubCandles(
+                    finnhubSymbol,
+                    'D',
+                    thirtyDaysAgo,
+                    now
+                );
 
                 if (!quote || quote.c === 0) {
                     throw new Error('No quote data available');
@@ -112,8 +120,8 @@ export async function POST(request: NextRequest) {
                     change24h: percentChange24h,
                     change7d: isNaN(change7d) ? 0 : change7d,
                     change30d: isNaN(change30d) ? 0 : change30d,
-                    change1y: 0, // Will need separate call for 1y data
-                    changeAll: 0, // Calculate from Sep 24, 2024
+                    change1y: 0,
+                    changeAll: 0,
                 };
 
                 console.log(`✓ ${symbol}: $${currentPrice.toFixed(2)} | 24h: ${percentChange24h.toFixed(2)}% | 7d: ${change7d.toFixed(2)}% | 30d: ${change30d.toFixed(2)}%`);
