@@ -74,17 +74,66 @@ END:VCARD`;
     { name: "Email", url: "mailto:josh@modevz.ca", icon: "✉️" },
   ];
 
-  let darkModeActive = useTheme().systemTheme === "dark"; //false;
+  let darkModeActive = useTheme().systemTheme === "dark";
+
+  // Structured Data Schema for Person/Professional (GEO & SEO Optimization)
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Joshua Xavier",
+    "url": "https://josh.modevz.ca",
+    "image": "https://josh.modevz.ca/hero.jpg",
+    "jobTitle": "Technical Consultant & Software Developer",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "MoDevz",
+      "url": "https://josh.modevz.ca"
+    },
+    "description": "Joshua Xavier is a Technical Consultant and Software Developer serving small businesses across Toronto, ON and San Francisco, CA.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Toronto",
+      "addressRegion": "ON",
+      "addressCountry": "CA"
+    },
+    "knowsAbout": [
+      "Technical Consulting",
+      "Web Development",
+      "Blockchain Integration",
+      "Next.js",
+      "Solana",
+      "Small Business Strategy"
+    ],
+    "sameAs": [
+      "https://www.linkedin.com/in/joxavier-3299/",
+      "https://x.com/joshuax47",
+      "https://www.instagram.com/joshuax32/"
+    ]
+  };
 
   return (
     <>
       <Head>
-        <title>Mo | Where Small Business Happens</title>
+        {/* Optimized Title & Meta Description targeting search keywords and locations */}
+        <title>Joshua Xavier | Technical Consultant & Developer | Toronto & San Francisco</title>
         <meta
           name="description"
-          content="Entrepreneurial innovator specializing in high-fashion branding, music industry leadership, and web development."
+          content="Joshua Xavier is a professional Technical Consultant and Developer at MoDevz. Providing custom Web Development, Blockchain Solutions, and Strategy for small businesses."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="keywords" content="Joshua Xavier, Technical Consultant, Software Developer, MoDevz, Toronto Web Development, San Francisco Blockchain Developer" />
+        
+        {/* Open Graph Meta Tags for Social Media Optimization */}
+        <meta property="og:title" content="Joshua Xavier | Technical Consultant & Developer" />
+        <meta property="og:description" content="Technical consulting, web development, and blockchain solutions for growing businesses by Joshua Xavier." />
+        <meta property="og:url" content="https://josh.modevz.ca" />
+        <meta property="og:type" content="profile" />
+
+        {/* Structured Data / JSON-LD Injection */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
       </Head>
 
       <div
@@ -141,11 +190,11 @@ END:VCARD`;
           >
             <Image
               src="/mo.svg"
-              alt="Mo Logo"
+              alt="MoDevz Logo - Where Small Business Happens"
               fill
               style={{
                 objectFit: "contain",
-                filter: darkModeActive ?  "none" : "invert(100%)",
+                filter: darkModeActive ? "none" : "invert(100%)",
               }}
               className="rounded-xl"
             />
@@ -186,7 +235,7 @@ END:VCARD`;
             >
               <Image
                 src="/hero.jpg"
-                alt="Joshua Xavier"
+                alt="Joshua Xavier - Headshot"
                 width={112}
                 height={112}
                 style={{
@@ -254,7 +303,7 @@ END:VCARD`;
             >
               <Image
                 src="/hero.jpg"
-                alt="Joshua Xavier"
+                alt="Joshua Xavier - Technical Consultant"
                 width={112}
                 height={112}
                 style={{
@@ -282,17 +331,29 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Title */}
-          <h2
+          {/* H1 Tag Addition for explicit Search Intent targeting */}
+          <h1
             style={{
               color: "#ffffff",
+              fontSize: "28px",
+              fontWeight: "700",
+              marginBottom: "4px",
+              margin: "0 0 4px 0",
+            }}
+          >
+            Joshua Xavier
+          </h1>
+
+          <h2
+            style={{
+              color: "#a0a0a0",
               fontSize: "18px",
-              fontWeight: "600",
+              fontWeight: "500",
               marginBottom: "8px",
               margin: "0 0 8px 0",
             }}
           >
-            Technical Consultant
+            Technical Consultant & Software Developer
           </h2>
 
           <p
