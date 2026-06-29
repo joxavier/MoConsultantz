@@ -60,11 +60,7 @@ END:VCARD`;
   };
 
   const socialLinks = [
-    {
-      name: "LinkedIn",
-      url: "https://www.linkedin.com/in/joxavier-3299/",
-      icon: "💼",
-    },
+    { name: "LinkedIn", url: "https://www.linkedin.com/in/joxavier-3299/", icon: "💼" },
     { name: "Twitter", url: "https://x.com/joshuax47", icon: "🐦" },
     {
       name: "Instagram",
@@ -107,7 +103,17 @@ END:VCARD`;
     "sameAs": [
       "https://www.linkedin.com/in/joxavier-3299/",
       "https://x.com/joshuax47",
-      "https://www.instagram.com/joshuax32/"
+      "https://www.instagram.com/joshuax32/",
+      "https://www.facebook.com/Joshuax47",
+      "https://www.tiktok.com/@jmojx",
+      "https://open.spotify.com/user/mangoesrmyfav",
+      "https://www.youtube.com/@realJMOJX",
+      "https://www.snapchat.com/@jmojx",
+      "https://github.com/joxavier",
+      "https://stackoverflow.com/users/18236982/joshua-xavier",
+      "https://www.reddit.com/user/joxavier99/",
+      "https://ca.pinterest.com/joshuax47/",
+      "https://jmojx.metaparlour.io/"
     ]
   };
 
@@ -115,7 +121,7 @@ END:VCARD`;
     <>
       <Head>
         {/* Optimized Title & Meta Description targeting search keywords and locations */}
-        <title>Joshua Xavier | Technical Consultant & Developer | Toronto & San Francisco</title>
+        <title>Joshua Xavier | Technical Consultant & Developer | Waterloo, Toronto & Silicon Valley</title>
         <meta
           name="description"
           content="Joshua Xavier is a professional Technical Consultant and Developer at MoDevz. Providing custom Web Development, Blockchain Solutions, and Strategy for small businesses."
