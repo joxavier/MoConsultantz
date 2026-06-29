@@ -4,7 +4,23 @@ import Head from "next/head";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Highlights from "./Highlights";
+import { CredibilityBar } from "./CredibilityBar";
 import personalPageData from "@/data/personalPage.json";
+import {
+  FaLinkedin,
+  FaXTwitter,
+  FaInstagram,
+  FaFacebook,
+  FaTiktok,
+  FaSpotify,
+  FaYoutube,
+  FaSnapchat,
+  FaGithub,
+  FaStackOverflow,
+  FaReddit,
+  FaPinterest,
+  FaGlobe,
+} from "react-icons/fa6";
 
 export default function PersonalPage() {
   const [showBookingForm, setShowBookingForm] = useState(false);
@@ -22,7 +38,7 @@ export default function PersonalPage() {
   const handleSaveContact = () => {
     const contact = {
       name: "Joshua Xavier",
-      company: "Mo - Where Small Business Happens",
+      company: "MoDevz",
       email: "josh@modevz.ca",
       phone: "+1-647-687-1183",
       website: "https://josh.modevz.ca",
@@ -46,13 +62,23 @@ END:VCARD`;
     window.URL.revokeObjectURL(url);
   };
 
-  const handleBookingSubmit = (e: { preventDefault: () => void }) => {
+  const handleBookingSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Here you would integrate with your payment processor
-    alert(
-      "Booking form submitted! This would integrate with your payment system."
-    );
-    setShowBookingForm(false);
+
+    const res = await fetch("/api/booking", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookingData),
+    });
+
+    if (res.ok) {
+      alert("Booking request sent!");
+      setShowBookingForm(false);
+    } else {
+      alert("Something went wrong.");
+    }
   };
 
   const scrollToMoreInfo = () => {
@@ -60,15 +86,77 @@ END:VCARD`;
   };
 
   const socialLinks = [
-    { name: "LinkedIn", url: "https://www.linkedin.com/in/joxavier-3299/", icon: "💼" },
-    { name: "Twitter", url: "https://x.com/joshuax47", icon: "🐦" },
+    {
+      name: "LinkedIn",
+      url: "https://www.linkedin.com/in/joxavier-3299/",
+      icon: FaLinkedin,
+    },
+    {
+      name: "X",
+      url: "https://x.com/joshuax47",
+      icon: FaXTwitter,
+    },
     {
       name: "Instagram",
       url: "https://www.instagram.com/joshuax32/",
-      icon: "📸",
+      icon: FaInstagram,
     },
-    { name: "Email", url: "mailto:josh@modevz.ca", icon: "✉️" },
+    {
+      name: "GitHub",
+      url: "https://github.com/joxavier",
+      icon: FaGithub,
+    },
+    {
+      name: "YouTube",
+      url: "https://www.youtube.com/@realJMOJX",
+      icon: FaYoutube,
+    },
+
+    // Hidden by default
+    {
+      name: "Facebook",
+      url: "https://www.facebook.com/Joshuax47",
+      icon: FaFacebook,
+    },
+    {
+      name: "TikTok",
+      url: "https://www.tiktok.com/@jmojx",
+      icon: FaTiktok,
+    },
+    {
+      name: "Spotify",
+      url: "https://open.spotify.com/user/mangoesrmyfav",
+      icon: FaSpotify,
+    },
+    {
+      name: "Snapchat",
+      url: "https://www.snapchat.com/@jmojx",
+      icon: FaSnapchat,
+    },
+    {
+      name: "Stack Overflow",
+      url: "https://stackoverflow.com/users/18236982/joshua-xavier",
+      icon: FaStackOverflow,
+    },
+    {
+      name: "Reddit",
+      url: "https://www.reddit.com/user/joxavier99/",
+      icon: FaReddit,
+    },
+    {
+      name: "Pinterest",
+      url: "https://ca.pinterest.com/joshuax47/",
+      icon: FaPinterest,
+    },
+    {
+      name: "Metaparlour",
+      url: "https://jmojx.metaparlour.io/",
+      image: "https://metaparlour.io/favicon.ico",
+    },
   ];
+  const [showAllSocials, setShowAllSocials] = useState(false);
+
+  const visibleLinks = showAllSocials ? socialLinks : socialLinks.slice(0, 5);
 
   let darkModeActive = useTheme().systemTheme === "dark";
 
@@ -76,31 +164,32 @@ END:VCARD`;
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "name": "Joshua Xavier",
-    "url": "https://josh.modevz.ca",
-    "image": "https://josh.modevz.ca/hero.jpg",
-    "jobTitle": "Technical Consultant & Software Developer",
-    "worksFor": {
+    name: "Joshua Xavier",
+    url: "https://josh.modevz.ca",
+    image: "https://josh.modevz.ca/hero.jpg",
+    jobTitle: "Technical Consultant & Software Developer",
+    worksFor: {
       "@type": "Organization",
-      "name": "MoDevz",
-      "url": "https://josh.modevz.ca"
+      name: "MoDevz",
+      url: "https://josh.modevz.ca",
     },
-    "description": "Joshua Xavier is a Technical Consultant and Software Developer serving small businesses across Toronto, ON and San Francisco, CA.",
-    "address": {
+    description:
+      "Joshua Xavier is a Technical Consultant and Software Developer serving small businesses across Toronto, ON and San Francisco, CA.",
+    address: {
       "@type": "PostalAddress",
-      "addressLocality": "Toronto",
-      "addressRegion": "ON",
-      "addressCountry": "CA"
+      addressLocality: "Toronto",
+      addressRegion: "ON",
+      addressCountry: "CA",
     },
-    "knowsAbout": [
+    knowsAbout: [
       "Technical Consulting",
       "Web Development",
       "Blockchain Integration",
       "Next.js",
       "Solana",
-      "Small Business Strategy"
+      "Small Business Strategy",
     ],
-    "sameAs": [
+    sameAs: [
       "https://www.linkedin.com/in/joxavier-3299/",
       "https://x.com/joshuax47",
       "https://www.instagram.com/joshuax32/",
@@ -113,25 +202,37 @@ END:VCARD`;
       "https://stackoverflow.com/users/18236982/joshua-xavier",
       "https://www.reddit.com/user/joxavier99/",
       "https://ca.pinterest.com/joshuax47/",
-      "https://jmojx.metaparlour.io/"
-    ]
+      "https://jmojx.metaparlour.io/",
+    ],
   };
 
   return (
     <>
       <Head>
         {/* Optimized Title & Meta Description targeting search keywords and locations */}
-        <title>Joshua Xavier | Technical Consultant & Developer | Waterloo, Toronto & Silicon Valley</title>
+        <title>
+          Joshua Xavier | Technical Consultant & Developer | Waterloo, Toronto &
+          Silicon Valley
+        </title>
         <meta
           name="description"
           content="Joshua Xavier is a professional Technical Consultant and Developer at MoDevz. Providing custom Web Development, Blockchain Solutions, and Strategy for small businesses."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="keywords" content="Joshua Xavier, Technical Consultant, Software Developer, MoDevz, Toronto Web Development, San Francisco Blockchain Developer" />
-        
+        <meta
+          name="keywords"
+          content="Joshua Xavier, Technical Consultant, Software Developer, MoDevz, Toronto Web Development, San Francisco Blockchain Developer"
+        />
+
         {/* Open Graph Meta Tags for Social Media Optimization */}
-        <meta property="og:title" content="Joshua Xavier | Technical Consultant & Developer" />
-        <meta property="og:description" content="Technical consulting, web development, and blockchain solutions for growing businesses by Joshua Xavier." />
+        <meta
+          property="og:title"
+          content="Joshua Xavier | Technical Consultant & Developer"
+        />
+        <meta
+          property="og:description"
+          content="Technical consulting, web development, and blockchain solutions for growing businesses by Joshua Xavier."
+        />
         <meta property="og:url" content="https://josh.modevz.ca" />
         <meta property="og:type" content="profile" />
 
@@ -160,7 +261,6 @@ END:VCARD`;
               display: flex !important;
             }
           }
-
           @media (min-width: 769px) {
             .desktop-profile {
               display: flex !important;
@@ -183,30 +283,26 @@ END:VCARD`;
               "linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d1b69 100%)",
             padding: "20px",
             boxSizing: "border-box",
-            position: "relative", // required for Image fill
+            position: "relative",
             overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "100%",
-            }}
-          >
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
             <Image
               src="/mo.svg"
               alt="MoDevz Logo - Where Small Business Happens"
               fill
               style={{
                 objectFit: "contain",
-                filter: darkModeActive ? "none" : "invert(100%)",
+                filter: !darkModeActive ? "none" : "invert(100%)",
               }}
               className="rounded-xl"
+              priority // Priority loading for above-the-fold content improves SEO core web vitals
             />
           </div>
         </div>
 
+        {/* Mobile Profile Photo */}
         <div
           className="mobile-profile-overlap"
           style={{
@@ -250,20 +346,6 @@ END:VCARD`;
                   objectFit: "cover",
                   borderRadius: "50%",
                   display: "block",
-                }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const fallback = document.createElement("div");
-                  fallback.style.width = "100%";
-                  fallback.style.height = "100%";
-                  fallback.style.display = "flex";
-                  fallback.style.alignItems = "center";
-                  fallback.style.justifyContent = "center";
-                  fallback.style.fontSize = "48px";
-                  fallback.style.color = "#ffffff";
-                  fallback.textContent = "👨‍💼";
-                  target.parentNode?.appendChild(fallback);
                 }}
               />
             </div>
@@ -319,20 +401,6 @@ END:VCARD`;
                   borderRadius: "50%",
                   display: "block",
                 }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const fallback = document.createElement("div");
-                  fallback.style.width = "100%";
-                  fallback.style.height = "100%";
-                  fallback.style.display = "flex";
-                  fallback.style.alignItems = "center";
-                  fallback.style.justifyContent = "center";
-                  fallback.style.fontSize = "48px";
-                  fallback.style.color = "#ffffff";
-                  fallback.textContent = "👨‍💼";
-                  target.parentNode?.appendChild(fallback);
-                }}
               />
             </div>
           </div>
@@ -370,7 +438,7 @@ END:VCARD`;
               margin: "0 0 30px 0",
             }}
           >
-            Where Small Business Happens
+            Mo — Where Small Business Happens
           </p>
 
           {/* Social Links */}
@@ -383,39 +451,47 @@ END:VCARD`;
               justifyContent: "center",
             }}
           >
-            {socialLinks.map((link, index) => (
-              <a
-                key={index}
-                href={link.url}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  background: "rgba(255, 255, 255, 0.1)",
-                  color: "#ffffff",
-                  textDecoration: "none",
-                  fontSize: "20px",
-                  transition: "all 0.3s ease",
-                  border: "1px solid rgba(138, 43, 226, 0.3)",
-                }}
-                onMouseEnter={(e) => {
-                  const target = e.target as HTMLAnchorElement;
-                  target.style.background =
-                    "linear-gradient(45deg, #8a2be2, #4169e1)";
-                  target.style.transform = "scale(1.1)";
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.target as HTMLAnchorElement;
-                  target.style.background = "rgba(255, 255, 255, 0.1)";
-                  target.style.transform = "scale(1)";
-                }}
-              >
-                {link.icon}
-              </a>
-            ))}
+            {/* Social Icons */}
+            <div className="flex flex-wrap justify-center gap-5">
+              {visibleLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  className="group flex flex-col items-center gap-2"
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-muted transition-all duration-300 group-hover:scale-105 group-hover:border-primary/30 group-hover:bg-primary/10">
+                    {social.image ? (
+                      <img
+                        src={social.image}
+                        alt={social.name}
+                        className="h-7 w-7 object-contain"
+                      />
+                    ) : (
+                      <social.icon className="h-6 w-6 text-muted-foreground transition-colors duration-300 group-hover:text-primary" />
+                    )}
+                  </div>
+
+                  <span className="text-xs font-medium text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+                    {social.name}
+                  </span>
+                </a>
+              ))}
+            </div>
+
+            {/* View All / Show Less */}
+            {socialLinks.length > 5 && (
+              <div className="flex w-full justify-center">
+                <button
+                  onClick={() => setShowAllSocials((prev) => !prev)}
+                  className="rounded-full border border-border bg-background px-5 py-2 text-sm font-medium transition-colors hover:bg-muted"
+                >
+                  {showAllSocials ? "Show Less" : "View All"}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -442,17 +518,6 @@ END:VCARD`;
                 transition: "all 0.3s ease",
                 textAlign: "center",
               }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLButtonElement).style.transform =
-                  "translateY(-2px)";
-                (e.target as HTMLButtonElement).style.boxShadow =
-                  "0 10px 25px rgba(138, 43, 226, 0.4)";
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLButtonElement).style.transform =
-                  "translateY(0)";
-                (e.target as HTMLButtonElement).style.boxShadow = "none";
-              }}
             >
               💾 Save Contact
             </button>
@@ -470,19 +535,6 @@ END:VCARD`;
                 cursor: "pointer",
                 transition: "all 0.3s ease",
                 textAlign: "center",
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLButtonElement).style.background = "#4169e1";
-                (e.target as HTMLButtonElement).style.color = "#ffffff";
-                (e.target as HTMLButtonElement).style.transform =
-                  "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLButtonElement).style.background =
-                  "transparent";
-                (e.target as HTMLButtonElement).style.color = "#4169e1";
-                (e.target as HTMLButtonElement).style.transform =
-                  "translateY(0)";
               }}
             >
               📅 Book Now
@@ -502,24 +554,13 @@ END:VCARD`;
                 transition: "all 0.3s ease",
                 textAlign: "center",
               }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLButtonElement).style.background =
-                  "rgba(255, 255, 255, 0.1)";
-                (e.target as HTMLButtonElement).style.transform =
-                  "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLButtonElement).style.background =
-                  "transparent";
-                (e.target as HTMLButtonElement).style.transform =
-                  "translateY(0)";
-              }}
             >
               ℹ️ More Info
             </button>
           </div>
         </div>
 
+        <CredibilityBar />
         {/* More Info Section */}
         <div
           ref={moreInfoRef}
@@ -530,11 +571,7 @@ END:VCARD`;
           }}
         >
           <div
-            style={{
-              maxWidth: "800px",
-              margin: "0 auto",
-              textAlign: "center",
-            }}
+            style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}
           >
             <h2
               style={{
@@ -547,7 +584,7 @@ END:VCARD`;
                 backgroundClip: "text",
               }}
             >
-              About Me
+              About Joshua Xavier
             </h2>
 
             <Highlights highlights={highlights} />
@@ -568,22 +605,25 @@ END:VCARD`;
                 next-generation technologies to fulfill evolving consumer needs.
                 With a detail-oriented mindset and a commitment to excellence, I
                 specialize in crafting interactive, client-centric digital
-                solutions that drive real-world impact.
+                solutions that drive real-world impact across key markets like{" "}
+                <strong>Toronto, Ontario</strong> and{" "}
+                <strong>San Francisco, California</strong>.
               </p>
               <p style={{ marginBottom: "20px" }}>
                 My background in business and technology allows me to bridge
-                strategy with execution—developing tools, systems, and platforms
-                that help small businesses grow. I’m especially interested in
-                integrating blockchain, automation, and AI to enhance customer
-                experiences and operational efficiency.
+                strategy with execution—developing tools, systems, and custom
+                software platforms that help small businesses scale effectively.
+                I specialize in integrating secure blockchain applications,
+                operational automation, and tailored AI components to optimize
+                customer experiences and elevate efficiency.
               </p>
               <p>
-                I’m known for my strategic foresight and my ability to build
-                plans that align with long-term success. Outside of work, I
-                enjoy catching up on basketball, blockchain developments, and
-                hip-hop culture. My drive for success is rooted in empowering
-                communities and helping businesses scale with purpose and
-                precision.
+                As the driving force behind <strong>MoDevz</strong>, I build
+                platforms and tech stacks designed for long-term scalability.
+                Whether architecting high-performance web applications or
+                coordinating strategic digital infrastructures, my mission is
+                centered on empowering small businesses to scale with purpose,
+                clarity, and precision.
               </p>
             </div>
 
@@ -614,9 +654,8 @@ END:VCARD`;
                   🎓 Education
                 </h3>
                 <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
-                  4+ degrees with majors in Business and Computer Science,
-                  minors in Marketing and Economics, and certified in
-                  Cybersecurity and AI/ML technologies.
+                  Dual degrees in Business Administration and Computer Science
+                  with specialization across core technical matrices.
                 </p>
               </div>
 
@@ -639,8 +678,9 @@ END:VCARD`;
                   💼 Experience
                 </h3>
                 <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
-                  Years of experience spanning web development, music industry
-                  platforms, and blockchain integration.
+                  Years of specialized technical consulting history encompassing
+                  custom web frameworks, software architecture, and
+                  decentralized applications.
                 </p>
               </div>
             </div>
@@ -686,16 +726,6 @@ END:VCARD`;
                   cursor: "pointer",
                   transition: "all 0.3s ease",
                 }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLButtonElement).style.transform =
-                    "scale(1.05)";
-                  (e.target as HTMLButtonElement).style.boxShadow =
-                    "0 10px 25px rgba(138, 43, 226, 0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLButtonElement).style.transform = "scale(1)";
-                  (e.target as HTMLButtonElement).style.boxShadow = "none";
-                }}
               >
                 Get Started Today
               </button>
@@ -740,13 +770,7 @@ END:VCARD`;
                   marginBottom: "30px",
                 }}
               >
-                <h2
-                  style={{
-                    color: "#ffffff",
-                    fontSize: "24px",
-                    margin: 0,
-                  }}
-                >
+                <h2 style={{ color: "#ffffff", fontSize: "24px", margin: 0 }}>
                   Book Consultation
                 </h2>
                 <button
@@ -978,17 +1002,6 @@ END:VCARD`;
                     fontWeight: "600",
                     cursor: "pointer",
                     transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLButtonElement).style.transform =
-                      "translateY(-2px)";
-                    (e.target as HTMLButtonElement).style.boxShadow =
-                      "0 10px 25px rgba(138, 43, 226, 0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLButtonElement).style.transform =
-                      "translateY(0)";
-                    (e.target as HTMLButtonElement).style.boxShadow = "none";
                   }}
                 >
                   Book & Pay Now
