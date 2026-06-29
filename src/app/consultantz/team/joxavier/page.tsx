@@ -469,9 +469,9 @@ END:VCARD`;
                         alt={social.name}
                         className="h-7 w-7 object-contain"
                       />
-                    ) : (
+                    ) : social.icon ? (
                       <social.icon className="h-6 w-6 text-muted-foreground transition-colors duration-300 group-hover:text-primary" />
-                    )}
+                    ) : null}
                   </div>
 
                   <span className="text-xs font-medium text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
