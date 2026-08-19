@@ -1,31 +1,134 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || '';
-const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
+const YAHOO_CHART_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
+const CRYPTO_SYMBOLS = new Set(['BTC', 'SOL', 'ADA', 'FIL', 'USDC', 'USDT']);
+const STABLECOINS = new Set(['USDC', 'USDT']);
 
-async function getFinnhubQuote(symbol: string) {
-    const response = await fetch(
-        `${FINNHUB_BASE_URL}/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`
-    );
-    if (!response.ok) {
-        throw new Error(`Failed to fetch quote for ${symbol}`);
-    }
-    return response.json();
+type BaseCurrency = 'USD' | 'CAD';
+type YahooChartResult = {
+    meta?: {
+        chartPreviousClose?: number;
+        currency?: string;
+        regularMarketPrice?: number;
+    };
+    timestamp?: number[];
+    indicators?: {
+        quote?: Array<{
+            close?: Array<number | null>;
+        }>;
+    };
+};
+function normalizeBaseCurrency(value: unknown): BaseCurrency {
+    return value === 'CAD' ? 'CAD' : 'USD';
 }
 
-async function getFinnhubCandles(symbol: string, resolution: string, from: number, to: number) {
-    const response = await fetch(
-        `${FINNHUB_BASE_URL}/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}&token=${FINNHUB_API_KEY}`
-    );
-    if (!response.ok) {
-        throw new Error(`Failed to fetch candles for ${symbol}`);
+function normalizeAssetSymbol(symbol: string) {
+    return symbol.replace('-USD', '').replace('-CAD', '');
+}
+
+function mapToYahooSymbol(symbol: string) {
+    const normalized = normalizeAssetSymbol(symbol);
+
+    if (CRYPTO_SYMBOLS.has(normalized)) {
+        return `${normalized}-USD`;
     }
-    return response.json();
+
+    return symbol;
+}
+
+async function fetchYahooChart(symbol: string, range: string, interval: string): Promise<YahooChartResult> {
+    const searchParams = new URLSearchParams({
+        range,
+        interval,
+        includePrePost: 'true',
+    });
+    const response = await fetch(`${YAHOO_CHART_BASE_URL}/${encodeURIComponent(symbol)}?${searchParams.toString()}`, {
+        headers: {
+            'User-Agent': 'Mozilla/5.0',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Yahoo chart request failed for ${symbol} with ${response.status}`);
+    }
+
+    const data = await response.json();
+    const result = data?.chart?.result?.[0];
+    const error = data?.chart?.error;
+
+    if (!result || error) {
+        throw new Error(error?.description || `No Yahoo chart data for ${symbol}`);
+    }
+
+    return result;
+}
+
+function getCloseSeries(chart: YahooChartResult) {
+    const timestamps = chart.timestamp || [];
+    const closes = chart.indicators?.quote?.[0]?.close || [];
+
+    return timestamps
+        .map((timestamp, index) => ({
+            timestamp,
+            close: closes[index],
+        }))
+        .filter((point): point is { timestamp: number; close: number } => typeof point.close === 'number' && point.close > 0);
+}
+
+function getLatestClose(chart: YahooChartResult) {
+    const series = getCloseSeries(chart);
+    return chart.meta?.regularMarketPrice || series[series.length - 1]?.close || 0;
+}
+
+function calculateChangeFromSeries(chart: YahooChartResult, currentPrice: number, secondsAgo: number) {
+    const series = getCloseSeries(chart);
+
+    if (!series.length || !currentPrice) {
+        return 0;
+    }
+
+    const targetTime = Math.floor(Date.now() / 1000) - secondsAgo;
+    let baseline = series[0].close;
+
+    for (const point of series) {
+        if (point.timestamp <= targetTime) {
+            baseline = point.close;
+        } else {
+            break;
+        }
+    }
+
+    if (!baseline) return 0;
+
+    return ((currentPrice - baseline) / baseline) * 100;
+}
+
+function getNativeCurrency(symbol: string, chart: YahooChartResult): BaseCurrency {
+    const yahooCurrency = chart.meta?.currency;
+
+    if (yahooCurrency === 'CAD' || symbol === 'WEED.TO') return 'CAD';
+    return 'USD';
+}
+
+async function getUsdCadRate() {
+    try {
+        const chart = await fetchYahooChart('CAD=X', '5d', '1d');
+        return getLatestClose(chart) || 1.43;
+    } catch (error) {
+        console.error('Failed to fetch USD/CAD rate:', error);
+        return 1.43;
+    }
+}
+
+function convertPrice(price: number, nativeCurrency: BaseCurrency, baseCurrency: BaseCurrency, usdCadRate: number) {
+    if (nativeCurrency === baseCurrency) return price;
+    return baseCurrency === 'CAD' ? price * usdCadRate : price / usdCadRate;
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const { symbols } = await request.json();
+        const { symbols, baseCurrency: requestedBaseCurrency } = await request.json();
+        const baseCurrency = normalizeBaseCurrency(requestedBaseCurrency);
 
         if (!symbols || !Array.isArray(symbols)) {
             return NextResponse.json(
@@ -34,111 +137,79 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log('Fetching data from Finnhub for symbols:', symbols);
-
+        const usdCadRate = await getUsdCadRate();
         const results: Record<string, any> = {};
 
-        // Fetch data for each symbol sequentially to avoid rate limits
         for (const symbol of symbols) {
             try {
-                // Map symbols to Finnhub format
-                let finnhubSymbol = symbol;
+                const normalizedSymbol = normalizeAssetSymbol(symbol);
 
-                if (symbol.includes('-USD')) {
-                    const base = symbol.replace('-USD', '');
-                    if (base === 'BTC') finnhubSymbol = 'BINANCE:BTCUSDT';
-                    else if (base === 'SOL') finnhubSymbol = 'BINANCE:SOLUSDT';
-                    else if (base === 'ADA') finnhubSymbol = 'BINANCE:ADAUSDT';
-                    else if (base === 'FIL') finnhubSymbol = 'BINANCE:FILUSDT';
-                    else if (base === 'USDC') finnhubSymbol = 'BINANCE:USDCUSDT';
-                    else if (base === 'USDT') {
-                        results[symbol] = {
-                            c: 1.0,
-                            pc: 1.0,
-                            dp: 0,
-                            price: 1.0,
-                            change24h: 0,
-                            change7d: 0,
-                            change30d: 0,
-                        };
-                        continue;
-                    }
-                } else if (symbol === 'WEED.TO') {
-                    finnhubSymbol = 'WEED:CA';
+                if (STABLECOINS.has(normalizedSymbol)) {
+                    const stablePrice = convertPrice(1, 'USD', baseCurrency, usdCadRate);
+                    results[symbol] = {
+                        c: stablePrice,
+                        pc: stablePrice,
+                        price: stablePrice,
+                        baseCurrency,
+                        nativeCurrency: 'USD',
+                        sourceSymbol: `${normalizedSymbol}-USD`,
+                        usdCadRate,
+                        change1h: 0,
+                        change4h: 0,
+                        change1d: 0,
+                        change7d: 0,
+                        change1m: 0,
+                    };
+                    continue;
                 }
 
-                // Get current quote
-                const quote = await getFinnhubQuote(finnhubSymbol);
+                const yahooSymbol = mapToYahooSymbol(symbol);
+                const intradayChart = await fetchYahooChart(yahooSymbol, '5d', '15m');
+                const dailyChart = await fetchYahooChart(yahooSymbol, '2mo', '1d');
+                const currentPrice = getLatestClose(intradayChart) || getLatestClose(dailyChart);
 
-                console.log("Retrieved:", finnhubSymbol, quote);
+                if (!currentPrice) {
+                    throw new Error(`No current price for ${symbol}`);
+                }
 
-                // Get historical candles for change calculations
-                const now = Math.floor(Date.now() / 1000);
-                const thirtyDaysAgo = now - (30 * 24 * 60 * 60);
-
-                const candles30d = await getFinnhubCandles(
-                    finnhubSymbol,
-                    'D',
-                    thirtyDaysAgo,
-                    now
+                const nativeCurrency = getNativeCurrency(symbol, intradayChart);
+                const displayPrice = convertPrice(currentPrice, nativeCurrency, baseCurrency, usdCadRate);
+                const previousClose = convertPrice(
+                    intradayChart.meta?.chartPreviousClose || dailyChart.meta?.chartPreviousClose || currentPrice,
+                    nativeCurrency,
+                    baseCurrency,
+                    usdCadRate
                 );
 
-                if (!quote || quote.c === 0) {
-                    throw new Error('No quote data available');
-                }
-
-                const currentPrice = quote.c;
-                const previousClose = quote.pc;
-                const percentChange24h = quote.dp || 0;
-
-                // Calculate changes from candles
-                let change7d = 0;
-                let change30d = 0;
-                
-                if (candles30d && candles30d.c && candles30d.c.length > 0) {
-                    // 7 days ago
-                    if (candles30d.c.length >= 7) {
-                        const sevenDaysAgo = candles30d.c[candles30d.c.length - 7];
-                        change7d = ((currentPrice - sevenDaysAgo) / sevenDaysAgo) * 100;
-                    }
-
-                    // 30 days ago
-                    const thirtyDaysAgoPrice = candles30d.c[0];
-                    change30d = ((currentPrice - thirtyDaysAgoPrice) / thirtyDaysAgoPrice) * 100;
-                }
-
-                // Store in Finnhub format + calculated changes
                 results[symbol] = {
-                    c: currentPrice,
+                    c: displayPrice,
                     pc: previousClose,
-                    dp: percentChange24h,
-                    h: quote.h,
-                    l: quote.l,
-                    o: quote.o,
-                    t: quote.t,
-                    price: currentPrice,
-                    change24h: percentChange24h,
-                    change7d: isNaN(change7d) ? 0 : change7d,
-                    change30d: isNaN(change30d) ? 0 : change30d,
-                    change1y: 0,
-                    changeAll: 0,
+                    price: displayPrice,
+                    baseCurrency,
+                    nativeCurrency,
+                    sourceSymbol: yahooSymbol,
+                    usdCadRate,
+                    change1h: calculateChangeFromSeries(intradayChart, currentPrice, 60 * 60),
+                    change4h: calculateChangeFromSeries(intradayChart, currentPrice, 4 * 60 * 60),
+                    change1d: calculateChangeFromSeries(intradayChart, currentPrice, 24 * 60 * 60),
+                    change7d: calculateChangeFromSeries(dailyChart, currentPrice, 7 * 24 * 60 * 60),
+                    change1m: calculateChangeFromSeries(dailyChart, currentPrice, 30 * 24 * 60 * 60),
                 };
 
-                console.log(`✓ ${symbol}: $${currentPrice.toFixed(2)} | 24h: ${percentChange24h.toFixed(2)}% | 7d: ${change7d.toFixed(2)}% | 30d: ${change30d.toFixed(2)}%`);
-
-                await new Promise(resolve => setTimeout(resolve, 100));
-
+                await new Promise(resolve => setTimeout(resolve, 50));
             } catch (error: any) {
-                console.error(`✗ Error fetching ${symbol}:`, error.message);
+                console.error(`Error fetching ${symbol}:`, error.message);
                 results[symbol] = {
                     error: error.message,
                     c: 0,
                     pc: 0,
-                    dp: 0,
                     price: 0,
-                    change24h: 0,
+                    baseCurrency,
+                    change1h: 0,
+                    change4h: 0,
+                    change1d: 0,
                     change7d: 0,
-                    change30d: 0,
+                    change1m: 0,
                 };
             }
         }
