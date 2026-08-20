@@ -462,12 +462,13 @@ const Header = () => {
         }}>
             <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px' }}>
                 <div style={{ backgroundColor: '#fff', borderRadius: '32%', padding: '5px' }}>
-                    <Link href="/home">
+                    <Link href="/" aria-label="MoDevz home">
                         <Image
                             src="/mo.svg"
                             alt="MO Logo"
                             width={40}
                             height={40}
+                            style={{ width: '40px', height: '40px' }}
                         />
                     </Link>
                 </div>
@@ -497,6 +498,7 @@ const Header = () => {
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <MenuItem link="/about" text="About Us" onClick={toggleMenu} />
                                     {renderMobileServices()}
+                                    <MenuItem link="/technical-consulting" text="Work With Us" onClick={toggleMenu} />
                                     <MenuItem link="/moos" text="MoOS" onClick={toggleMenu} />
                                 </div>
                             </nav>
@@ -510,6 +512,9 @@ const Header = () => {
                             <a href="/about" style={{ textDecoration: 'none', color: '#fff' }}>About Us.</a>
                         </li>
                         {renderServicesDropdown()}
+                        <li style={{ marginRight: '30px' }}>
+                            <Link href="/technical-consulting" style={{ textDecoration: 'none', color: '#fff', border: '1px solid #fff', borderRadius: '999px', padding: '10px 16px' }}>Work With Us</Link>
+                        </li>
                         <li style={{ marginRight: '30px' }}>
                             <a href="/moos" style={{ textDecoration: 'none', color: '#fff' }}>MoOS.</a>
                         </li>

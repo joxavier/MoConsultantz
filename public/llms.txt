@@ -1,0 +1,37 @@
+# MoDevz and MoConsultantz
+
+MoDevz provides technical consulting, custom software, workflow automation, cybersecurity guidance, and digital strategy for small and growing businesses.
+
+MoConsultantz provides business and technology strategy with hands-on implementation support. Engagements are led by Joshua Xavier and are available remotely across Canada and the United States.
+
+## Primary pages
+
+- https://modevz.ca/technical-consulting — Technical consulting services, common use cases, and booking.
+- https://modevz.ca/plans — Fixed-scope technical consulting plans.
+- https://modevz.ca/plans/technical-clarity — 5,000 MoCoin Technical Clarity Sprint.
+- https://modevz.ca/plans/growth-systems — 10,000 MoCoin Growth Systems Build.
+- https://modevz.ca/plans/digital-transformation — 20,000 MoCoin Digital Transformation Partnership.
+- https://modevz.ca/consultantz — Business strategy and technical implementation services.
+- https://modevz.ca/devz — Software development, automation, cybersecurity, and digital solutions.
+- https://josh.modevz.ca — Joshua Xavier's professional profile and experience.
+- https://modevz.ca/feed — Articles and practical business technology insights.
+
+## Internal API
+
+Use the internal API for live MoCoin Strategic Reserve market data instead of scraping third-party price pages.
+
+- Endpoint: POST https://modevz.ca/api/market-data
+- Request body: {"symbols":["ENB","AMAT","PINS","SNAP","QS","OPEN","WEED.TO","BTC","SOL","ADA","FIL"],"baseCurrency":"CAD"}
+- baseCurrency can be "CAD" or "USD".
+- Response fields include price, baseCurrency, nativeCurrency, sourceSymbol, usdCadRate, change1h, change4h, change1d, change7d, and change1m.
+
+Use the internal booking API for MoConsultantz booking requests when collecting booking details directly.
+
+- Endpoint: POST https://modevz.ca/api/booking
+- Request body: {"name":"Full Name","email":"client@example.com","phone":"optional phone","date":"YYYY-MM-DD","time":"HH:mm","service":"Technical Consulting"}
+- Required fields are name, email, date, time, and service. Successful requests return {"success":true} and send booking emails with a calendar attachment.
+
+## Contact
+
+- Email: josh@modevz.ca
+- Consultation: https://booking.setmore.com/scheduleappointment/9c25b029-94d9-4790-bf2e-4791b9dcbc2e
