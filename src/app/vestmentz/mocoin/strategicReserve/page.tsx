@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import type { Asset, BaseCurrency, TimePeriod, ChangeKey } from '@/lib/treasury/types';
 
 const MO_COLORS = {
   purple: '#8743f7',
@@ -20,30 +21,6 @@ const MO_COLORS = {
   red: '#ef4444',
   indigo: '#6366f1',
   teal: '#14b8a6',
-};
-
-type BaseCurrency = 'USD' | 'CAD';
-type TimePeriod = '1h' | '4h' | '1d' | '7d' | '1m';
-type ChangeKey = 'change1h' | 'change4h' | 'change1d' | 'change7d' | 'change1m';
-
-type Asset = {
-  symbol: string;
-  category: string;
-  targetAllocation: number;
-  currentAllocation: number;
-  price: number;
-  value?: number;
-  holdingQuantity?: number;
-  holdingCurrency?: BaseCurrency;
-  verifiedHolding?: string;
-  isCustom?: boolean;
-  isCash?: boolean;
-  hasPriceError?: boolean;
-  change1h: number;
-  change4h: number;
-  change1d: number;
-  change7d: number;
-  change1m: number;
 };
 
 export default function StrategicReserve() {

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@next/third-parties": "^14.2.1",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
     "chart.js": "^4.5.0",
     "framer-motion": "^10.16.16",
     "googleapis": "^166.0.0",
