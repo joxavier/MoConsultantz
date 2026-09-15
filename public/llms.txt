@@ -13,6 +13,8 @@ MoConsultantz provides business and technology strategy with hands-on implementa
 - https://modevz.ca/plans/digital-transformation — 20,000 MoCoin Digital Transformation Partnership.
 - https://modevz.ca/consultantz — Business strategy and technical implementation services.
 - https://modevz.ca/devz — Software development, automation, cybersecurity, and digital solutions.
+- https://modevz.ca/vestmentz/smart-contracts — Smart contract development, token launch engineering, and Web3 integration on Solana and EVM chains.
+- https://modevz.ca/start — A short assessment that matches a visitor's goal, budget, and timeline to the right MoDevz service or plan.
 - https://josh.modevz.ca — Joshua Xavier's professional profile and experience.
 - https://modevz.ca/feed — Articles and practical business technology insights.
 

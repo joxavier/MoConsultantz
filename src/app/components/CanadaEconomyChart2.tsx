@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface CanadaEconomyChartProps {
@@ -57,6 +57,14 @@ const CanadaEconomyChart: React.FC<CanadaEconomyChartProps> = ({ height = 500 })
     gold: false,
     oil: false
   });
+  const [viewportWidth, setViewportWidth] = useState(1024);
+
+  useEffect(() => {
+    const updateWidth = () => setViewportWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   // Raw data arrays including additional assets
   const rawData = useMemo((): RawDataPoint[] => {
@@ -294,30 +302,30 @@ const CanadaEconomyChart: React.FC<CanadaEconomyChartProps> = ({ height = 500 })
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
-            margin={{ 
-              top: 20, 
-              right: window.innerWidth < 640 ? 20 : window.innerWidth < 1024 ? 40 : 80, 
-              left: window.innerWidth < 640 ? 20 : 40, 
-              bottom: window.innerWidth < 640 ? 40 : 60 
+            margin={{
+              top: 20,
+              right: viewportWidth < 640 ? 20 : viewportWidth < 1024 ? 40 : 80,
+              left: viewportWidth < 640 ? 20 : 40,
+              bottom: viewportWidth < 640 ? 40 : 60
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e4e7" opacity={0.6} />
-            <XAxis 
-              dataKey="year" 
+            <XAxis
+              dataKey="year"
               stroke="#374151"
-              fontSize={window.innerWidth < 640 ? 10 : 12}
+              fontSize={viewportWidth < 640 ? 10 : 12}
               fontWeight="500"
             />
-            <YAxis 
+            <YAxis
               stroke="#374151"
-              fontSize={window.innerWidth < 640 ? 10 : 12}
+              fontSize={viewportWidth < 640 ? 10 : 12}
               fontWeight="500"
-              width={window.innerWidth < 640 ? 40 : 60}
-              label={{ 
-                value: `% Change since ${baseYear}`, 
-                angle: -90, 
+              width={viewportWidth < 640 ? 40 : 60}
+              label={{
+                value: `% Change since ${baseYear}`,
+                angle: -90,
                 position: 'insideLeft',
-                style: { fontSize: window.innerWidth < 640 ? '10px' : '12px' }
+                style: { fontSize: viewportWidth < 640 ? '10px' : '12px' }
               }}
             />
             <Tooltip content={<CustomTooltip />} />

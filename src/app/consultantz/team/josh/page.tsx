@@ -47,7 +47,7 @@ export default function Home() {
         >
           <div className={"grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-4"}>
             <div className="bio sm:order-first lg:order-last">
-              <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'dark' ? 'white' : 'none', marginBottom: 4 }}>About Me</h1>
+              <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'white', marginBottom: 4 }}>About Me</h1>
               <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5' }}>
                 I am an entrepreneurial innovator with a keen eye for detail and a commitment to excellence. My experience spans high-fashion branding, where I develop exclusive, luxury-focused projects, to strategic leadership in the music industry, creating platforms that empower artists through technology and creative services. With a strong foundation in web development and tech solutions, I craft interactive, client-centric digital experiences using the latest frameworks.
 
