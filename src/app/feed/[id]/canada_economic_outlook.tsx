@@ -2,7 +2,6 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import Head from "next/head";
 // If your file exists at src/components/CanadaEconomyChart.tsx, keep this import.
 // Otherwise, update the path below to the correct relative path, for example:
 import CanadaEconomyChart from "../../components/CanadaEconomyChart2";
@@ -85,84 +84,6 @@ Published by Joshua Xavier - August 9, 2025
 
   return (
     <>
-      <Head>
-        <title>
-          Canada Economic Outlook 2025: Post-Pandemic Recovery & Opportunities
-        </title>
-        <meta
-          name="description"
-          content="Comprehensive analysis of Canada's economic outlook 2025, covering post-pandemic recovery, housing crisis, green economy growth, inflation trends, and digital transformation opportunities."
-        />
-        <meta
-          name="keywords"
-          content="Canada economic outlook 2025, post-pandemic recovery, housing crisis Canada, green economy Canada, Canadian inflation 2025, digital transformation, immigration and economy, future of work Canada"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="author" content="Joshua Xavier" />
-        <meta
-          property="og:title"
-          content="Canada Economic Outlook 2025: Post-Pandemic Recovery & Opportunities"
-        />
-        <meta
-          property="og:description"
-          content="Expert analysis of Canada's economic challenges and opportunities in 2025, including housing affordability, green tech growth, and digital transformation."
-        />
-        <meta property="og:type" content="article" />
-        <meta
-          property="og:image"
-          content="https://modevz.ca/Canadas-Post-Pandemic-Economic-Outlook.png"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="Canada Economic Outlook 2025: Post-Pandemic Recovery"
-        />
-        <meta
-          name="twitter:description"
-          content="Comprehensive analysis of Canada's economic outlook covering housing crisis, green economy, and digital transformation opportunities."
-        />
-        <link
-          rel="canonical"
-          href="https://modevz.ca/feed/canadas-post-pandemic-economic-outlook"
-        />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            headline:
-              "Canada Economic Outlook 2025: Post-Pandemic Recovery & Opportunities",
-            description:
-              "Comprehensive analysis of Canada's economic outlook 2025, covering post-pandemic recovery, housing crisis, green economy growth, inflation trends, and digital transformation opportunities.",
-            author: {
-              "@type": "Person",
-              name: "Joshua Xavier",
-              url: "https://josh.modevz.ca/",
-            },
-            publisher: {
-              "@type": "Organization",
-              name: "MoDevz",
-              url: "https://modevz.ca",
-            },
-            datePublished: "2025-10-01T00:00:00Z",
-            dateModified: "2025-10-01T00:00:00Z",
-            image:
-              "https://modevz.ca/Canadas-Post-Pandemic-Economic-Outlook.png",
-            url: "https://modevz.ca/feed/6",
-            mainEntityOfPage: {
-              "@type": "WebPage",
-              "@id": "https://modevz.ca/feed/6",
-            },
-            keywords: [
-              "Canada",
-              "Economic Outlook",
-              "Post-Pandemic",
-              "Housing Crisis",
-              "Green Economy",
-              "Digital Transformation",
-            ],
-          })}
-        </script>
-      </Head>
       <article className="min-h-screen mx-auto px-4 py-8 max-w-md md:max-w-6xl lg:max-w-full sm:p-6 md:p-8 lg:p-32 mt-16 sm:mt-20 md:mt-24 lg:mt-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700">
         {/* Canadian Flag Accent */}
         <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
@@ -263,7 +184,7 @@ Published by Joshua Xavier - August 9, 2025
               </div>
               <div className="hidden md:block w-px h-8 bg-white/30"></div>
               <div className="text-sm">
-                <p>Published: October 1st, 2025</p>
+                <p>Published: January 5th, 2026</p>
                 <p>Reading time: 8 minutes</p>
               </div>
             </div>

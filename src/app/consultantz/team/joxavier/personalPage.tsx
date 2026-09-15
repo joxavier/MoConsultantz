@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import Link from "next/link";
 import Highlights from "./Highlights";
 import { CredibilityBar } from "./CredibilityBar";
 import {
@@ -433,6 +434,36 @@ END:VCARD`;
               <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
                 Years of specialized technical consulting history encompassing custom web frameworks, software architecture, and decentralized applications.
               </p>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "50px", textAlign: "left" }}>
+            <h3 style={{ fontSize: "24px", marginBottom: "20px", color: "#ffffff", textAlign: "center" }}>✍️ Articles by Joshua Xavier</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
+              {[
+                { href: "/feed/3", title: "From Ethereum to Exodus: Canada's Blockchain Boom—and Bust?" },
+                { href: "/feed/6", title: "2026 Outlook: Canada's Post-Pandemic Economic Outlook" },
+                { href: "/articles/tech-adoption-cycle", title: "Understanding the Technology Adoption Cycle" },
+              ].map((post) => (
+                <Link
+                  key={post.href}
+                  href={post.href}
+                  style={{
+                    display: "block",
+                    padding: "20px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    color: "#e0e0e0",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    lineHeight: 1.5,
+                    textDecoration: "none",
+                  }}
+                >
+                  {post.title}
+                </Link>
+              ))}
             </div>
           </div>
 
