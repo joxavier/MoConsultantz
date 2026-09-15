@@ -341,6 +341,25 @@ export default function StrategicReserve() {
   const performanceData = generateWeightedPerformance();
   const totalChange = calculateWeightedChange('currentAllocation');
   const targetChange = calculateWeightedChange('targetAllocation');
+
+  const PROJECTION_HORIZONS: { label: string; days: number }[] = [
+    { label: 'Today', days: 0 },
+    { label: '1M', days: 30 },
+    { label: '3M', days: 90 },
+    { label: '6M', days: 180 },
+    { label: '1Y', days: 365 },
+  ];
+
+  const getPeriodDays = (period: TimePeriod) => {
+    switch (period) {
+      case '1h': return 1 / 24;
+      case '4h': return 4 / 24;
+      case '1d': return 1;
+      case '7d': return 7;
+      case '1m': return 30;
+      default: return 7;
+    }
+  };
   const reserveAssets = assets.filter((asset) => (asset.holdingQuantity || 0) > 0 || (asset.value || 0) > 0);
   const totalReserveValue = assets.reduce((sum, asset) => sum + (asset.value || 0), 0);
   const currentAllocationTotal = assets.reduce((sum, asset) => sum + asset.currentAllocation, 0);
@@ -349,6 +368,25 @@ export default function StrategicReserve() {
     ? reserveAssets.reduce((sum, asset) => sum + asset.targetAllocation, 0)
     : targetAllocationTotal;
   const formatMoney = (value: number) => `${currency === 'CAD' ? 'C$' : '$'}${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  // Linear extrapolation of the weighted return over the selected period, applied to
+  // both the current allocation and the target ("ideal") allocation, so the two lines
+  // show what continuing the recent trend would mean for each mix. Not a forecast.
+  const periodDays = getPeriodDays(timePeriod);
+  const currentDailyRate = periodDays > 0 ? totalChange / periodDays : 0;
+  const idealDailyRate = periodDays > 0 ? targetChange / periodDays : 0;
+
+  const projectionData = PROJECTION_HORIZONS.map((horizon) => ({
+    horizon: horizon.label,
+    days: horizon.days,
+    'Current Allocation': totalReserveValue * (1 + (currentDailyRate * horizon.days) / 100),
+    'Ideal Allocation': totalReserveValue * (1 + (idealDailyRate * horizon.days) / 100),
+  }));
+
+  const finalProjection = projectionData[projectionData.length - 1];
+  const currentProjectedGain = finalProjection['Current Allocation'] - totalReserveValue;
+  const idealProjectedGain = finalProjection['Ideal Allocation'] - totalReserveValue;
+  const rebalanceUplift = idealProjectedGain - currentProjectedGain;
   const rebalanceActions = assets
     .filter((asset) => asset.targetAllocation > 0 || asset.currentAllocation > 0)
     .map((asset) => {
@@ -710,6 +748,75 @@ export default function StrategicReserve() {
     );
   };
 
+  const ProjectedGainsView = () => {
+    return (
+      <div className="w-full bg-gray-900 rounded-xl p-6 border border-gray-700">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
+          <div>
+            <h3 className="text-2xl font-bold text-white">Projected Gains: Ideal vs Current Allocation</h3>
+            <p className="text-sm text-gray-400 mt-2">
+              Extrapolates the {timePeriod.toUpperCase()} weighted return for each mix. Not a forecast or a guarantee.
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-xs uppercase tracking-wider text-gray-500">Reserve Value Today</div>
+            <div className="text-xl font-bold text-white">{formatMoney(totalReserveValue)}</div>
+          </div>
+        </div>
+
+        <ResponsiveContainer width="100%" height={360}>
+          <LineChart data={projectionData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="horizon" stroke="#9ca3af" style={{ fontSize: '12px' }} />
+            <YAxis
+              stroke="#9ca3af"
+              style={{ fontSize: '12px' }}
+              tickFormatter={(value: number) => formatMoney(value)}
+              width={100}
+            />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#fff' }}
+              formatter={(value: any) => formatMoney(Number(value))}
+            />
+            <Legend />
+            <Line type="monotone" dataKey="Current Allocation" stroke={MO_COLORS.blue} strokeWidth={3} dot={{ r: 4 }} />
+            <Line type="monotone" dataKey="Ideal Allocation" stroke={MO_COLORS.green} strokeWidth={3} dot={{ r: 4 }} />
+          </LineChart>
+        </ResponsiveContainer>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
+            <div className="text-xs uppercase tracking-wider text-gray-400">Current allocation, 1Y</div>
+            <div className={`mt-1 text-xl font-bold ${currentProjectedGain >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {currentProjectedGain >= 0 ? '+' : ''}{formatMoney(currentProjectedGain)}
+            </div>
+            <div className="text-sm text-gray-400 mt-1">{formatMoney(finalProjection['Current Allocation'])} projected</div>
+          </div>
+          <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
+            <div className="text-xs uppercase tracking-wider text-gray-400">Ideal allocation, 1Y</div>
+            <div className={`mt-1 text-xl font-bold ${idealProjectedGain >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {idealProjectedGain >= 0 ? '+' : ''}{formatMoney(idealProjectedGain)}
+            </div>
+            <div className="text-sm text-gray-400 mt-1">{formatMoney(finalProjection['Ideal Allocation'])} projected</div>
+          </div>
+          <div className="rounded-lg border border-[#8743f7]/40 bg-[#8743f7]/10 p-4">
+            <div className="text-xs uppercase tracking-wider text-gray-400">Rebalancing uplift, 1Y</div>
+            <div className={`mt-1 text-xl font-bold ${rebalanceUplift >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {rebalanceUplift >= 0 ? '+' : ''}{formatMoney(rebalanceUplift)}
+            </div>
+            <div className="text-sm text-gray-400 mt-1">Gap between ideal and current trajectory</div>
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-500 text-center mt-6">
+          Projection linearly extends the {timePeriod.toUpperCase()} weighted return for each allocation. It assumes the recent trend
+          continues at a constant rate and does not account for volatility, compounding, fees, or market conditions changing.
+          For illustration only, not investment advice.
+        </p>
+      </div>
+    );
+  };
+
   return (
     <div className="mt-32 min-h-screen bg-black text-white font-mono p-6">
       <div className="max-w-7xl mx-auto">
@@ -799,6 +906,7 @@ export default function StrategicReserve() {
           <PieChartView />
           <TableView />
           <RebalanceActionsView />
+          <ProjectedGainsView />
           {/*<PerformanceChart />*/}
         </div>
 
