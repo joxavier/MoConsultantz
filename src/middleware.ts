@@ -73,6 +73,11 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  else if (currentHost === "xavieracademy" || currentHost === "academy") {
+    url.pathname = `/devz/xavieracademy${path}`;
+    return NextResponse.rewrite(url);
+  }
+
   if (hostname === "localhost:3000" || hostname === "moconsultantz.com") {
     console.log(path)
     if (path.startsWith("/devz") || path.startsWith("/vestmentz") || path.startsWith("/consultantz") || path.startsWith("/feed") || path.startsWith("/moos") || path.startsWith("/josh") || path.startsWith("/services") || path.startsWith("/technical-consulting") || path.startsWith("/plans") || path.startsWith("/start")) {
