@@ -1,0 +1,26 @@
+{
+  "mocoin": {
+    "mintAddress": "HHVmXazRvA3VdciVG4ayE7vjgUFUn12t5r7vYm2BJ258",
+    "poolAddress": "2mz5eNLTpCk2F6CvP1y9LWdUe6LUh1zqPa7bzPFYWns8",
+    "lpMintAddress": null
+  },
+  "treasuryWalletAddress": null,
+  "targetAllocations": [
+    { "symbol": "ENB", "category": "Core Equities", "targetAllocation": 7 },
+    { "symbol": "AMAT", "category": "Core Equities", "targetAllocation": 7 },
+    { "symbol": "PINS", "category": "Core Equities", "targetAllocation": 7 },
+    { "symbol": "SNAP", "category": "Core Equities", "targetAllocation": 7 },
+    { "symbol": "QS", "category": "Speculative Equities", "targetAllocation": 3.33 },
+    { "symbol": "OPEN", "category": "Speculative Equities", "targetAllocation": 3.33 },
+    { "symbol": "WEED.TO", "category": "Speculative Equities", "targetAllocation": 3.34 },
+    { "symbol": "BTC", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 15 },
+    { "symbol": "SOL", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 7 },
+    { "symbol": "ADA", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 4 },
+    { "symbol": "FIL", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 3 },
+    { "symbol": "USD Cash", "category": "Fixed Income / Cash", "targetAllocation": 5 },
+    { "symbol": "CAD Cash", "category": "Fixed Income / Cash", "targetAllocation": 5 },
+    { "symbol": "Pre-Seed Portfolio", "category": "Pre-Seed", "targetAllocation": 10 },
+    { "symbol": "MoCoin", "category": "MoCoin Treasury", "targetAllocation": 0 },
+    { "symbol": "MoCoin Liquidity Pool", "category": "MoCoin Treasury", "targetAllocation": 0 }
+  ]
+}

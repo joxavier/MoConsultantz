@@ -71,7 +71,7 @@ const QualificationsSection: React.FC<QualificationsSectionProps> = ({ qualifica
     style={{ minHeight: '50vh' }}
   >
     <div style={{ alignItems: 'center' }}>
-      <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'dark' ? 'white' : 'none', marginBottom: 4 }}>Qualifications</h1>
+      <h1 style={{ color: 'rgb(28, 78, 110)', backgroundColor: 'white', marginBottom: 4 }}>Qualifications</h1>
       <p style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', lineHeight: '1.5', marginBottom: '40px' }}>
         My vast range of experiences qualifies me to execute roles.</p>
 

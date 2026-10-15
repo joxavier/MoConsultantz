@@ -1,0 +1,42 @@
+{
+    "hero": {
+        "imageUrl": "/KellmanHero.jpg",
+        "altText": "Hero Image",
+        "title": "Tech &\nBusiness",
+        "buttonText": "Connect",
+        "buttonLink": "#contact"
+    },
+    "highlights": [
+        {
+            "link": "#experience",
+            "iconSrc": "/icons/Target.svg",
+            "altText": "Experienced Web Developer",
+            "title": "8+",
+            "description": "Years of Experience"
+        },
+        {
+            "link": "#reviews",
+            "iconSrc": "/icons/Customer.svg",
+            "altText": "Top Rated Web Developer",
+            "title": "5+",
+            "description": "Satisfied Clients"
+        }
+    ],
+    "reviews": [
+        {
+            "reviewer": "Luis Leon",
+            "role": "Director Business Development at Hostopia",
+            "reviewerImg": "https://media.licdn.com/dms/image/v2/C5603AQGP-Y3iKHnZIg/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1609285778744?e=1756944000&v=beta&t=oYLRF6kJqu4i2D-BePg9LqNCQtChg9W3Herqhc1Gm04",
+            "altText": "April 30, 2024, Luis managed Kellman directly",
+            "reviewerLink": "https://www.linkedin.com/in/luis-leon-0aa0ab1",
+            "review": ""
+        },
+        {
+            "reviewer": "#experience",
+            "reviewerImg": "/icons/Target.svg",
+            "altText": "Experienced Web Developer",
+            "reviewerLink": "8+",
+            "review": "Years of Experience"
+        }
+    ]
+}
