@@ -4,23 +4,27 @@
     "poolAddress": "2mz5eNLTpCk2F6CvP1y9LWdUe6LUh1zqPa7bzPFYWns8",
     "lpMintAddress": null
   },
+  "poolScan": {
+    "extraTokenMints": []
+  },
   "treasuryWalletAddress": null,
-  "targetAllocations": [
-    { "symbol": "ENB", "category": "Core Equities", "targetAllocation": 7 },
-    { "symbol": "AMAT", "category": "Core Equities", "targetAllocation": 7 },
-    { "symbol": "PINS", "category": "Core Equities", "targetAllocation": 7 },
-    { "symbol": "SNAP", "category": "Core Equities", "targetAllocation": 7 },
-    { "symbol": "QS", "category": "Speculative Equities", "targetAllocation": 3.33 },
-    { "symbol": "OPEN", "category": "Speculative Equities", "targetAllocation": 3.33 },
-    { "symbol": "WEED.TO", "category": "Speculative Equities", "targetAllocation": 3.34 },
-    { "symbol": "BTC", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 15 },
-    { "symbol": "SOL", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 7 },
-    { "symbol": "ADA", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 4 },
-    { "symbol": "FIL", "category": "Crypto Infrastructure & Altcoins", "targetAllocation": 3 },
-    { "symbol": "USD Cash", "category": "Fixed Income / Cash", "targetAllocation": 5 },
-    { "symbol": "CAD Cash", "category": "Fixed Income / Cash", "targetAllocation": 5 },
-    { "symbol": "Pre-Seed Portfolio", "category": "Pre-Seed", "targetAllocation": 10 },
-    { "symbol": "MoCoin", "category": "MoCoin Treasury", "targetAllocation": 0 },
-    { "symbol": "MoCoin Liquidity Pool", "category": "MoCoin Treasury", "targetAllocation": 0 }
+  "holdingsAsOf": "2026-10-15",
+  "assets": [
+    { "symbol": "ENB", "name": "Enbridge", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
+    { "symbol": "AMAT", "name": "Applied Materials", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
+    { "symbol": "PINS", "name": "Pinterest", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
+    { "symbol": "SNAP", "name": "Snap", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
+    { "symbol": "QS", "name": "QuantumScape", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.33, "quantity": null },
+    { "symbol": "OPEN", "name": "Opendoor", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.33, "quantity": null },
+    { "symbol": "WEED.TO", "name": "Canopy Growth", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.34, "quantity": 142, "holdingLabel": "142 shares" },
+    { "symbol": "BTC", "name": "Bitcoin", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 15, "quantity": null },
+    { "symbol": "SOL", "name": "Solana (0.321 SOL + 1.00372 mSOL)", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 7, "quantity": 1.32472, "holdingLabel": "1.32472 SOL" },
+    { "symbol": "ADA", "name": "Cardano", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 4, "quantity": 522, "holdingLabel": "522 ADA" },
+    { "symbol": "FIL", "name": "Filecoin", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 3, "quantity": null },
+    { "symbol": "USD Cash", "name": "US dollars", "category": "Fixed Income / Cash", "kind": "cash", "targetAllocation": 5, "quantity": 1000, "currency": "USD", "holdingLabel": "1,000 USD" },
+    { "symbol": "CAD Cash", "name": "Canadian dollars", "category": "Fixed Income / Cash", "kind": "cash", "targetAllocation": 5, "quantity": 500, "currency": "CAD", "holdingLabel": "500 CAD" },
+    { "symbol": "Pre-Seed Portfolio", "name": "Pre-seed investments", "category": "Pre-Seed", "kind": "manual", "targetAllocation": 10, "manualValue": null, "currency": "USD" },
+    { "symbol": "MoCoin", "name": "MoCoin held by the treasury", "category": "MoCoin Treasury", "kind": "onchain", "targetAllocation": 0 },
+    { "symbol": "MoCoin LP", "name": "Liquidity pool positions", "category": "MoCoin Treasury", "kind": "onchain", "targetAllocation": 0 }
   ]
 }

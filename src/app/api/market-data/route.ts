@@ -110,14 +110,18 @@ function getNativeCurrency(symbol: string, chart: YahooChartResult): BaseCurrenc
     return 'USD';
 }
 
+const FALLBACK_USD_CAD_RATE = 1.43;
+const HISTORY_DAYS = 31;
+
 async function getUsdCadRate() {
     try {
         const chart = await fetchYahooChart('CAD=X', '5d', '1d');
-        return getLatestClose(chart) || 1.43;
+        const rate = getLatestClose(chart);
+        if (rate) return { rate, isFallback: false };
     } catch (error) {
         console.error('Failed to fetch USD/CAD rate:', error);
-        return 1.43;
     }
+    return { rate: FALLBACK_USD_CAD_RATE, isFallback: true };
 }
 
 function convertPrice(price: number, nativeCurrency: BaseCurrency, baseCurrency: BaseCurrency, usdCadRate: number) {
@@ -137,7 +141,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const usdCadRate = await getUsdCadRate();
+        const { rate: usdCadRate, isFallback: usdCadRateIsFallback } = await getUsdCadRate();
         const results: Record<string, any> = {};
 
         for (const symbol of symbols) {
@@ -154,6 +158,7 @@ export async function POST(request: NextRequest) {
                         nativeCurrency: 'USD',
                         sourceSymbol: `${normalizedSymbol}-USD`,
                         usdCadRate,
+                        usdCadRateIsFallback,
                         change1h: 0,
                         change4h: 0,
                         change1d: 0,
@@ -189,6 +194,15 @@ export async function POST(request: NextRequest) {
                     nativeCurrency,
                     sourceSymbol: yahooSymbol,
                     usdCadRate,
+                    usdCadRateIsFallback,
+                    // Daily closes for the last month, in the base currency
+                    // (historical points use today's FX rate).
+                    history: getCloseSeries(dailyChart)
+                        .slice(-HISTORY_DAYS)
+                        .map((point) => ({
+                            t: point.timestamp,
+                            c: convertPrice(point.close, nativeCurrency, baseCurrency, usdCadRate),
+                        })),
                     change1h: calculateChangeFromSeries(intradayChart, currentPrice, 60 * 60),
                     change4h: calculateChangeFromSeries(intradayChart, currentPrice, 4 * 60 * 60),
                     change1d: calculateChangeFromSeries(intradayChart, currentPrice, 24 * 60 * 60),
