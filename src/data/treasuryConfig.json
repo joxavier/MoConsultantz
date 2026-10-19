@@ -8,15 +8,15 @@
     "extraTokenMints": []
   },
   "treasuryWalletAddress": null,
-  "holdingsAsOf": "2026-10-15",
+  "holdingsAsOf": "2026-10-19",
   "assets": [
     { "symbol": "ENB", "name": "Enbridge", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
     { "symbol": "AMAT", "name": "Applied Materials", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
     { "symbol": "PINS", "name": "Pinterest", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
-    { "symbol": "SNAP", "name": "Snap", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
+    { "symbol": "SNAP", "name": "Snap", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null, "purchase": { "amount": 100, "currency": "CAD", "date": "2026-10-17" } },
     { "symbol": "QS", "name": "QuantumScape", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.33, "quantity": null },
     { "symbol": "OPEN", "name": "Opendoor", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.33, "quantity": null },
-    { "symbol": "WEED.TO", "name": "Canopy Growth", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.34, "quantity": 142, "holdingLabel": "142 shares" },
+    { "symbol": "WEED.TO", "name": "Canopy Growth Corp.", "category": "Speculative Equities", "kind": "market", "targetAllocation": 3.34, "quantity": 150, "holdingLabel": "150 shares" },
     { "symbol": "BTC", "name": "Bitcoin", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 15, "quantity": null },
     { "symbol": "SOL", "name": "Solana (0.321 SOL + 1.00372 mSOL)", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 7, "quantity": 1.32472, "holdingLabel": "1.32472 SOL" },
     { "symbol": "ADA", "name": "Cardano", "category": "Crypto Infrastructure & Altcoins", "kind": "market", "targetAllocation": 4, "quantity": 522, "holdingLabel": "522 ADA" },

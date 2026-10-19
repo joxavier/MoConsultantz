@@ -36,6 +36,10 @@ const MO_COLORS = {
 const ASSET_CONFIG = treasuryConfig.assets as unknown as AssetConfig[];
 const HOLDINGS_AS_OF = treasuryConfig.holdingsAsOf;
 const MARKET_SYMBOLS = ASSET_CONFIG.filter((asset) => asset.kind === 'market').map((asset) => asset.symbol);
+// Positions recorded as an amount spent on a date (no share count given).
+const PURCHASES = Object.fromEntries(
+  ASSET_CONFIG.filter((asset) => asset.kind === 'market' && asset.quantity == null && asset.purchase).map((asset) => [asset.symbol, asset.purchase]),
+);
 const REFRESH_MS = 5 * 60 * 1000;
 const REBALANCE_PREVIEW = 6;
 
@@ -94,6 +98,7 @@ type MarketQuote = {
   usdCadRate?: number;
   usdCadRateIsFallback?: boolean;
   history?: PricePoint[];
+  purchase?: { quantity: number; bookValue: number; priceOnDate: number } | { error: string };
   change1h?: number;
   change4h?: number;
   change1d?: number;
@@ -131,17 +136,30 @@ function buildAssets(
 
     switch (config.kind) {
       case 'market': {
-        const quantity = config.quantity || 0;
         const quote = marketData?.[config.symbol];
+        const resolved = quote?.purchase && !('error' in quote.purchase) ? quote.purchase : undefined;
+        const quantity = config.quantity ?? resolved?.quantity ?? 0;
+        // A dated purchase counts as held even before its share count is
+        // known, so a failed lookup shows as an error rather than "not held".
+        const isHeld = quantity > 0 || (config.quantity == null && Boolean(config.purchase));
         if (!quote || quote.error) {
-          return { ...base, isHeld: quantity > 0, hasPriceError: Boolean(marketData) };
+          return { ...base, isHeld, hasPriceError: Boolean(marketData) };
         }
         const price = quote.c || quote.price || 0;
+        const gain = resolved ? quantity * price - resolved.bookValue : 0;
+        const holdingLabel = resolved
+          ? `${resolved.quantity.toFixed(4)} shares · ${gain >= 0 ? '+' : ''}${formatMoneyFor(currency)(gain)}`
+          : config.purchase && config.quantity == null
+            ? 'Share count unavailable'
+            : config.holdingLabel;
         return {
           ...base,
+          holdingLabel,
           price,
           value: quantity * price,
-          isHeld: quantity > 0,
+          isHeld,
+          hasPriceError: config.quantity == null && Boolean(config.purchase) && !resolved,
+          bookValue: resolved?.bookValue,
           history: quote.history,
           change1h: quote.change1h || 0,
           change4h: quote.change4h || 0,
@@ -347,7 +365,7 @@ export default function StrategicReserve() {
         const response = await fetch('/api/market-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ symbols: MARKET_SYMBOLS, baseCurrency: currency }),
+          body: JSON.stringify({ symbols: MARKET_SYMBOLS, baseCurrency: currency, purchases: PURCHASES }),
         });
         if (!response.ok) throw new Error(`Market data request failed (${response.status})`);
         const data = await response.json();

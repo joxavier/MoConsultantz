@@ -36,9 +36,13 @@ function mapToYahooSymbol(symbol: string) {
     return symbol;
 }
 
-async function fetchYahooChart(symbol: string, range: string, interval: string): Promise<YahooChartResult> {
+type ChartWindow = string | { period1: number; period2: number };
+
+async function fetchYahooChart(symbol: string, window: ChartWindow, interval: string): Promise<YahooChartResult> {
     const searchParams = new URLSearchParams({
-        range,
+        ...(typeof window === 'string'
+            ? { range: window }
+            : { period1: String(window.period1), period2: String(window.period2) }),
         interval,
         includePrePost: 'true',
     });
@@ -129,9 +133,41 @@ function convertPrice(price: number, nativeCurrency: BaseCurrency, baseCurrency:
     return baseCurrency === 'CAD' ? price * usdCadRate : price / usdCadRate;
 }
 
+type Purchase = { amount: number; currency: BaseCurrency; date: string };
+
+// Last daily close on or before the given date (YYYY-MM-DD). Weekends and
+// holidays fall back to the previous trading day.
+async function getCloseOnDate(yahooSymbol: string, date: string) {
+    const endOfDay = Math.floor(new Date(`${date}T23:59:59Z`).getTime() / 1000);
+    if (!Number.isFinite(endOfDay)) throw new Error(`Invalid purchase date ${date}`);
+
+    const chart = await fetchYahooChart(yahooSymbol, { period1: endOfDay - 10 * 24 * 60 * 60, period2: endOfDay }, '1d');
+    const closes = getCloseSeries(chart).filter((point) => point.timestamp <= endOfDay);
+    const close = closes[closes.length - 1]?.close;
+    if (!close) throw new Error(`No ${yahooSymbol} close on or before ${date}`);
+    return close;
+}
+
+// A position recorded as "this much money, on this date" instead of a share
+// count: the share count is fixed from that day's close (and that day's
+// USD/CAD rate when the money and the asset are in different currencies), so
+// from then on the position moves with the asset's price.
+async function resolvePurchase(yahooSymbol: string, nativeCurrency: BaseCurrency, baseCurrency: BaseCurrency, purchase: Purchase) {
+    const closeOnDate = await getCloseOnDate(yahooSymbol, purchase.date);
+    const needsFx = purchase.currency !== nativeCurrency || purchase.currency !== baseCurrency;
+    const fxOnDate = needsFx ? await getCloseOnDate('CAD=X', purchase.date) : 1;
+
+    const amountInNative = convertPrice(purchase.amount, purchase.currency, nativeCurrency, fxOnDate);
+    return {
+        quantity: amountInNative / closeOnDate,
+        bookValue: convertPrice(purchase.amount, purchase.currency, baseCurrency, fxOnDate),
+        priceOnDate: convertPrice(closeOnDate, nativeCurrency, baseCurrency, fxOnDate),
+    };
+}
+
 export async function POST(request: NextRequest) {
     try {
-        const { symbols, baseCurrency: requestedBaseCurrency } = await request.json();
+        const { symbols, baseCurrency: requestedBaseCurrency, purchases = {} } = await request.json();
         const baseCurrency = normalizeBaseCurrency(requestedBaseCurrency);
 
         if (!symbols || !Array.isArray(symbols)) {
@@ -179,6 +215,12 @@ export async function POST(request: NextRequest) {
 
                 const nativeCurrency = getNativeCurrency(symbol, intradayChart);
                 const displayPrice = convertPrice(currentPrice, nativeCurrency, baseCurrency, usdCadRate);
+                const purchase: Purchase | undefined = purchases[symbol];
+                let purchaseResult: Awaited<ReturnType<typeof resolvePurchase>> | { error: string } | undefined;
+                if (purchase) {
+                    purchaseResult = await resolvePurchase(yahooSymbol, nativeCurrency, baseCurrency, purchase)
+                        .catch((error: any) => ({ error: error.message as string }));
+                }
                 const previousClose = convertPrice(
                     intradayChart.meta?.chartPreviousClose || dailyChart.meta?.chartPreviousClose || currentPrice,
                     nativeCurrency,
@@ -195,6 +237,7 @@ export async function POST(request: NextRequest) {
                     sourceSymbol: yahooSymbol,
                     usdCadRate,
                     usdCadRateIsFallback,
+                    purchase: purchaseResult,
                     // Daily closes for the last month, in the base currency
                     // (historical points use today's FX rate).
                     history: getCloseSeries(dailyChart)

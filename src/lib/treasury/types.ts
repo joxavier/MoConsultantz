@@ -22,6 +22,10 @@ export type AssetConfig = {
   holdingLabel?: string;
   // Only for kind "manual": value in `currency`, or null while not yet valued.
   manualValue?: number | null;
+  // Only for kind "market", as an alternative to `quantity`: a position
+  // recorded as money spent on a date. The share count is worked out from
+  // that day's close. An explicit `quantity` takes precedence.
+  purchase?: { amount: number; currency: BaseCurrency; date: string };
 };
 
 export type Asset = AssetConfig & {
@@ -33,6 +37,8 @@ export type Asset = AssetConfig & {
   isHeld: boolean;
   hasPriceError?: boolean;
   history?: PricePoint[];
+  // What was paid, in the display currency (for `purchase` positions).
+  bookValue?: number;
   change1h: number;
   change4h: number;
   change1d: number;
