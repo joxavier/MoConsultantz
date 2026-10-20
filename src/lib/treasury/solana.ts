@@ -43,6 +43,34 @@ export async function getTokenAccountBalance(ownerAddress: string, mintAddress: 
   }, 0);
 }
 
+const TOKEN_PROGRAM_IDS = [
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb", // Token-2022
+];
+
+// Every token the wallet holds, keyed by mint, in two RPC calls (one per token
+// program) — cheaper than one call per mint when scanning many LP mints.
+export async function getAllTokenBalances(ownerAddress: string): Promise<Record<string, number>> {
+  const owner = new PublicKey(ownerAddress);
+  const responses = await Promise.all(
+    TOKEN_PROGRAM_IDS.map((programId) =>
+      getConnection().getParsedTokenAccountsByOwner(owner, { programId: new PublicKey(programId) })
+    )
+  );
+
+  const balances: Record<string, number> = {};
+  for (const response of responses) {
+    for (const account of response.value) {
+      const info = account.account.data.parsed?.info;
+      const amount = info?.tokenAmount?.uiAmount;
+      if (info?.mint && typeof amount === "number") {
+        balances[info.mint] = (balances[info.mint] || 0) + amount;
+      }
+    }
+  }
+  return balances;
+}
+
 export async function getTokenSupply(mintAddress: string): Promise<number> {
   const mint = new PublicKey(mintAddress);
   const supply = await getConnection().getTokenSupply(mint, "confirmed");
