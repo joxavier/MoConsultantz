@@ -1,18 +1,20 @@
 'use client'
+import type { GetServerSideProps, NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import Image from "next/image";
-import Header from '../components/Header';
-import UnderConstructionPage from '../components/UnderConstructionPage';
+import Head from 'next/head';
+import Hero from '../consultantz/Hero';
+
 import dynamic from 'next/dynamic';
 import StripePricingTable from '../components/PricingTable';
+import TrustedBySlider from "../components/Slider";
 
 export default function Devz() {
   const [isAnimated, setIsAnimated] = useState(false);
   const controls = useAnimation();
 
   const TypewriterComponent = dynamic(() => import('typewriter-effect'), { ssr: false });
-
 
   const benefits = [
     {
@@ -23,14 +25,26 @@ export default function Devz() {
       title: "E-Commerce",
       description: "Elevate your e-commerce venture with our comprehensive package. From online payment processing to inventory management, we ensure a seamless journey. Specializing in custom designs and social media content to boost your digital footprint."
     },
-    {
+    /*{
       title: "Digital Marketing",
       description: "Amplify your online presence with our Digital Marketing solutions. Our expert team crafts tailored strategies to boost your brand visibility, engage your audience, and drive conversions, helping you reach your business goals effectively."
     },
     {
+      title: "Smart Contract Development",
+      description: "Convert your business requirements into coded smart functions and deploy them to a smart contract. Our Smart Contract Development service ensures precision and efficiency, leveraging blockchain technology to automate and secure your business processes."
+    },
+    {
       title: "Cybersecurity",
       description: "Protect your business from online threats with our Cybersecurity services. We offer comprehensive solutions to safeguard your digital assets, including data encryption, threat detection, and proactive security measures, ensuring peace of mind in an increasingly interconnected world."
-    }
+    },
+    {
+      title: "Bookkeeping & Accounting",
+      description: "Simplify your financial operations using open-source accounting tools. We provide transparent, cost-effective bookkeeping and accounting services designed for small businesses, helping you stay compliant and financially informed."
+    },
+    {
+      title: "Small Business Consulting & Financing",
+      description: "Unlock your business’s potential with expert consulting and access to funding. Whether you're starting out or scaling up, we offer personalized guidance, strategic planning, and financing support to help you achieve your goals."
+    }*/
   ];
 
   useEffect(() => {
@@ -38,17 +52,31 @@ export default function Devz() {
     setIsAnimated(true);
   }, [controls]);
 
-
-  //console.log(GetProducts())
+  const hero = {
+    "imageUrl": "/mo.svg",
+    "altText": "Hero Image",
+    "title": "Grow Your Small Business",
+    "buttonText": "Connect",
+    "buttonLink": "/team/joxavier"
+  }
 
   return (
-
-
-
-
     <main className="flex min-h-screen flex-col items-center justify-between p-10 sm:p-10 md:p-24 lg:p-32 font"
       style={{ fontFamily: 'Anton, sans-serif' }}>
-      <Header />
+      <Head>
+        <title>MoDevz - Software Development</title>
+        <meta name="description" content="Your hub for cutting-edge software solutions. From web development to cybersecurity, we've got you covered." />
+        <link rel="canonical" href="https://modevz.ca" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="MoDevz - Software Development" />
+        <meta property="og:description" content="Your hub for cutting-edge software solutions. From web development to cybersecurity, we've got you covered." />
+        <meta property="og:image" content="https://example.com/your-image.jpg" />
+        <meta property="og:instagram" content="https://www.instagram.com/movestmentz/" />
+        <meta property="og:tiktok" content="https://www.tiktok.com/@movestmentz" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@moVestmentz" />
+        <meta property="og:linkedin" content="https://www.linkedin.com/company/mo0430" />
+      </Head>
 
       <div style={{ maxWidth: '1320px' }}>
         <motion.div
@@ -61,28 +89,32 @@ export default function Devz() {
             margin: '0px auto'
           }}
         >
-
+          <Hero {...hero} />
 
           <motion.div animate={{ opacity: isAnimated ? 1 : 0 }} style={{ textAlign: 'center' }}>
-            <div className={` font-bold text-4xl`}>
+            <div className="font-bold text-4xl">
               MoDevz
             </div>
-            <div className={`font-bold text-2xl`} style={{ lineHeight: '1', marginTop: '-0.5rem' }}>
+            <div className="font-bold text-2xl" style={{ lineHeight: '1', marginTop: '0rem' }}>
               Software Development
             </div>
           </motion.div>
+
           <motion.p
             style={{
               opacity: isAnimated ? 1 : 0,
-              fontSize: '1.2rem', textAlign: 'center',
-              lineHeight: '1.5', width: '60%',
+              fontSize: '1.2rem',
+              textAlign: 'center',
+              lineHeight: '1.5',
+              width: '60%',
               display: 'flex',
               alignItems: 'center',
               minHeight: '32vh',
               maxWidth: '1080px',
               margin: '30px auto',
               fontFamily: 'monospace'
-            }}>
+            }}
+          >
             <TypewriterComponent
               options={{
                 strings: [
@@ -103,22 +135,30 @@ export default function Devz() {
             {benefits.map((benefit, index) => (
               <motion.div key={index} style={{ width: '100%', maxWidth: '800px', margin: '0 auto', padding: '20px', border: '2px solid', borderRadius: '8px', marginBottom: '20px' }} animate={{ x: isAnimated ? 0 : (index % 2 === 0 ? 1000 : -1000) }}>
                 <div style={{ textAlign: 'center' }}>
-                  <h2 className={` font-bold text-2xl`} style={{ fontSize: '1.5rem', marginBottom: '10px' }}>{benefit.title}</h2>
+                  <h2 className="font-bold text-2xl" style={{ fontSize: '1.5rem', marginBottom: '10px' }}>{benefit.title}</h2>
                   <p style={{ fontFamily: 'monospace', fontSize: '1rem', margin: '0' }}>{benefit.description}</p>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          {/*<div>
-            <motion.div className={`font-bold text-3xl text-center`}>Plans</motion.div>
-            <StripePricingTable />
-          </div>*/}
+          {/* Products */}
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-8">
 
+          </div>
 
+          <div className="  items-center justify-between p-10 sm:p-6 md:p-24 lg:p-32" style={{  justifyContent: 'space-around', margin: ' 0 auto', maxWidth: '80vw' }}>
+
+            <TrustedBySlider />
+          </div>
+
+          {/* Pricing Table */}
+          <div>
+           {/* <motion.div className="font-bold text-3xl text-center">Plans</motion.div>
+            <StripePricingTable />*/}
+          </div>
         </motion.div>
-        {/*<UnderConstructionPage redirectLink="https://sites.google.com/view/modevz/modevz" />*/}
       </div>
     </main>
   );
-}
+};

@@ -12,14 +12,14 @@
             "iconSrc": "/consultantz.png",
             "altText": "Business Consulting",
             "title": "MoConsultantz",
-            "description": "Business Consulting"
+            "description": "Business Advising"
         },
         {
             "link": "/vestmentz",
             "iconSrc": "/vestmentz.png",
             "altText": "Business Banking",
             "title": "MoVestmentz",
-            "description": "Business Banking"
+            "description": "Next-Gen Finance"
         },
         {
             "link": "/devz",

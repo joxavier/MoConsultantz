@@ -1,0 +1,91 @@
+{
+  "MoConsultantz": {
+    "description": "Advisory & Consulting Services",
+    "services": [
+      {
+        "service": "Business & Strategy Consulting",
+        "features": [
+          "Business Consulting",
+          "Corporate Strategy & Transformation"
+        ]
+      },
+      {
+        "service": "Continuity & Market Insights",
+        "features": [
+          "Business Continuity Planning",
+          "Market Research & Analysis"
+        ]
+      },
+      {
+        "service": "Legal, Risk & Regulatory Advisory",
+        "features": [
+          "Legal Advisory",
+          "Risk Management & Compliance",
+          "Tax & Regulatory Advisory",
+          "Global Trade & Tariff Consulting"
+        ]
+      },
+      {
+        "service": "People & Sustainability",
+        "features": [
+          "HR & Talent Advisory",
+          "ESG & Sustainability Advisory"
+        ]
+      }
+    ]
+  },
+  "MoVestmentz": {
+    "description": "Accounting, Financing, Wealth, Digital Assets",
+    "services": [
+      {
+        "service": "Core Financial Services",
+        "features": [
+          "Accounting & Audit",
+          "Financing & Capital Structuring",
+          "Insurance Solutions"
+        ]
+      },
+      {
+        "service": "Investment & Wealth Management",
+        "features": [
+          "Investment Advisory & Portfolio Management",
+          "Retirement & Wealth Planning",
+          "Private Equity & Venture Capital Services",
+          "Real Estate Investment Solutions"
+        ]
+      },
+      {
+        "service": "Digital & Impact Investment",
+        "features": [
+          "MoCoin (Digital Assets)",
+          "ESG / Impact Investment Strategies",
+          "DeFi Wealth Solutions",
+          "Crypto Custody & Compliance Services"
+        ]
+      }
+    ]
+  },
+  "MoDevz": {
+    "description": "Software/Digital, Smart Infrastructure",
+    "services": [
+      {
+        "service": "Software & Digital Solutions",
+        "features": [
+          "Software Development (Web, Mobile, AI)",
+          "Cloud Solutions (MoOS – Small Business Cloud)",
+          "CRM & Business Automation",
+          "Cybersecurity & Data Protection",
+          "Digital Workspace Solutions"
+        ]
+      },
+      {
+        "service": "Smart Infrastructure & Real Estate",
+        "features": [
+          "Residential & Commercial Real Estate Development",
+          "PropTech (Smart Buildings & IoT for Real Estate)",
+          "Smart Home Services"
+        ]
+      }
+    ]
+  }
+}
