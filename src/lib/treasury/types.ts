@@ -10,6 +10,8 @@ export type ChangeKey = 'change1h' | 'change4h' | 'change1d' | 'change7d' | 'cha
 export type AssetKind = 'market' | 'cash' | 'manual' | 'onchain';
 
 export type PricePoint = { t: number; c: number };
+// Price points for each chart period (see HISTORY_WINDOWS in /api/market-data).
+export type PriceHistory = Partial<Record<TimePeriod, PricePoint[]>>;
 
 export type AssetConfig = {
   symbol: string;
@@ -36,7 +38,7 @@ export type Asset = AssetConfig & {
   // read as "not yet held" instead of a misleading $0 position.
   isHeld: boolean;
   hasPriceError?: boolean;
-  history?: PricePoint[];
+  history?: PriceHistory;
   // What was paid, in the display currency (for `purchase` positions).
   bookValue?: number;
   // For cash held in the other currency: the pair its change is measured

@@ -7,6 +7,7 @@ import type {
   AssetConfig,
   BaseCurrency,
   ChangeKey,
+  PriceHistory,
   PricePoint,
   TimePeriod,
   TreasuryResponse,
@@ -75,6 +76,19 @@ const CHANGE_KEYS: Record<TimePeriod, ChangeKey> = {
   '1m': 'change1m',
 };
 
+const PERIOD_SECONDS: Record<TimePeriod, number> = {
+  '1h': 60 * 60,
+  '4h': 4 * 60 * 60,
+  '1d': 24 * 60 * 60,
+  '7d': 7 * 24 * 60 * 60,
+  '1m': 30 * 24 * 60 * 60,
+};
+
+// What the page can show values in. BTC isn't a currency the price API
+// knows about: the page asks for USD and divides by BTC's own USD price.
+type DisplayCurrency = BaseCurrency | 'BTC';
+type Rates = { usdCad: number; btcUsd: number };
+
 const PROJECTION_HORIZONS: { label: string; days: number }[] = [
   { label: 'Today', days: 0 },
   { label: '1M', days: 30 },
@@ -98,7 +112,7 @@ type MarketQuote = {
   error?: string;
   usdCadRate?: number;
   usdCadRateIsFallback?: boolean;
-  history?: PricePoint[];
+  history?: PriceHistory;
   purchase?: { quantity: number; bookValue: number; priceOnDate: number } | { error: string };
   change1h?: number;
   change4h?: number;
@@ -120,18 +134,86 @@ function getFxRate(marketData: MarketData | null) {
   };
 }
 
-function convert(amount: number, from: BaseCurrency, to: BaseCurrency, usdCadRate: number) {
-  if (from === to || !usdCadRate) return amount;
-  return to === 'CAD' ? amount * usdCadRate : amount / usdCadRate;
+function convert(amount: number, from: BaseCurrency, to: DisplayCurrency, rates: Rates) {
+  if (from === to) return amount;
+  if (to === 'BTC') {
+    const usd = from === 'USD' || !rates.usdCad ? amount : amount / rates.usdCad;
+    return rates.btcUsd ? usd / rates.btcUsd : 0;
+  }
+  if (!rates.usdCad) return amount;
+  return to === 'CAD' ? amount * rates.usdCad : amount / rates.usdCad;
+}
+
+// Change of A measured in B, given both changes measured in USD.
+const relativeChange = (a: number, b: number) => ((1 + a / 100) / (1 + b / 100) - 1) * 100;
+
+// Price at time t from a series sorted by time: the last point at or before
+// t, or undefined if the series starts after t.
+function priceAt(series: PricePoint[] | undefined, t: number) {
+  if (!series?.length || series[0].t > t) return undefined;
+  let price = series[0].c;
+  for (const point of series) {
+    if (point.t > t) break;
+    price = point.c;
+  }
+  return price;
+}
+
+const CHANGE_FIELDS = ['change1h', 'change4h', 'change1d', 'change7d', 'change1m'] as const;
+
+// Re-expresses USD market data in BTC: prices and history divided by BTC's
+// price at the same moment, changes taken relative to BTC's. Also adds
+// `_cash_USD` / `_cash_CAD` quotes so both kinds of cash move against BTC.
+function toBtcView(data: MarketData): { data: MarketData; btcUsd: number } | null {
+  const btc = data.BTC;
+  const btcUsd = btc && !btc.error ? btc.c || btc.price || 0 : 0;
+  if (!btc || !btcUsd) return null;
+
+  const divideHistory = (history: PriceHistory | undefined, invert = false): PriceHistory | undefined =>
+    history &&
+    Object.fromEntries(
+      Object.entries(history).map(([period, points]) => [
+        period,
+        points!.map((point) => {
+          const btcThen = priceAt(btc.history?.[period as TimePeriod], point.t) || btcUsd;
+          return { t: point.t, c: (invert ? 1 : point.c) / btcThen };
+        }),
+      ]),
+    );
+  const relativeChanges = (quote: MarketQuote, invert = false) =>
+    Object.fromEntries(CHANGE_FIELDS.map((key) => [key, relativeChange(invert ? 0 : quote[key] || 0, btc[key] || 0)]));
+
+  const out: MarketData = {};
+  for (const [symbol, quote] of Object.entries(data)) {
+    if (symbol === '_fx' || !quote || quote.error) {
+      out[symbol] = quote;
+      continue;
+    }
+    const price = (quote.c || quote.price || 0) / btcUsd;
+    const purchase =
+      quote.purchase && !('error' in quote.purchase)
+        ? { ...quote.purchase, bookValue: quote.purchase.bookValue / btcUsd, priceOnDate: quote.purchase.priceOnDate / btcUsd }
+        : quote.purchase;
+    out[symbol] = { ...quote, c: price, price, purchase, history: divideHistory(quote.history), ...relativeChanges(quote) };
+  }
+
+  // One USD is 1/BTC; one CAD is (CAD in USD)/BTC, using the USD-base FX quote.
+  out._cash_USD = { history: divideHistory(btc.history, true), ...relativeChanges(btc, true) };
+  const fx = data._fx;
+  out._cash_CAD =
+    fx && !fx.error && fx.currency === 'CAD'
+      ? { history: divideHistory(fx.history), ...relativeChanges(fx) }
+      : { error: 'USD/CAD unavailable' };
+
+  return { data: out, btcUsd };
 }
 
 function buildAssets(
   marketData: MarketData | null,
   treasury: TreasuryResponse | null,
-  currency: BaseCurrency,
+  currency: DisplayCurrency,
+  rates: Rates,
 ): Asset[] {
-  const { usdCadRate } = getFxRate(marketData);
-
   const assets: Asset[] = ASSET_CONFIG.map((config) => {
     const base = { ...config, ...ZERO_CHANGES, price: 0, value: 0, currentAllocation: 0, isHeld: false };
 
@@ -172,19 +254,21 @@ function buildAssets(
       case 'cash': {
         const quantity = config.quantity || 0;
         const cashCurrency = config.currency || 'USD';
-        const price = convert(1, cashCurrency, currency, usdCadRate);
+        const price = convert(1, cashCurrency, currency, rates);
         const cash = { ...base, price, value: quantity * price, isHeld: quantity > 0 };
         if (cashCurrency === currency) return cash;
 
-        // Foreign cash moves with the exchange rate, measured in the base currency.
-        const fx = marketData?._fx;
+        // Foreign cash moves with the exchange rate, measured in the display
+        // currency: the FX quote for USD/CAD, or the synthetic BTC-view quote.
+        const fx = marketData?.[`_cash_${cashCurrency}`] ?? (marketData?._fx?.currency === cashCurrency ? marketData._fx : undefined);
         const fxPair = `${cashCurrency}/${currency}`;
-        if (!fx || fx.error || fx.currency !== cashCurrency) {
+        if (!fx || fx.error) {
           return { ...cash, fxPair, hasPriceError: Boolean(marketData) };
         }
         return {
           ...cash,
           fxPair,
+          history: fx.history,
           change1h: fx.change1h || 0,
           change4h: fx.change4h || 0,
           change1d: fx.change1d || 0,
@@ -196,7 +280,7 @@ function buildAssets(
         if (config.manualValue == null) return base;
         return {
           ...base,
-          value: convert(config.manualValue, config.currency || 'USD', currency, usdCadRate),
+          value: convert(config.manualValue, config.currency || 'USD', currency, rates),
           isHeld: config.manualValue > 0,
         };
       }
@@ -204,7 +288,7 @@ function buildAssets(
         const totals = treasury?.totals;
         if (!totals) return base;
         const valueUsd = config.symbol === 'MoCoin' ? totals.moCoinValueUsd : totals.lpValueUsd;
-        return { ...base, value: convert(valueUsd, 'USD', currency, usdCadRate), isHeld: valueUsd > 0, isLive: true };
+        return { ...base, value: convert(valueUsd, 'USD', currency, rates), isHeld: valueUsd > 0, isLive: true };
       }
     }
   });
@@ -232,47 +316,47 @@ function moneyChange(assets: Asset[], changeKey: ChangeKey) {
   }, 0);
 }
 
-const dayKey = (timestamp: number) => new Date(timestamp * 1000).toISOString().slice(0, 10);
-
-// Reserve value per day over the last month, from real daily closes of the
-// market assets actually held. Stocks don't trade on weekends, so each asset
-// carries its last close forward. Cash, the pre-seed valuation and on-chain
-// positions have no history here and are held at today's value.
-function buildValueHistory(assets: Asset[]) {
-  const held = assets.filter((asset) => asset.kind === 'market' && asset.isHeld);
-  const flatValue = assets
-    .filter((asset) => asset.kind !== 'market')
-    .reduce((sum, asset) => sum + asset.value, 0);
-
-  if (!held.length || held.some((asset) => !asset.history?.length)) return [];
-
-  const closesByAsset = held.map((asset) => {
-    const byDay = new Map<string, number>();
-    asset.history!.forEach((point) => byDay.set(dayKey(point.t), point.c));
-    return byDay;
-  });
-
-  const days = Array.from(new Set(held.flatMap((asset) => asset.history!.map((point) => dayKey(point.t))))).sort();
-  const lastClose: (number | undefined)[] = held.map(() => undefined);
-
-  const series: { day: string; value: number }[] = [];
-  for (const day of days) {
-    closesByAsset.forEach((byDay, index) => {
-      if (byDay.has(day)) lastClose[index] = byDay.get(day);
-    });
-    // Skip leading days until every held asset has a price.
-    if (lastClose.some((close) => close === undefined)) continue;
-    const marketValue = held.reduce((sum, asset, index) => sum + (asset.quantity || 0) * (lastClose[index] as number), 0);
-    series.push({ day, value: marketValue + flatValue });
-  }
-
-  // Pin the final point to the live value so the chart ends where the headline does.
+// Reserve value across the selected period, from real prices of what's held:
+// market assets and foreign cash each have a price series for the period.
+// Every series time becomes a point, and each asset carries its last price
+// forward (stocks don't trade overnight or at weekends). The pre-seed
+// valuation and on-chain positions have no history and stay at today's value.
+// The last point is the live total, so the chart ends where the headline does.
+function buildValueHistory(assets: Asset[], period: TimePeriod) {
+  const now = Math.floor(Date.now() / 1000);
+  const start = now - PERIOD_SECONDS[period];
   const liveTotal = assets.reduce((sum, asset) => sum + asset.value, 0);
-  if (series.length) series[series.length - 1] = { ...series[series.length - 1], value: liveTotal };
+
+  const tracked = assets.filter(
+    (asset) => (asset.kind === 'market' || asset.kind === 'cash') && asset.value > 0 && asset.price > 0 && asset.history?.[period]?.length,
+  );
+  if (!tracked.length) return [];
+
+  const flatValue = liveTotal - tracked.reduce((sum, asset) => sum + asset.value, 0);
+  const units = tracked.map((asset) => asset.value / asset.price);
+  const times = Array.from(
+    new Set([start, ...tracked.flatMap((asset) => asset.history![period]!.map((point) => point.t).filter((t) => t > start && t < now))]),
+  ).sort((a, b) => a - b);
+
+  const series: { t: number; value: number }[] = [];
+  for (const t of times) {
+    const prices = tracked.map((asset) => priceAt(asset.history![period], t));
+    // Skip leading points until every tracked asset has a price.
+    if (prices.some((price) => price === undefined)) continue;
+    series.push({ t, value: flatValue + prices.reduce<number>((sum, price, index) => sum + (price as number) * units[index], 0) });
+  }
+  series.push({ t: now, value: liveTotal });
   return series;
 }
 
-function formatMoneyFor(currency: BaseCurrency) {
+function formatMoneyFor(currency: DisplayCurrency) {
+  if (currency === 'BTC') {
+    return (value: number) => {
+      const abs = Math.abs(value);
+      const digits = abs >= 100 ? 4 : abs >= 1 ? 6 : 8;
+      return `${value < 0 ? '-' : ''}₿${abs.toFixed(digits)}`;
+    };
+  }
   const formatter = new Intl.NumberFormat('en-CA', {
     style: 'currency',
     currency,
@@ -292,8 +376,14 @@ const formatPercent = (value: number, signed = true) =>
 
 const changeColor = (value: number) => (value > 0 ? 'text-emerald-400' : value < 0 ? 'text-red-400' : 'text-gray-400');
 
-const formatDay = (day: string) =>
-  new Date(`${day}T12:00:00Z`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+function formatPointTime(t: number, period: TimePeriod) {
+  const date = new Date(t * 1000);
+  if (period === '1h' || period === '4h' || period === '1d') {
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+  if (period === '7d') return date.toLocaleString([], { weekday: 'short', hour: 'numeric' });
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
 
 // ---------- presentational pieces ----------
 
@@ -368,7 +458,10 @@ function Skeleton({ className = '' }: { className?: string }) {
 export default function StrategicReserve() {
   const [view, setView] = useState<'asset' | 'industry'>('asset');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('7d');
-  const [currency, setCurrency] = useState<BaseCurrency>('CAD');
+  const [currency, setCurrency] = useState<DisplayCurrency>('CAD');
+  // The BTC view is built from USD prices, so switching between USD and BTC
+  // doesn't need a new request.
+  const fetchCurrency: BaseCurrency = currency === 'BTC' ? 'USD' : currency;
 
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [marketError, setMarketError] = useState<string | null>(null);
@@ -384,7 +477,7 @@ export default function StrategicReserve() {
         const response = await fetch('/api/market-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ symbols: MARKET_SYMBOLS, baseCurrency: currency, purchases: PURCHASES }),
+          body: JSON.stringify({ symbols: MARKET_SYMBOLS, baseCurrency: fetchCurrency, purchases: PURCHASES }),
         });
         if (!response.ok) throw new Error(`Market data request failed (${response.status})`);
         const data = await response.json();
@@ -404,7 +497,7 @@ export default function StrategicReserve() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [currency]);
+  }, [fetchCurrency]);
 
   useEffect(() => {
     let cancelled = false;
@@ -433,19 +526,31 @@ export default function StrategicReserve() {
   const changeKey = CHANGE_KEYS[timePeriod];
   const period = PERIODS.find((entry) => entry.key === timePeriod)!;
 
-  const assets = useMemo(() => buildAssets(marketData, treasury, currency), [marketData, treasury, currency]);
   const fx = getFxRate(marketData);
+  const btcView = useMemo(() => (currency === 'BTC' && marketData ? toBtcView(marketData) : null), [currency, marketData]);
+  const btcUnavailable = currency === 'BTC' && Boolean(marketData) && !btcView;
+  const viewData = currency === 'BTC' ? btcView?.data ?? null : marketData;
+  const rates: Rates = { usdCad: fx.usdCadRate, btcUsd: btcView?.btcUsd || 0 };
+
+  const assets = useMemo(
+    () => buildAssets(viewData, treasury, currency, rates),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [viewData, treasury, currency, rates.usdCad, rates.btcUsd],
+  );
 
   const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0);
-  const totalChange = weightedChange(assets, changeKey, 'currentAllocation');
-  const totalMoneyChange = moneyChange(assets, changeKey);
+  const valueHistory = useMemo(() => buildValueHistory(assets, timePeriod), [assets, timePeriod]);
+  // The headline change is the chart's own start-to-now change when there is
+  // a chart, so the two always agree.
+  const chartStart = valueHistory.length > 1 ? valueHistory[0].value : 0;
+  const totalMoneyChange = chartStart > 0 ? totalValue - chartStart : moneyChange(assets, changeKey);
+  const totalChange = chartStart > 0 ? (totalMoneyChange / chartStart) * 100 : weightedChange(assets, changeKey, 'currentAllocation');
   const targetTotal = assets.reduce((sum, asset) => sum + asset.targetAllocation, 0);
   const unallocatedTarget = Math.max(0, 100 - targetTotal);
 
   const heldAssets = assets.filter((asset) => asset.isHeld);
   const notHeldAssets = assets.filter((asset) => !asset.isHeld && asset.targetAllocation > 0);
 
-  const valueHistory = useMemo(() => buildValueHistory(assets), [assets]);
 
   const assetColor = (symbol: string) =>
     ASSET_COLORS[ASSET_CONFIG.findIndex((asset) => asset.symbol === symbol) % ASSET_COLORS.length];
@@ -513,7 +618,7 @@ export default function StrategicReserve() {
             <p className="text-sm font-medium text-gray-400">MoCoin Strategic Reserve</p>
             <Segmented
               size="sm"
-              options={[{ key: 'CAD', label: 'CAD' }, { key: 'USD', label: 'USD' }]}
+              options={[{ key: 'CAD', label: 'CAD' }, { key: 'USD', label: 'USD' }, { key: 'BTC', label: 'BTC' }]}
               value={currency}
               onChange={setCurrency}
             />
@@ -541,11 +646,13 @@ export default function StrategicReserve() {
             {' · '}Refreshes every 5 min
           </p>
 
-          {(marketError || (marketData && fx.isFallback)) && (
+          {(marketError || btcUnavailable || (marketData && fx.isFallback)) && (
             <div className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
               {marketError
                 ? `Live prices couldn't be loaded (${marketError}). Showing the last values received.`
-                : `The live USD/CAD rate is unavailable, so conversions use a fallback rate of ${fx.usdCadRate.toFixed(2)}.`}
+                : btcUnavailable
+                  ? "The live BTC price is unavailable, so values can't be shown in BTC right now."
+                  : `The live USD/CAD rate is unavailable, so conversions use a fallback rate of ${fx.usdCadRate.toFixed(2)}.`}
             </div>
           )}
         </header>
@@ -553,7 +660,7 @@ export default function StrategicReserve() {
         {/* Value chart */}
         <Card className="px-2 pb-4 pt-4 sm:px-4">
           <div className="px-2 sm:px-2">
-            <p className="text-sm text-gray-400">Reserve value · past 30 days</p>
+            <p className="text-sm text-gray-400">Reserve value · {period.description}</p>
           </div>
           {loading ? (
             <Skeleton className="mx-2 mt-4 h-48 sm:h-56" />
@@ -567,12 +674,12 @@ export default function StrategicReserve() {
                       <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="day" hide />
+                  <XAxis dataKey="t" hide />
                   <YAxis hide domain={['dataMin', 'dataMax']} />
                   <Tooltip
                     contentStyle={TOOLTIP_STYLE}
                     labelStyle={{ color: '#9ca3af', marginBottom: 4 }}
-                    labelFormatter={(day: any) => formatDay(String(day))}
+                    labelFormatter={(t: any) => formatPointTime(Number(t), timePeriod)}
                     formatter={(value: any) => [formatMoney(Number(value)), 'Value']}
                   />
                   <Area type="monotone" dataKey="value" stroke={chartColor} strokeWidth={2} fill="url(#reserveFill)" />
@@ -591,7 +698,7 @@ export default function StrategicReserve() {
             />
           </div>
           <p className="mt-3 px-2 text-center text-xs text-gray-500">
-            Chart uses daily closes of the market assets held. Cash, pre-seed and on-chain positions are held at today&apos;s value.
+            Built from live prices of the assets held and the exchange rate. Pre-seed and on-chain positions are held at today&apos;s value.
           </p>
         </Card>
 
@@ -854,7 +961,7 @@ export default function StrategicReserve() {
                         </div>
                       </div>
                       <div className="shrink-0 text-right tabular-nums">
-                        <div className="text-sm text-white">{formatMoney(convert(pool.liquidityUsd, 'USD', currency, fx.usdCadRate))}</div>
+                        <div className="text-sm text-white">{formatMoney(convert(pool.liquidityUsd, 'USD', currency, rates))}</div>
                         <div className="text-xs text-gray-500">
                           {position ? `Treasury ${(position.poolShare * 100).toFixed(2)}%` : 'liquidity'}
                         </div>

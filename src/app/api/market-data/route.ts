@@ -115,7 +115,57 @@ function getNativeCurrency(symbol: string, chart: YahooChartResult): BaseCurrenc
 }
 
 const FALLBACK_USD_CAD_RATE = 1.43;
-const HISTORY_DAYS = 31;
+
+type Period = '1h' | '4h' | '1d' | '7d' | '1m';
+type PricePoint = { t: number; c: number };
+
+// Which chart feeds each period, how far back it goes, and how coarse the
+// points are (0 = keep every point), so a month isn't sent at 5-minute detail.
+const HISTORY_WINDOWS: Record<Period, { source: 'intraday' | 'hourly'; seconds: number; step: number }> = {
+    '1h': { source: 'intraday', seconds: 60 * 60, step: 0 },
+    '4h': { source: 'intraday', seconds: 4 * 60 * 60, step: 0 },
+    '1d': { source: 'intraday', seconds: 24 * 60 * 60, step: 15 * 60 },
+    '7d': { source: 'hourly', seconds: 7 * 24 * 60 * 60, step: 60 * 60 },
+    '1m': { source: 'hourly', seconds: 30 * 24 * 60 * 60, step: 4 * 60 * 60 },
+};
+
+// Price points for each period. Each series also keeps the last point from
+// before its window, so something that didn't trade inside the window (a
+// stock overnight or at the weekend) still has a price to carry forward.
+function buildHistory(
+    charts: { intraday: YahooChartResult; hourly: YahooChartResult },
+    toBase: (price: number) => number,
+): Record<Period, PricePoint[]> {
+    const now = Math.floor(Date.now() / 1000);
+    const series = {
+        intraday: getCloseSeries(charts.intraday),
+        hourly: getCloseSeries(charts.hourly),
+    };
+
+    const history = {} as Record<Period, PricePoint[]>;
+    for (const [period, window] of Object.entries(HISTORY_WINDOWS) as [Period, (typeof HISTORY_WINDOWS)[Period]][]) {
+        const start = now - window.seconds;
+        const points = series[window.source];
+        const before = points.filter((point) => point.timestamp < start).pop();
+        const inside = points.filter((point) => point.timestamp >= start);
+
+        const kept: typeof inside = [];
+        let lastBucket = -1;
+        for (const point of inside) {
+            const bucket = window.step ? Math.floor(point.timestamp / window.step) : point.timestamp;
+            if (bucket === lastBucket) kept[kept.length - 1] = point;
+            else kept.push(point);
+            lastBucket = bucket;
+        }
+
+        history[period] = (before ? [before, ...kept] : kept).map((point) => ({
+            t: point.timestamp,
+            // 7 significant digits is plenty for a chart and keeps the payload small.
+            c: Number(toBase(point.close).toPrecision(7)),
+        }));
+    }
+    return history;
+}
 
 async function getUsdCadRate() {
     try {
@@ -137,9 +187,10 @@ function convertPrice(price: number, nativeCurrency: BaseCurrency, baseCurrency:
 // when the base is CAD, CAD in USD when the base is USD. CAD=X is CAD per
 // USD, so the USD-base view is its inverse.
 async function getFxChanges(baseCurrency: BaseCurrency) {
-    const [intradayChart, dailyChart] = await Promise.all([
-        fetchYahooChart('CAD=X', '5d', '15m'),
+    const [intradayChart, dailyChart, hourlyChart] = await Promise.all([
+        fetchYahooChart('CAD=X', '5d', '5m'),
         fetchYahooChart('CAD=X', '2mo', '1d'),
+        fetchYahooChart('CAD=X', '1mo', '1h'),
     ]);
     const rate = getLatestClose(intradayChart) || getLatestClose(dailyChart);
     if (!rate) throw new Error('No USD/CAD rate');
@@ -151,11 +202,16 @@ async function getFxChanges(baseCurrency: BaseCurrency) {
         change7d: calculateChangeFromSeries(dailyChart, rate, 7 * 24 * 60 * 60),
         change1m: calculateChangeFromSeries(dailyChart, rate, 30 * 24 * 60 * 60),
     };
-    if (baseCurrency === 'CAD') return { currency: 'USD' as BaseCurrency, ...usdInCad };
+    const charts = { intraday: intradayChart, hourly: hourlyChart };
+    if (baseCurrency === 'CAD') {
+        // Price of one USD in CAD is the rate itself.
+        return { currency: 'USD' as BaseCurrency, ...usdInCad, history: buildHistory(charts, (rate) => rate) };
+    }
 
     const invert = (change: number) => (1 / (1 + change / 100) - 1) * 100;
     return {
         currency: 'CAD' as BaseCurrency,
+        history: buildHistory(charts, (rate) => 1 / rate),
         change1h: invert(usdInCad.change1h),
         change4h: invert(usdInCad.change4h),
         change1d: invert(usdInCad.change1d),
@@ -236,8 +292,11 @@ export async function POST(request: NextRequest) {
                 }
 
                 const yahooSymbol = mapToYahooSymbol(symbol);
-                const intradayChart = await fetchYahooChart(yahooSymbol, '5d', '15m');
-                const dailyChart = await fetchYahooChart(yahooSymbol, '2mo', '1d');
+                const [intradayChart, dailyChart, hourlyChart] = await Promise.all([
+                    fetchYahooChart(yahooSymbol, '5d', '5m'),
+                    fetchYahooChart(yahooSymbol, '2mo', '1d'),
+                    fetchYahooChart(yahooSymbol, '1mo', '1h'),
+                ]);
                 const currentPrice = getLatestClose(intradayChart) || getLatestClose(dailyChart);
 
                 if (!currentPrice) {
@@ -269,14 +328,12 @@ export async function POST(request: NextRequest) {
                     usdCadRate,
                     usdCadRateIsFallback,
                     purchase: purchaseResult,
-                    // Daily closes for the last month, in the base currency
+                    // Prices for each chart period, in the base currency
                     // (historical points use today's FX rate).
-                    history: getCloseSeries(dailyChart)
-                        .slice(-HISTORY_DAYS)
-                        .map((point) => ({
-                            t: point.timestamp,
-                            c: convertPrice(point.close, nativeCurrency, baseCurrency, usdCadRate),
-                        })),
+                    history: buildHistory(
+                        { intraday: intradayChart, hourly: hourlyChart },
+                        (price) => convertPrice(price, nativeCurrency, baseCurrency, usdCadRate),
+                    ),
                     change1h: calculateChangeFromSeries(intradayChart, currentPrice, 60 * 60),
                     change4h: calculateChangeFromSeries(intradayChart, currentPrice, 4 * 60 * 60),
                     change1d: calculateChangeFromSeries(intradayChart, currentPrice, 24 * 60 * 60),
