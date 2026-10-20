@@ -1,6 +1,5 @@
 'use server'
 
-import axios from "axios";
 const yahooFinance = require("yahoo-finance2").default;
 
 export async function getPrice() {    
