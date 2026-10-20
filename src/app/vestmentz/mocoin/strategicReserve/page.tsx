@@ -92,6 +92,7 @@ const TOOLTIP_STYLE = {
 };
 
 type MarketQuote = {
+  currency?: BaseCurrency;
   c?: number;
   price?: number;
   error?: string;
@@ -170,8 +171,26 @@ function buildAssets(
       }
       case 'cash': {
         const quantity = config.quantity || 0;
-        const price = convert(1, config.currency || 'USD', currency, usdCadRate);
-        return { ...base, price, value: quantity * price, isHeld: quantity > 0 };
+        const cashCurrency = config.currency || 'USD';
+        const price = convert(1, cashCurrency, currency, usdCadRate);
+        const cash = { ...base, price, value: quantity * price, isHeld: quantity > 0 };
+        if (cashCurrency === currency) return cash;
+
+        // Foreign cash moves with the exchange rate, measured in the base currency.
+        const fx = marketData?._fx;
+        const fxPair = `${cashCurrency}/${currency}`;
+        if (!fx || fx.error || fx.currency !== cashCurrency) {
+          return { ...cash, fxPair, hasPriceError: Boolean(marketData) };
+        }
+        return {
+          ...cash,
+          fxPair,
+          change1h: fx.change1h || 0,
+          change4h: fx.change4h || 0,
+          change1d: fx.change1d || 0,
+          change7d: fx.change7d || 0,
+          change1m: fx.change1m || 0,
+        };
       }
       case 'manual': {
         if (config.manualValue == null) return base;
@@ -603,10 +622,12 @@ export default function StrategicReserve() {
                     <div className="font-medium text-white">{formatMoney(asset.value)}</div>
                     <div className={`text-sm ${asset.hasPriceError ? 'text-amber-300' : changeColor(asset[changeKey])}`}>
                       {asset.hasPriceError
-                        ? 'Price unavailable'
+                        ? asset.fxPair ? `${asset.fxPair} unavailable` : 'Price unavailable'
                         : asset.kind === 'market'
                           ? formatPercent(asset[changeKey])
-                          : `${asset.currentAllocation.toFixed(1)}% of reserve`}
+                          : asset.fxPair
+                            ? `${asset.fxPair} ${formatPercent(asset[changeKey])}`
+                            : `${asset.currentAllocation.toFixed(1)}% of reserve`}
                     </div>
                   </div>
                 </li>

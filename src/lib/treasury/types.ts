@@ -39,6 +39,9 @@ export type Asset = AssetConfig & {
   history?: PricePoint[];
   // What was paid, in the display currency (for `purchase` positions).
   bookValue?: number;
+  // For cash held in the other currency: the pair its change is measured
+  // against, e.g. "USD/CAD" when viewing in CAD.
+  fxPair?: string;
   change1h: number;
   change4h: number;
   change1d: number;

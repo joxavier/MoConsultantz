@@ -8,9 +8,10 @@
     "extraTokenMints": []
   },
   "treasuryWalletAddress": null,
-  "holdingsAsOf": "2026-10-19",
+  "holdingsAsOf": "2026-10-20",
   "assets": [
-    { "symbol": "ENB", "name": "Enbridge", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
+    { "symbol": "ENB", "name": "Enbridge", "category": "Core Equities", "kind": "market", "targetAllocation": 3.5, "quantity": null },
+    { "symbol": "NXE", "name": "NexGen Energy Ltd.", "category": "Core Equities", "kind": "market", "targetAllocation": 3.5, "quantity": null },
     { "symbol": "AMAT", "name": "Applied Materials", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
     { "symbol": "PINS", "name": "Pinterest", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null },
     { "symbol": "SNAP", "name": "Snap", "category": "Core Equities", "kind": "market", "targetAllocation": 7, "quantity": null, "purchase": { "amount": 100, "currency": "CAD", "date": "2026-10-17" } },

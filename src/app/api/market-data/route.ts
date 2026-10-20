@@ -133,6 +133,37 @@ function convertPrice(price: number, nativeCurrency: BaseCurrency, baseCurrency:
     return baseCurrency === 'CAD' ? price * usdCadRate : price / usdCadRate;
 }
 
+// How the other currency moved, measured in the base currency: USD in CAD
+// when the base is CAD, CAD in USD when the base is USD. CAD=X is CAD per
+// USD, so the USD-base view is its inverse.
+async function getFxChanges(baseCurrency: BaseCurrency) {
+    const [intradayChart, dailyChart] = await Promise.all([
+        fetchYahooChart('CAD=X', '5d', '15m'),
+        fetchYahooChart('CAD=X', '2mo', '1d'),
+    ]);
+    const rate = getLatestClose(intradayChart) || getLatestClose(dailyChart);
+    if (!rate) throw new Error('No USD/CAD rate');
+
+    const usdInCad = {
+        change1h: calculateChangeFromSeries(intradayChart, rate, 60 * 60),
+        change4h: calculateChangeFromSeries(intradayChart, rate, 4 * 60 * 60),
+        change1d: calculateChangeFromSeries(intradayChart, rate, 24 * 60 * 60),
+        change7d: calculateChangeFromSeries(dailyChart, rate, 7 * 24 * 60 * 60),
+        change1m: calculateChangeFromSeries(dailyChart, rate, 30 * 24 * 60 * 60),
+    };
+    if (baseCurrency === 'CAD') return { currency: 'USD' as BaseCurrency, ...usdInCad };
+
+    const invert = (change: number) => (1 / (1 + change / 100) - 1) * 100;
+    return {
+        currency: 'CAD' as BaseCurrency,
+        change1h: invert(usdInCad.change1h),
+        change4h: invert(usdInCad.change4h),
+        change1d: invert(usdInCad.change1d),
+        change7d: invert(usdInCad.change7d),
+        change1m: invert(usdInCad.change1m),
+    };
+}
+
 type Purchase = { amount: number; currency: BaseCurrency; date: string };
 
 // Last daily close on or before the given date (YYYY-MM-DD). Weekends and
@@ -269,6 +300,13 @@ export async function POST(request: NextRequest) {
                     change1m: 0,
                 };
             }
+        }
+
+        try {
+            results._fx = { ...(await getFxChanges(baseCurrency)), usdCadRate, usdCadRateIsFallback };
+        } catch (error: any) {
+            console.error('Failed to fetch USD/CAD changes:', error.message);
+            results._fx = { error: error.message, usdCadRate, usdCadRateIsFallback };
         }
 
         return NextResponse.json(results);
