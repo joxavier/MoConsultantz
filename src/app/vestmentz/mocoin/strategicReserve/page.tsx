@@ -566,6 +566,8 @@ export default function StrategicReserve() {
       target: members.reduce((sum, asset) => sum + asset.targetAllocation, 0),
       value: members.reduce((sum, asset) => sum + asset.value, 0),
       change: weightedChange(members, changeKey, 'currentAllocation'),
+      held: members.filter((asset) => asset.isHeld).length,
+      total: members.length,
     };
   });
   const assetRows = assets.map((asset) => ({
@@ -577,7 +579,7 @@ export default function StrategicReserve() {
     value: asset.value,
     change: asset[changeKey],
   }));
-  const allocationRows = (view === 'industry' ? categoryRows : assetRows).filter((row) => row.current > 0 || row.target > 0);
+  const pieRows = (view === 'industry' ? categoryRows : assetRows).filter((row) => row.current > 0);
 
   // Rebalance: compare each asset's weight to its target.
   const rebalanceActions = assets
@@ -702,80 +704,11 @@ export default function StrategicReserve() {
           </p>
         </Card>
 
-        {/* Holdings */}
-        <Card>
-          <SectionTitle title="Holdings" subtitle={`As of ${new Date(`${HOLDINGS_AS_OF}T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}`} />
-          {loading ? (
-            <div className="space-y-3">
-              {[0, 1, 2, 3].map((index) => <Skeleton key={index} className="h-14" />)}
-            </div>
-          ) : (
-            <ul className="-mx-2 divide-y divide-white/5">
-              {heldAssets.map((asset) => (
-                <li key={asset.symbol} className="flex items-center gap-3 px-2 py-3">
-                  <AssetBadge symbol={asset.symbol} color={assetColor(asset.symbol)} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate font-medium text-white">{asset.symbol}</span>
-                      {asset.isLive && (
-                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300">
-                          Live
-                        </span>
-                      )}
-                    </div>
-                    <div className="truncate text-sm text-gray-400">{asset.holdingLabel || asset.name}</div>
-                  </div>
-                  <div className="shrink-0 text-right tabular-nums">
-                    <div className="font-medium text-white">{formatMoney(asset.value)}</div>
-                    <div className={`text-sm ${asset.hasPriceError ? 'text-amber-300' : changeColor(asset[changeKey])}`}>
-                      {asset.hasPriceError
-                        ? asset.fxPair ? `${asset.fxPair} unavailable` : 'Price unavailable'
-                        : asset.kind === 'market'
-                          ? formatPercent(asset[changeKey])
-                          : asset.fxPair
-                            ? `${asset.fxPair} ${formatPercent(asset[changeKey])}`
-                            : `${asset.currentAllocation.toFixed(1)}% of reserve`}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!loading && notHeldAssets.length > 0 && (
-            <>
-              <h3 className="mt-6 text-sm font-semibold text-gray-300">Targeted, not yet held</h3>
-              <p className="mt-1 text-xs text-gray-500">
-                These have a target allocation but no position yet, so they count as 0% of the reserve.
-              </p>
-              <ul className="-mx-2 mt-2 divide-y divide-white/5">
-                {notHeldAssets.map((asset) => (
-                  <li key={asset.symbol} className="flex items-center gap-3 px-2 py-3 opacity-80">
-                    <AssetBadge symbol={asset.symbol} color={MO_COLORS.gray} />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-medium text-white">{asset.symbol}</div>
-                      <div className="truncate text-sm text-gray-500">
-                        {asset.kind === 'manual' ? 'Valuation pending' : asset.kind === 'onchain' ? 'Wallet not connected' : asset.name}
-                      </div>
-                    </div>
-                    <div className="shrink-0 text-right tabular-nums">
-                      <div className="text-sm text-gray-300">Target {asset.targetAllocation.toFixed(2)}%</div>
-                      {asset.kind === 'market' && !asset.hasPriceError && (
-                        <div className={`text-sm ${changeColor(asset[changeKey])}`}>{formatPercent(asset[changeKey])}</div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </Card>
-
-        {/* Allocation */}
+        {/* Holdings: allocation pie on top, then the list for the selected view */}
         <Card>
           <SectionTitle
-            title="Allocation"
-            subtitle="Current weight vs target"
+            title="Holdings"
+            subtitle={`As of ${new Date(`${HOLDINGS_AS_OF}T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}`}
             right={
               <Segmented
                 size="sm"
@@ -786,113 +719,172 @@ export default function StrategicReserve() {
             }
           />
           {loading ? (
-            <Skeleton className="mx-auto h-52 w-52 rounded-full" />
-          ) : (
-            <div className="relative mx-auto h-52 w-full max-w-xs sm:h-60">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={allocationRows.filter((row) => row.current > 0)}
-                    dataKey="current"
-                    nameKey="name"
-                    innerRadius="68%"
-                    outerRadius="100%"
-                    paddingAngle={2}
-                    stroke="none"
-                  >
-                    {allocationRows.filter((row) => row.current > 0).map((row) => (
-                      <Cell key={row.key} fill={row.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#fff' }} formatter={(value: any, name: any) => [`${Number(value).toFixed(2)}%`, name]} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xs text-gray-400">{heldAssets.length} held</span>
-                <span className="text-lg font-semibold tabular-nums">{formatMoney(totalValue)}</span>
+            <>
+              <Skeleton className="mx-auto h-52 w-52 rounded-full" />
+              <div className="mt-6 space-y-3">
+                {[0, 1, 2, 3].map((index) => <Skeleton key={index} className="h-14" />)}
               </div>
-            </div>
-          )}
-
-          <ul className="-mx-2 mt-4 divide-y divide-white/5">
-            {allocationRows.map((row) => (
-              <li key={row.key} className="flex items-center gap-3 px-2 py-3">
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
-                <span className="min-w-0 flex-1 truncate text-sm text-white">{row.name}</span>
-                <span className="w-16 text-right text-sm font-medium tabular-nums text-white">{row.current.toFixed(1)}%</span>
-                <span className="w-20 text-right text-xs tabular-nums text-gray-500">of {row.target.toFixed(1)}%</span>
-              </li>
-            ))}
-            {unallocatedTarget > 0.01 && (
-              <li className="flex items-center gap-3 px-2 py-3">
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-dashed border-gray-500" />
-                <span className="min-w-0 flex-1 truncate text-sm text-gray-400">Unallocated target</span>
-                <span className="w-16 text-right text-sm tabular-nums text-gray-500">—</span>
-                <span className="w-20 text-right text-xs tabular-nums text-gray-500">{unallocatedTarget.toFixed(1)}%</span>
-              </li>
-            )}
-          </ul>
-        </Card>
-
-        {/* Rebalance */}
-        <Card>
-          <SectionTitle title="Rebalance" subtitle="What it would take to reach each target" />
-          {loading ? (
-            <div className="space-y-3">
-              {[0, 1, 2].map((index) => <Skeleton key={index} className="h-12" />)}
-            </div>
-          ) : (
-            <ul className="space-y-4">
-              {(showAllRebalance ? rebalanceActions : rebalanceActions.slice(0, REBALANCE_PREVIEW)).map((asset) => {
-                const isAdd = asset.action === 'Add';
-                const isReduce = asset.action === 'Reduce';
-                const barWidth = `${Math.min(50, (Math.abs(asset.delta) / maxRebalanceDelta) * 50)}%`;
-                return (
-                  <li key={asset.symbol}>
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-sm font-medium text-white">{asset.symbol}</span>
-                      <span className={`shrink-0 text-sm font-semibold tabular-nums ${isAdd ? 'text-emerald-400' : isReduce ? 'text-red-400' : 'text-gray-400'}`}>
-                        {asset.action === 'Hold' ? 'Hold' : `${asset.action} ${formatMoney(asset.estimatedValue)}`}
-                      </span>
-                    </div>
-                    <div className="relative mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                      <div className="absolute left-1/2 top-0 h-full w-px bg-white/20" />
-                      <div
-                        className={`absolute top-0 h-full rounded-full ${isAdd ? 'bg-emerald-500' : isReduce ? 'bg-red-500' : 'bg-gray-500'}`}
-                        style={{ width: barWidth, left: isAdd ? '50%' : undefined, right: isReduce ? '50%' : undefined }}
-                      />
-                    </div>
-                    <div className="mt-1 flex justify-between text-xs tabular-nums text-gray-500">
-                      <span>Now {asset.currentAllocation.toFixed(1)}%</span>
-                      <span>Target {asset.targetAllocation.toFixed(1)}%</span>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          {!loading && rebalanceActions.length > REBALANCE_PREVIEW && (
-            <button
-              type="button"
-              onClick={() => setShowAllRebalance((value) => !value)}
-              className="mt-4 w-full rounded-full bg-white/[0.06] py-2.5 text-sm font-medium text-gray-200 transition-colors hover:bg-white/[0.1]"
-            >
-              {showAllRebalance ? 'Show less' : `Show all ${rebalanceActions.length}`}
-            </button>
-          )}
-        </Card>
-
-        {/* Projection */}
-        <Card>
-          <SectionTitle
-            title="If the last month repeated"
-            subtitle="Compounds each mix's trailing 1-month return. An illustration, not a forecast."
-          />
-          {loading ? (
-            <Skeleton className="h-48" />
+            </>
           ) : (
             <>
-              <div className="h-48 sm:h-56">
+              <div className="relative mx-auto h-52 w-full max-w-xs sm:h-60">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieRows} dataKey="current" nameKey="name" innerRadius="68%" outerRadius="100%" paddingAngle={2} stroke="none">
+                      {pieRows.map((row) => (
+                        <Cell key={row.key} fill={row.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={TOOLTIP_STYLE} itemStyle={{ color: '#fff' }} formatter={(value: any, name: any) => [`${Number(value).toFixed(2)}%`, name]} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-xs text-gray-400">{view === 'asset' ? `${heldAssets.length} held` : `${pieRows.length} categories`}</span>
+                  <span className="text-lg font-semibold tabular-nums">{formatMoney(totalValue)}</span>
+                </div>
+              </div>
+
+              {view === 'asset' ? (
+                <>
+                  <ul className="-mx-2 mt-4 divide-y divide-white/5">
+                    {heldAssets.map((asset) => (
+                      <li key={asset.symbol} className="flex items-center gap-3 px-2 py-3">
+                        <AssetBadge symbol={asset.symbol} color={assetColor(asset.symbol)} />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="truncate font-medium text-white">{asset.symbol}</span>
+                            {asset.isLive && (
+                              <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-300">
+                                Live
+                              </span>
+                            )}
+                          </div>
+                          <div className="truncate text-sm text-gray-400">
+                            {asset.currentAllocation.toFixed(1)}% · {asset.holdingLabel || asset.name}
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right tabular-nums">
+                          <div className="font-medium text-white">{formatMoney(asset.value)}</div>
+                          <div className={`text-sm ${asset.hasPriceError ? 'text-amber-300' : changeColor(asset[changeKey])}`}>
+                            {asset.hasPriceError
+                              ? asset.fxPair ? `${asset.fxPair} unavailable` : 'Price unavailable'
+                              : asset.kind === 'market'
+                                ? formatPercent(asset[changeKey])
+                                : asset.fxPair
+                                  ? `${asset.fxPair} ${formatPercent(asset[changeKey])}`
+                                  : asset.isLive ? 'On-chain' : 'No change'}
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {notHeldAssets.length > 0 && (
+                    <>
+                      <h3 className="mt-6 text-sm font-semibold text-gray-300">Targeted, not yet held</h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        These have a target allocation but no position yet, so they count as 0% of the reserve.
+                      </p>
+                      <ul className="-mx-2 mt-2 divide-y divide-white/5">
+                        {notHeldAssets.map((asset) => (
+                          <li key={asset.symbol} className="flex items-center gap-3 px-2 py-3 opacity-80">
+                            <AssetBadge symbol={asset.symbol} color={MO_COLORS.gray} />
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate font-medium text-white">{asset.symbol}</div>
+                              <div className="truncate text-sm text-gray-500">
+                                {asset.kind === 'manual' ? 'Valuation pending' : asset.kind === 'onchain' ? 'Wallet not connected' : asset.name}
+                              </div>
+                            </div>
+                            <div className="shrink-0 text-right tabular-nums">
+                              <div className="text-sm text-gray-300">Target {asset.targetAllocation.toFixed(2)}%</div>
+                              {asset.kind === 'market' && !asset.hasPriceError && (
+                                <div className={`text-sm ${changeColor(asset[changeKey])}`}>{formatPercent(asset[changeKey])}</div>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </>
+              ) : (
+                <ul className="-mx-2 mt-4 divide-y divide-white/5">
+                  {categoryRows
+                    .filter((row) => row.value > 0 || row.target > 0)
+                    .map((row) => (
+                      <li key={row.key} className={`flex items-center gap-3 px-2 py-3 ${row.value > 0 ? '' : 'opacity-70'}`}>
+                        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: row.value > 0 ? row.color : MO_COLORS.gray }} />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate font-medium text-white">{row.name}</div>
+                          <div className="truncate text-sm text-gray-400">
+                            {row.value > 0 ? `${row.current.toFixed(1)}% · ${row.held} of ${row.total} held` : 'Not yet held'}
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right tabular-nums">
+                          <div className="font-medium text-white">{formatMoney(row.value)}</div>
+                          {row.value > 0 && <div className={`text-sm ${changeColor(row.change)}`}>{formatPercent(row.change)}</div>}
+                        </div>
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </>
+          )}
+        </Card>
+
+        {/* Projected allocation: current weights against targets, the
+            projection for each mix, and the moves that get from one to the other */}
+        <Card>
+          <SectionTitle title="Projected allocation" subtitle="Where the reserve is now, where its targets put it, and how each mix would grow" />
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-16" />
+              <Skeleton className="h-48" />
+            </div>
+          ) : (
+            <>
+              {/* Current vs target, by category */}
+              <div className="space-y-3">
+                {[
+                  { label: 'Now', key: 'current' as const },
+                  { label: 'Target', key: 'target' as const },
+                ].map((bar) => (
+                  <div key={bar.label}>
+                    <div className="mb-1 text-xs font-medium text-gray-400">{bar.label}</div>
+                    <div className="flex h-3 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                      {categoryRows
+                        .filter((row) => row[bar.key] > 0)
+                        .map((row) => (
+                          <div key={row.key} style={{ width: `${row[bar.key]}%`, backgroundColor: row.color }} title={`${row.name} ${row[bar.key].toFixed(1)}%`} />
+                        ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <ul className="mt-3 grid grid-cols-1 gap-x-4 gap-y-1.5 text-xs sm:grid-cols-2">
+                {categoryRows
+                  .filter((row) => row.current > 0 || row.target > 0)
+                  .map((row) => (
+                    <li key={row.key} className="flex items-center gap-2">
+                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
+                      <span className="min-w-0 flex-1 truncate text-gray-300">{row.name}</span>
+                      <span className="tabular-nums text-gray-400">
+                        {row.current.toFixed(1)}% → {row.target.toFixed(1)}%
+                      </span>
+                    </li>
+                  ))}
+                {unallocatedTarget > 0.01 && (
+                  <li className="flex items-center gap-2">
+                    <span className="h-2 w-2 shrink-0 rounded-full border border-dashed border-gray-500" />
+                    <span className="min-w-0 flex-1 truncate text-gray-400">Unallocated target</span>
+                    <span className="tabular-nums text-gray-500">{unallocatedTarget.toFixed(1)}%</span>
+                  </li>
+                )}
+              </ul>
+
+              {/* Projection */}
+              <h3 className="mt-6 text-sm font-semibold text-gray-300">If the last month repeated</h3>
+              <div className="mt-2 h-44 sm:h-52">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={projectionData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                     <XAxis dataKey="horizon" stroke="#6b7280" tickLine={false} axisLine={false} fontSize={12} />
@@ -903,8 +895,7 @@ export default function StrategicReserve() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {[
                   { label: 'Current mix, 1Y', value: currentProjectedGain, note: `${formatPercent(currentMonthly)} / month`, dot: MO_COLORS.blue },
                   { label: 'Target mix, 1Y', value: idealProjectedGain, note: `${formatPercent(idealMonthly)} / month`, dot: MO_COLORS.purpleLight },
@@ -924,9 +915,49 @@ export default function StrategicReserve() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-xs text-gray-500">
-                Assumes the past month&apos;s return repeats every month. Ignores volatility, fees and changing markets. Not investment advice.
+              <p className="mt-3 text-xs text-gray-500">
+                Compounds each mix&apos;s trailing 1-month return. Ignores volatility, fees and changing markets. An illustration, not a forecast or investment advice.
               </p>
+
+              {/* Moves to reach the targets */}
+              <h3 className="mt-6 text-sm font-semibold text-gray-300">To reach the targets</h3>
+              <ul className="mt-3 space-y-4">
+                {(showAllRebalance ? rebalanceActions : rebalanceActions.slice(0, REBALANCE_PREVIEW)).map((asset) => {
+                  const isAdd = asset.action === 'Add';
+                  const isReduce = asset.action === 'Reduce';
+                  const barWidth = `${Math.min(50, (Math.abs(asset.delta) / maxRebalanceDelta) * 50)}%`;
+                  return (
+                    <li key={asset.symbol}>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="truncate text-sm font-medium text-white">{asset.symbol}</span>
+                        <span className={`shrink-0 text-sm font-semibold tabular-nums ${isAdd ? 'text-emerald-400' : isReduce ? 'text-red-400' : 'text-gray-400'}`}>
+                          {asset.action === 'Hold' ? 'Hold' : `${asset.action} ${formatMoney(asset.estimatedValue)}`}
+                        </span>
+                      </div>
+                      <div className="relative mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                        <div className="absolute left-1/2 top-0 h-full w-px bg-white/20" />
+                        <div
+                          className={`absolute top-0 h-full rounded-full ${isAdd ? 'bg-emerald-500' : isReduce ? 'bg-red-500' : 'bg-gray-500'}`}
+                          style={{ width: barWidth, left: isAdd ? '50%' : undefined, right: isReduce ? '50%' : undefined }}
+                        />
+                      </div>
+                      <div className="mt-1 flex justify-between text-xs tabular-nums text-gray-500">
+                        <span>Now {asset.currentAllocation.toFixed(1)}%</span>
+                        <span>Target {asset.targetAllocation.toFixed(1)}%</span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              {rebalanceActions.length > REBALANCE_PREVIEW && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllRebalance((value) => !value)}
+                  className="mt-4 w-full rounded-full bg-white/[0.06] py-2.5 text-sm font-medium text-gray-200 transition-colors hover:bg-white/[0.1]"
+                >
+                  {showAllRebalance ? 'Show less' : `Show all ${rebalanceActions.length}`}
+                </button>
+              )}
             </>
           )}
         </Card>
