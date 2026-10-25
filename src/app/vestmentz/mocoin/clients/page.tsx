@@ -1,0 +1,178 @@
+'use client'
+import React, { useEffect, useState } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import type { ClientsResponse } from '@/lib/clients';
+import type { BaseCurrency } from '@/lib/treasury/types';
+
+const CURRENCIES: BaseCurrency[] = ['CAD', 'USD'];
+
+const formatMoney = (value: number, currency: BaseCurrency) =>
+  new Intl.NumberFormat('en-CA', { style: 'currency', currency, maximumFractionDigits: value !== 0 && Math.abs(value) < 1 ? 6 : 2 }).format(value);
+
+const formatMonth = (date: string) => {
+  const [year, month] = date.split('-').map(Number);
+  return new Date(year, (month || 1) - 1).toLocaleDateString('en-CA', { year: 'numeric', month: 'long' });
+};
+
+// Saved per signed-in account so each user keeps their own display currency.
+const currencyKey = (email: string) => `clientsCurrency:${email.toLowerCase()}`;
+
+function readSavedCurrency(email: string): BaseCurrency | null {
+  try {
+    const saved = localStorage.getItem(currencyKey(email));
+    return saved === 'CAD' || saved === 'USD' ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+export default function ClientsPage() {
+  const { data: session, status } = useSession();
+  const [data, setData] = useState<ClientsResponse | null>(null);
+  const [error, setError] = useState<'forbidden' | 'failed' | null>(null);
+  const [currency, setCurrency] = useState<BaseCurrency>('CAD');
+
+  const email = session?.user?.email || '';
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    fetch('/api/clients')
+      .then(async (response) => {
+        if (response.status === 401 || response.status === 403) return setError('forbidden');
+        if (!response.ok) return setError('failed');
+        const payload: ClientsResponse = await response.json();
+        setData(payload);
+        const preferred = payload.clients.length === 1 ? payload.clients[0].preferredCurrency : 'CAD';
+        setCurrency(readSavedCurrency(email) || preferred);
+      })
+      .catch(() => setError('failed'));
+  }, [status, email]);
+
+  const chooseCurrency = (next: BaseCurrency) => {
+    setCurrency(next);
+    try {
+      localStorage.setItem(currencyKey(email), next);
+    } catch {}
+  };
+
+  const convert = (usd: number) => (currency === 'CAD' && data ? usd * data.usdCadRate : usd);
+
+  const shell = (children: React.ReactNode) => (
+    <main className="min-h-screen px-4 sm:px-6 lg:px-8 pt-28 pb-24">
+      <div className="max-w-4xl mx-auto">{children}</div>
+    </main>
+  );
+
+  if (status === 'loading') return shell(<p className="text-center text-gray-500">Loading…</p>);
+
+  if (status === 'unauthenticated') {
+    return shell(
+      <div className="max-w-md mx-auto text-center border border-gray-200 dark:border-white/10 rounded-2xl p-8">
+        <h1 className="text-3xl font-bold mb-3">Client Portfolio</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-8">Sign in with the Google account linked to your portfolio.</p>
+        <button
+          onClick={() => signIn('google')}
+          className="w-full px-6 py-3 bg-black text-white dark:bg-white dark:text-black rounded-lg font-semibold hover:opacity-90"
+        >
+          Continue with Google
+        </button>
+        <p className="text-xs text-gray-500 mt-6">
+          For your security, turn on 2-Step Verification for your Google account.
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return shell(
+      <div className="max-w-md mx-auto text-center border border-gray-200 dark:border-white/10 rounded-2xl p-8">
+        <h1 className="text-2xl font-bold mb-3">{error === 'forbidden' ? 'No portfolio found' : 'Something went wrong'}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          {error === 'forbidden'
+            ? `${email} isn't linked to a client portfolio.`
+            : 'We couldn’t load your portfolio. Please try again shortly.'}
+        </p>
+        <button onClick={() => signOut()} className="text-sm font-semibold underline underline-offset-2">Sign out</button>
+      </div>
+    );
+  }
+
+  if (!data) return shell(<p className="text-center text-gray-500">Loading portfolio…</p>);
+
+  return shell(
+    <>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">{data.isManager ? 'Clients' : 'Your Portfolio'}</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Signed in as {email} · <button onClick={() => signOut()} className="underline underline-offset-2">Sign out</button>
+          </p>
+        </div>
+        <div className="inline-flex rounded-lg border border-gray-200 dark:border-white/10 p-1 self-start" role="group" aria-label="Display currency">
+          {CURRENCIES.map((option) => (
+            <button
+              key={option}
+              onClick={() => chooseCurrency(option)}
+              aria-pressed={currency === option}
+              className={`px-4 py-1.5 rounded-md text-sm font-semibold ${currency === option ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-gray-500'}`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {data.clients.map((client) => (
+          <section key={client.id} className="border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5">
+              <h2 className="text-xl font-bold">{client.name}</h2>
+              <div className="text-right">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Current value</div>
+                <div className="text-2xl font-bold">{formatMoney(convert(client.totalUsd), currency)}</div>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-gray-500">
+                  <tr>
+                    <th className="px-6 py-3 font-medium">Deposit</th>
+                    <th className="px-6 py-3 font-medium">Date</th>
+                    <th className="px-6 py-3 font-medium text-right">Price</th>
+                    <th className="px-6 py-3 font-medium text-right">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {client.deposits.map((deposit) => (
+                    <tr key={`${deposit.token}-${deposit.date}`} className="border-t border-gray-200 dark:border-white/10">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-semibold">{deposit.quantity.toLocaleString('en-CA')} {deposit.token}</div>
+                        <div className="text-xs text-gray-500">{deposit.symbol}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">{formatMonth(deposit.date)}</td>
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        {deposit.priceUsd === null ? '—' : formatMoney(convert(deposit.priceUsd), currency)}
+                      </td>
+                      <td className="px-6 py-4 text-right whitespace-nowrap font-semibold">
+                        {deposit.valueUsd === null
+                          ? <span className="text-gray-500 font-normal" title={deposit.priceError}>Price unavailable</span>
+                          : formatMoney(convert(deposit.valueUsd), currency)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <p className="text-xs text-gray-500 mt-6">
+        Values use live on-chain prices from Solana liquidity pools (as of {new Date(data.pricedAt).toLocaleString('en-CA')}).
+        {currency === 'CAD' && (data.usdCadRateIsFallback
+          ? ` The live USD/CAD rate is unavailable, so a fallback rate of ${data.usdCadRate.toFixed(2)} is used.`
+          : ` Converted at USD/CAD ${data.usdCadRate.toFixed(4)}.`)}
+      </p>
+    </>
+  );
+}

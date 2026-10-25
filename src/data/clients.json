@@ -1,0 +1,17 @@
+{
+  "tokens": {
+    "MoCoin": { "symbol": "MoCoin", "mintAddress": "HHVmXazRvA3VdciVG4ayE7vjgUFUn12t5r7vYm2BJ258" },
+    "Metaparlour": { "symbol": "MP", "mintAddress": null }
+  },
+  "clients": [
+    {
+      "id": "tacticalGrape",
+      "name": "tacticalGrape",
+      "preferredCurrency": "CAD",
+      "deposits": [
+        { "token": "MoCoin", "quantity": 500, "date": "2020-05" },
+        { "token": "Metaparlour", "quantity": 300, "date": "2026-01" }
+      ]
+    }
+  ]
+}
