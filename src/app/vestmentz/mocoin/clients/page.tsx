@@ -126,7 +126,19 @@ export default function ClientsPage() {
         {data.clients.map((client) => (
           <section key={client.id} className="border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden">
             <div className="flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5">
-              <h2 className="text-xl font-bold">{client.name}</h2>
+              <div>
+                <h2 className="text-xl font-bold">{client.name}</h2>
+                {client.walletAddress && (
+                  <a
+                    href={`https://solscan.io/account/${client.walletAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-gray-500 underline underline-offset-2 font-mono"
+                  >
+                    {client.walletAddress.slice(0, 6)}…{client.walletAddress.slice(-6)}
+                  </a>
+                )}
+              </div>
               <div className="text-right">
                 <div className="text-xs text-gray-500 uppercase tracking-wide">Current value</div>
                 <div className="text-2xl font-bold">{formatMoney(convert(client.totalUsd), currency)}</div>
@@ -136,30 +148,40 @@ export default function ClientsPage() {
               <table className="w-full text-sm">
                 <thead className="text-left text-gray-500">
                   <tr>
-                    <th className="px-6 py-3 font-medium">Deposit</th>
+                    <th className="px-6 py-3 font-medium">Holding</th>
                     <th className="px-6 py-3 font-medium">Date</th>
                     <th className="px-6 py-3 font-medium text-right">Price</th>
                     <th className="px-6 py-3 font-medium text-right">Value</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {client.deposits.map((deposit) => (
-                    <tr key={`${deposit.token}-${deposit.date}`} className="border-t border-gray-200 dark:border-white/10">
+                  {client.holdings.map((holding) => (
+                    <tr key={`${holding.source}-${holding.mint || holding.label}-${holding.date || ''}`} className="border-t border-gray-200 dark:border-white/10">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-semibold">{deposit.quantity.toLocaleString('en-CA')} {deposit.token}</div>
-                        <div className="text-xs text-gray-500">{deposit.symbol}</div>
+                        <div className="font-semibold">{holding.quantity.toLocaleString('en-CA', { maximumFractionDigits: 6 })} {holding.label}</div>
+                        <div className="text-xs text-gray-500">{holding.symbol}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">{formatMonth(deposit.date)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{holding.date ? formatMonth(holding.date) : 'On-chain'}</td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
-                        {deposit.priceUsd === null ? '—' : formatMoney(convert(deposit.priceUsd), currency)}
+                        {holding.priceUsd === null ? '—' : formatMoney(convert(holding.priceUsd), currency)}
                       </td>
                       <td className="px-6 py-4 text-right whitespace-nowrap font-semibold">
-                        {deposit.valueUsd === null
-                          ? <span className="text-gray-500 font-normal" title={deposit.priceError}>Price unavailable</span>
-                          : formatMoney(convert(deposit.valueUsd), currency)}
+                        {holding.valueUsd === null
+                          ? <span className="text-gray-500 font-normal" title={holding.priceError}>Price unavailable</span>
+                          : formatMoney(convert(holding.valueUsd), currency)}
                       </td>
                     </tr>
                   ))}
+                  {!client.holdings.length && !client.walletError && (
+                    <tr className="border-t border-gray-200 dark:border-white/10">
+                      <td colSpan={4} className="px-6 py-6 text-center text-gray-500">No holdings yet.</td>
+                    </tr>
+                  )}
+                  {client.walletError && (
+                    <tr className="border-t border-gray-200 dark:border-white/10">
+                      <td colSpan={4} className="px-6 py-6 text-center text-gray-500">{client.walletError}</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
