@@ -9,7 +9,15 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { isManager, clients } = getVisibleClients(session);
+  let visible: Awaited<ReturnType<typeof getVisibleClients>>;
+  try {
+    visible = await getVisibleClients(session);
+  } catch (error: any) {
+    console.error("Clients sheet read error:", error.message);
+    return NextResponse.json({ error: "Client accounts are unavailable right now" }, { status: 503 });
+  }
+
+  const { isManager, clients } = visible;
   if (!clients.length) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

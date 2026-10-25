@@ -6,24 +6,28 @@ import { getPoolReserves } from "@/lib/treasury/raydium";
 import { discoverPools } from "@/lib/treasury/pools";
 import { getAllTokenBalances, getSolBalance } from "@/lib/treasury/solana";
 import type { BaseCurrency } from "@/lib/treasury/types";
+import { readClientsSheet, type SheetClient } from "@/lib/clientsSheet";
 
-// Required env var: CLIENT_ACCOUNT_EMAILS — comma-separated `clientId=email`
-// pairs (e.g. "tacticalGrape=someone@gmail.com") naming the Google account
-// that may see each client's balances. Kept out of the repo because it's
-// public. Treasury managers (TREASURY_MANAGER_EMAILS) see every client.
+// Client accounts (username, email, wallets) come from the "Clients" tab of
+// the Google Sheet — see clientsSheet.ts. src/data/clients.json only holds
+// recorded deposits, keyed by the same username. A signed-in user sees the
+// clients whose sheet row has their email; treasury managers
+// (TREASURY_MANAGER_EMAILS) see every client.
 
 export type TokenName = keyof typeof clientsData.tokens;
 
 export type ClientDeposit = { token: TokenName; quantity: number; date: string };
 
-// A client is valued from recorded deposits, a scan of a Solana wallet, or both.
+// A client is valued from recorded deposits, scans of Solana wallets, or both.
 export type ClientConfig = {
   id: string;
   name: string;
   preferredCurrency: BaseCurrency;
   deposits?: ClientDeposit[];
-  walletAddress?: string;
+  walletAddresses?: string[];
 };
+
+type DepositRecord = { id: string; name?: string; preferredCurrency?: BaseCurrency; deposits?: ClientDeposit[] };
 
 export type Holding = {
   source: "deposit" | "wallet";
@@ -33,6 +37,7 @@ export type Holding = {
   // Deposit month (YYYY-MM); absent for live wallet balances.
   date?: string;
   mint?: string;
+  wallet?: string;
   priceUsd: number | null;
   valueUsd: number | null;
   priceError?: string;
@@ -53,25 +58,43 @@ export type ClientsResponse = {
   pricedAt: string;
 };
 
-const clients = clientsData.clients as ClientConfig[];
+const depositRecords = clientsData.clients as DepositRecord[];
 
-function getAccountMap(): Record<string, string[]> {
-  const map: Record<string, string[]> = {};
-  for (const entry of (process.env.CLIENT_ACCOUNT_EMAILS || "").split(",")) {
-    const [clientId, email] = entry.split("=").map((part) => part?.trim());
-    if (!clientId || !email) continue;
-    const key = email.toLowerCase();
-    map[key] = [...(map[key] || []), clientId];
+// Sheet rows and deposit records, joined on username. A username can appear on
+// several sheet rows (e.g. two people sharing a portfolio); its wallets are
+// combined.
+function buildClients(rows: SheetClient[]): ClientConfig[] {
+  const byId = new Map<string, ClientConfig>();
+  const get = (id: string) => {
+    const key = id.toLowerCase();
+    if (!byId.has(key)) byId.set(key, { id, name: id, preferredCurrency: "CAD", walletAddresses: [] });
+    return byId.get(key)!;
+  };
+
+  for (const record of depositRecords) {
+    Object.assign(get(record.id), {
+      name: record.name || record.id,
+      deposits: record.deposits,
+      ...(record.preferredCurrency && { preferredCurrency: record.preferredCurrency }),
+    });
   }
-  return map;
+  for (const row of rows) {
+    const client = get(row.username);
+    if (row.preferredCurrency) client.preferredCurrency = row.preferredCurrency;
+    client.walletAddresses = Array.from(new Set([...(client.walletAddresses || []), ...row.walletAddresses]));
+  }
+  return Array.from(byId.values());
 }
 
-export function getVisibleClients(session: Session | null): { isManager: boolean; clients: ClientConfig[] } {
+export async function getVisibleClients(session: Session | null): Promise<{ isManager: boolean; clients: ClientConfig[] }> {
+  const rows = await cached("clients-sheet", readClientsSheet);
+  const clients = buildClients(rows);
+
   if (isTreasuryManagerSession(session)) return { isManager: true, clients };
 
   const email = session?.user?.email?.toLowerCase();
-  const allowedIds = email ? getAccountMap()[email] || [] : [];
-  return { isManager: false, clients: clients.filter((client) => allowedIds.includes(client.id)) };
+  const allowedIds = new Set(rows.filter((row) => email && row.email === email).map((row) => row.username.toLowerCase()));
+  return { isManager: false, clients: clients.filter((client) => allowedIds.has(client.id.toLowerCase())) };
 }
 
 const DEXSCREENER_TOKENS_URL = "https://api.dexscreener.com/latest/dex/tokens";
@@ -191,6 +214,7 @@ function priced(holding: Omit<Holding, "valueUsd">): Holding {
 // Every non-zero balance in the wallet: native SOL plus each SPL / Token-2022
 // token, priced from Solana pools where possible.
 async function scanWallet(address: string): Promise<Holding[]> {
+  const wallet = address;
   const [sol, tokenBalances] = await Promise.all([getSolBalance(address), getAllTokenBalances(address)]);
 
   const held = Object.entries(tokenBalances).filter(([, amount]) => amount > 0);
@@ -206,7 +230,7 @@ async function scanWallet(address: string): Promise<Holding[]> {
   const holdings: Holding[] = [];
   if (sol > 0) {
     const solPrice = quotes[WRAPPED_SOL_MINT]?.priceUsd ?? null;
-    holdings.push(priced({ source: "wallet", label: "Solana", symbol: "SOL", quantity: sol, mint: WRAPPED_SOL_MINT, priceUsd: solPrice, priceError: solPrice === null ? "SOL price unavailable" : undefined }));
+    holdings.push(priced({ source: "wallet", label: "Solana", symbol: "SOL", quantity: sol, mint: WRAPPED_SOL_MINT, wallet, priceUsd: solPrice, priceError: solPrice === null ? "SOL price unavailable" : undefined }));
   }
   for (const [mint, quantity] of held) {
     const quote = quotes[mint];
@@ -215,6 +239,7 @@ async function scanWallet(address: string): Promise<Holding[]> {
     const symbol = quote?.symbol || (name && clientsData.tokens[name].symbol) || `${mint.slice(0, 4)}…${mint.slice(-4)}`;
     holdings.push(priced({
       source: "wallet",
+      wallet,
       label: name || symbol,
       symbol,
       quantity,
@@ -249,15 +274,14 @@ export async function priceClients(visible: ClientConfig[]) {
       });
 
       let walletError: string | undefined;
-      if (client.walletAddress) {
-        const address = client.walletAddress;
-        try {
-          holdings.push(...(await cached(`wallet:${address}`, () => scanWallet(address))));
-        } catch (error: any) {
-          console.error(`Wallet scan error for ${client.id}:`, error.message);
-          walletError = "Couldn't read on-chain balances right now.";
-        }
-      }
+      const scans = await Promise.allSettled(
+        (client.walletAddresses || []).map((address) => cached(`wallet:${address}`, () => scanWallet(address)))
+      );
+      scans.forEach((scan, i) => {
+        if (scan.status === "fulfilled") return holdings.push(...scan.value);
+        console.error(`Wallet scan error for ${client.id} (${client.walletAddresses![i]}):`, scan.reason?.message);
+        walletError = "Couldn't read some on-chain balances right now.";
+      });
 
       return { ...client, holdings, walletError, totalUsd: holdings.reduce((sum, h) => sum + (h.valueUsd || 0), 0) };
     })

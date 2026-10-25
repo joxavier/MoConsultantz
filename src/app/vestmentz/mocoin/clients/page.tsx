@@ -14,6 +14,8 @@ const formatMonth = (date: string) => {
   return new Date(year, (month || 1) - 1).toLocaleDateString('en-CA', { year: 'numeric', month: 'long' });
 };
 
+const shortAddress = (address: string) => `${address.slice(0, 6)}…${address.slice(-6)}`;
+
 // Saved per signed-in account so each user keeps their own display currency.
 const currencyKey = (email: string) => `clientsCurrency:${email.toLowerCase()}`;
 
@@ -29,7 +31,7 @@ function readSavedCurrency(email: string): BaseCurrency | null {
 export default function ClientsPage() {
   const { data: session, status } = useSession();
   const [data, setData] = useState<ClientsResponse | null>(null);
-  const [error, setError] = useState<'forbidden' | 'failed' | null>(null);
+  const [error, setError] = useState<'forbidden' | 'unavailable' | 'failed' | null>(null);
   const [currency, setCurrency] = useState<BaseCurrency>('CAD');
 
   const email = session?.user?.email || '';
@@ -39,6 +41,7 @@ export default function ClientsPage() {
     fetch('/api/clients')
       .then(async (response) => {
         if (response.status === 401 || response.status === 403) return setError('forbidden');
+        if (response.status === 503) return setError('unavailable');
         if (!response.ok) return setError('failed');
         const payload: ClientsResponse = await response.json();
         setData(payload);
@@ -128,16 +131,17 @@ export default function ClientsPage() {
             <div className="flex items-center justify-between p-6 bg-gray-50 dark:bg-white/5">
               <div>
                 <h2 className="text-xl font-bold">{client.name}</h2>
-                {client.walletAddress && (
+                {client.walletAddresses?.map((wallet) => (
                   <a
-                    href={`https://solscan.io/account/${client.walletAddress}`}
+                    key={wallet}
+                    href={`https://solscan.io/account/${wallet}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-gray-500 underline underline-offset-2 font-mono"
+                    className="block text-xs text-gray-500 underline underline-offset-2 font-mono"
                   >
-                    {client.walletAddress.slice(0, 6)}…{client.walletAddress.slice(-6)}
+                    {shortAddress(wallet)}
                   </a>
-                )}
+                ))}
               </div>
               <div className="text-right">
                 <div className="text-xs text-gray-500 uppercase tracking-wide">Current value</div>
@@ -159,7 +163,10 @@ export default function ClientsPage() {
                     <tr key={`${holding.source}-${holding.mint || holding.label}-${holding.date || ''}`} className="border-t border-gray-200 dark:border-white/10">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-semibold">{holding.quantity.toLocaleString('en-CA', { maximumFractionDigits: 6 })} {holding.label}</div>
-                        <div className="text-xs text-gray-500">{holding.symbol}</div>
+                        <div className="text-xs text-gray-500">
+                          {holding.symbol}
+                          {holding.wallet && (client.walletAddresses?.length || 0) > 1 && <span className="font-mono"> · {shortAddress(holding.wallet)}</span>}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">{holding.date ? formatMonth(holding.date) : 'On-chain'}</td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
