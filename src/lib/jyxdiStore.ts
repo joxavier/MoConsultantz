@@ -1,5 +1,5 @@
 import type { Session } from "next-auth";
-import { SITE, type Artwork, type ArtworkType } from "@/lib/jyxdi";
+import { SITE, formatOptions, parseOptions, type Artwork, type ArtworkType } from "@/lib/jyxdi";
 import { columnReader, normalizeHeader, readTab, writeTab } from "@/lib/googleSheets";
 
 // Everything the Art by Jyxdi admin (/admin on jyxdi.modevz.ca) can edit lives
@@ -15,7 +15,7 @@ import { columnReader, normalizeHeader, readTab, writeTab } from "@/lib/googleSh
 
 const PRODUCTS_TAB = "Products";
 const SETTINGS_TAB = "Settings";
-const PRODUCT_HEADERS = ["Slug", "Title", "Type", "Price", "Description", "Image", "Details", "Checkout URL", "Sold"];
+const PRODUCT_HEADERS = ["Slug", "Title", "Type", "Price", "Description", "Image", "Details", "Checkout URL", "Sold", "Options"];
 const SETTINGS_HEADERS = ["Key", "Value"];
 
 export type PaymentSettings = {
@@ -87,7 +87,7 @@ function parseProducts(rows: string[][]): Artwork[] {
   const col = {
     slug: find("slug"), title: find("title", "name"), type: find("type"), price: find("price"),
     description: find("description"), image: find("image", "imageurl"), details: find("details"),
-    checkoutUrl: find("checkouturl", "checkout", "paymentlink"), sold: find("sold"),
+    checkoutUrl: find("checkouturl", "checkout", "paymentlink"), sold: find("sold"), options: find("options", "variants"),
   };
 
   return body
@@ -106,13 +106,14 @@ function parseProducts(rows: string[][]): Artwork[] {
         details: cell(row, col.details) || undefined,
         checkoutUrl: cell(row, col.checkoutUrl) || undefined,
         sold: ["yes", "true", "sold", "y", "1"].includes(cell(row, col.sold).toLowerCase()),
+        options: parseOptions(cell(row, col.options)),
       };
     })
     .filter((artwork): artwork is Artwork => artwork !== null);
 }
 
 const productToRow = (a: Artwork) => [
-  a.slug, a.title, a.type, String(a.price), a.description, a.image, a.details || "", a.checkoutUrl || "", a.sold ? "Yes" : "",
+  a.slug, a.title, a.type, String(a.price), a.description, a.image, a.details || "", a.checkoutUrl || "", a.sold ? "Yes" : "", formatOptions(a.options),
 ];
 
 function parseSettings(rows: string[][]): StoreSettings {
@@ -215,6 +216,11 @@ export function validateProduct(input: any): Artwork {
   const checkoutUrl = str(input?.checkoutUrl, 2000, "Checkout link");
   if (checkoutUrl && !isHttpsUrl(checkoutUrl)) throw new StoreError("Checkout link must be an https:// link.");
 
+  const options = parseOptions(str(Array.isArray(input?.options) ? formatOptions(input.options) : input?.options, 1000, "Options"));
+  if (options.length > 6 || options.some((o) => o.values.length > 20 || o.name.length > 40 || o.values.some((v) => v.length > 40))) {
+    throw new StoreError("Options: up to 6 options, each with up to 20 short choices.");
+  }
+
   return {
     slug,
     title,
@@ -225,6 +231,7 @@ export function validateProduct(input: any): Artwork {
     details: str(input?.details, 200, "Details") || undefined,
     checkoutUrl: checkoutUrl || undefined,
     sold: Boolean(input?.sold),
+    options,
   };
 }
 

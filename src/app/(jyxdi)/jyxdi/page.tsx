@@ -22,6 +22,12 @@ export default async function JyxdiHome() {
 
   return (
     <>
+      {/* Header artwork */}
+      {SITE.headerImage && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={SITE.headerImage} alt={`Artwork by ${SITE.shortName}`} className="block max-h-[75vh] w-full object-cover" />
+      )}
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div

@@ -5,6 +5,7 @@
   "email": "artbyjyxdi@gmail.com",
   "instagram": "https://www.instagram.com/jyxdi/",
   "tagline": "Digital art, original canvas paintings and live event painting.",
+  "headerImage": "https://jyxdi.com/cdn/shop/files/IMG_0851.png?v=1740634630&width=2000",
   "description": "Art by Jyxdi offers digital artwork, original canvas paintings, custom commissions and live painting for weddings, birthdays and other events.",
   "location": {
     "city": null,
@@ -20,5 +21,38 @@
     "With each brushstroke, Jyxdi continues to push the boundaries of art, inviting us to see the world through her eyes and explore the limitless possibilities of creativity."
   ],
   "currency": "CAD",
-  "artworks": []
+  "artworks": [
+    {
+      "slug": "krishna-radha",
+      "title": "Radha Krishna",
+      "type": "canvas",
+      "price": 90,
+      "description": "Radha Krishna by Jyxdi, available as a poster or canvas print in four sizes.",
+      "image": "https://jyxdi.com/cdn/shop/files/IMG-4838.png?v=1746454492&width=823",
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            "16x20",
+            "24x30",
+            "30x40",
+            "48x60"
+          ]
+        },
+        {
+          "name": "Style",
+          "values": [
+            "Poster",
+            "Canvas"
+          ]
+        },
+        {
+          "name": "Material",
+          "values": [
+            "Classic UV"
+          ]
+        }
+      ]
+    }
+  ]
 }

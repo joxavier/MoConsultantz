@@ -1,19 +1,20 @@
 "use client";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
-import type { Artwork } from "@/lib/jyxdi";
+import { formatOptions, type Artwork } from "@/lib/jyxdi";
 import type { StoreSettings } from "@/lib/jyxdiStore";
 
 const splitParagraphs = (text: string) => text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
 type Tab = "products" | "payments" | "bio";
 
-const EMPTY_PRODUCT = { title: "", type: "canvas", price: "", image: "", description: "", details: "", checkoutUrl: "", sold: false, slug: "" };
+const EMPTY_PRODUCT = { title: "", type: "canvas", price: "", image: "", description: "", details: "", checkoutUrl: "", sold: false, slug: "", options: "" };
 type ProductForm = typeof EMPTY_PRODUCT;
 
 const toForm = (a: Artwork): ProductForm => ({
   title: a.title, type: a.type, price: String(a.price), image: a.image, description: a.description,
   details: a.details || "", checkoutUrl: a.checkoutUrl || "", sold: Boolean(a.sold), slug: a.slug,
+  options: formatOptions(a.options),
 });
 
 const price = (amount: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
@@ -195,6 +196,9 @@ export default function AdminPanel({ email, initialProducts, initialSettings }: 
             </Field>
             <Field label="Details" hint='Size and medium, e.g. "24 x 36 in, acrylic on canvas".'>
               <input maxLength={200} value={editing.form.details} onChange={(e) => setForm({ details: e.target.value })} className={inputClass} />
+            </Field>
+            <Field label="Options (optional)" hint='One per line, e.g. "Size: 16x20, 24x30" then "Style: Poster, Canvas". The price above becomes the starting price.'>
+              <textarea rows={3} maxLength={1000} value={editing.form.options} onChange={(e) => setForm({ options: e.target.value })} placeholder={"Size: 16x20, 24x30, 30x40\nStyle: Poster, Canvas"} className={inputClass} />
             </Field>
             <Field label="Checkout link (optional)" hint='A Stripe or Shopify payment link. Without one, buyers get a "Request this piece" button and your payment details.'>
               <input type="url" value={editing.form.checkoutUrl} onChange={(e) => setForm({ checkoutUrl: e.target.value })} placeholder="https://buy.stripe.com/…" className={inputClass} />

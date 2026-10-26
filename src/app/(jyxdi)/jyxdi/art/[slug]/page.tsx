@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ARTWORK_TYPE_LABELS, artworkJsonLd, formatPrice, jsonLdScript } from "@/lib/jyxdi";
+import { ARTWORK_TYPE_LABELS, artworkJsonLd, jsonLdScript } from "@/lib/jyxdi";
 import { getStoreArtwork, getStoreSettings } from "@/lib/jyxdiStore";
 import PaymentOptions from "../../_components/PaymentOptions";
+import ProductBuy from "../../_components/ProductBuy";
 
 // Products are added in /admin, so pages render on demand and refresh at most
 // once a minute (saving in /admin refreshes them immediately).
@@ -38,28 +39,8 @@ export default async function ArtworkPage({ params }: { params: { slug: string }
         <div>
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-[var(--jx-accent)]">{ARTWORK_TYPE_LABELS[artwork.type]}</p>
           <h1 className="jx-serif mt-2 text-4xl">{artwork.title}</h1>
-          <p className="mt-3 text-2xl tabular-nums">{formatPrice(artwork.price)}</p>
-          {artwork.details && <p className="mt-2 text-sm text-[var(--jx-muted)]">{artwork.details}</p>}
-          <p className="mt-6 whitespace-pre-line leading-relaxed">{artwork.description}</p>
-
-          <div className="mt-8">
-            {artwork.sold ? (
-              <Link href="/commissions" className="block rounded-full border border-[var(--jx-ink)] px-7 py-3.5 text-center font-medium sm:inline-block">
-                Sold. Commission something similar
-              </Link>
-            ) : artwork.checkoutUrl ? (
-              <a href={artwork.checkoutUrl} className="block rounded-full bg-[var(--jx-ink)] px-7 py-3.5 text-center font-medium text-[var(--jx-bg)] sm:inline-block">
-                Buy now
-              </a>
-            ) : (
-              <Link
-                href={`/commissions?piece=${encodeURIComponent(artwork.title)}`}
-                className="block rounded-full bg-[var(--jx-ink)] px-7 py-3.5 text-center font-medium text-[var(--jx-bg)] sm:inline-block"
-              >
-                Request this piece
-              </Link>
-            )}
-          </div>
+          <ProductBuy artwork={artwork} />
+          {artwork.description && <p className="mt-8 whitespace-pre-line leading-relaxed">{artwork.description}</p>}
           {!artwork.sold && !artwork.checkoutUrl && <PaymentOptions payments={settings} pieceTitle={artwork.title} />}
         </div>
       </div>

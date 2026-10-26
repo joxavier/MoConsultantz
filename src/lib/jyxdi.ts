@@ -21,7 +21,12 @@ export type Artwork = {
   // a "Request this piece" button that opens the commission form instead.
   checkoutUrl?: string;
   sold?: boolean;
+  // Choices the buyer picks before requesting, e.g. Size and Style. When a
+  // product has options, `price` is shown as the starting price.
+  options?: ProductOption[];
 };
+
+export type ProductOption = { name: string; values: string[] };
 
 export type Location = {
   city: string | null;
@@ -48,6 +53,25 @@ export const ARTWORK_TYPE_LABELS: Record<ArtworkType, string> = {
 export function getArtwork(slug: string) {
   return SITE.artworks.find((artwork) => artwork.slug === slug);
 }
+
+export const formatArtworkPrice = (artwork: Artwork) =>
+  `${artwork.options?.length ? "From " : ""}${formatPrice(artwork.price)}`;
+
+// Options as edited in /admin and stored in the sheet: one per line,
+// "Name: value, value, value".
+export function parseOptions(text: string): ProductOption[] {
+  return text
+    .split(/\n/)
+    .map((line) => {
+      const colon = line.indexOf(":");
+      if (colon < 0) return { name: "", values: [] };
+      const values = line.slice(colon + 1).split(",").map((v) => v.trim()).filter(Boolean);
+      return { name: line.slice(0, colon).trim(), values };
+    })
+    .filter((option) => option.name && option.values.length);
+}
+
+export const formatOptions = (options: ProductOption[] = []) => options.map((o) => `${o.name}: ${o.values.join(", ")}`).join("\n");
 
 export function formatPrice(amount: number) {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency: SITE.currency }).format(amount);
