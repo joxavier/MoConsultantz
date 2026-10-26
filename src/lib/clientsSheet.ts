@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+import { columnReader, normalizeHeader as normalize, readTab as readSheetTab } from "@/lib/googleSheets";
 import type { BaseCurrency } from "@/lib/treasury/types";
 
 // Client data lives in the Google Sheet named by GOOGLE_SHEET_ID (the same
@@ -52,54 +52,10 @@ export type LedgerEntry = {
   note?: string;
 };
 
-function getSheets() {
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    },
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-  return google.sheets({ version: "v4", auth });
-}
-
-async function createTab(spreadsheetId: string, title: string, headers: string[]) {
-  const sheets = getSheets();
-  await sheets.spreadsheets.batchUpdate({
-    spreadsheetId,
-    requestBody: { requests: [{ addSheet: { properties: { title, gridProperties: { frozenRowCount: 1 } } } }] },
-  });
-  await sheets.spreadsheets.values.update({
-    spreadsheetId,
-    range: `${title}!A1`,
-    valueInputOption: "RAW",
-    requestBody: { values: [headers] },
-  });
-}
-
-async function readTab(title: string, headers: string[]): Promise<string[][]> {
+function readTab(title: string, headers: string[]): Promise<string[][]> {
   const spreadsheetId = process.env.GOOGLE_SHEET_ID;
   if (!spreadsheetId) throw new Error("GOOGLE_SHEET_ID is not set");
-
-  try {
-    const response = await getSheets().spreadsheets.values.get({ spreadsheetId, range: `${title}!A:Z` });
-    return (response.data.values || []) as string[][];
-  } catch (error: any) {
-    // The Sheets API reports a missing tab as an unparseable range.
-    if (String(error?.message || "").includes("Unable to parse range")) {
-      await createTab(spreadsheetId, title, headers);
-      return [];
-    }
-    throw error;
-  }
-}
-
-const normalize = (value: string) => String(value).toLowerCase().replace(/[^a-z]/g, "");
-
-function columnReader(header: string[]) {
-  const find = (...names: string[]) => header.findIndex((cell) => names.includes(normalize(cell)));
-  const cell = (row: string[], i: number) => (i >= 0 ? String(row[i] ?? "").trim() : "");
-  return { find, cell };
+  return readSheetTab(spreadsheetId, title, headers);
 }
 
 export function parseClientRows(rows: string[][]): SheetClient[] {

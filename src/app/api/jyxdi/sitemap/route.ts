@@ -1,4 +1,7 @@
-import { SITE, absoluteUrl } from "@/lib/jyxdi";
+import { absoluteUrl } from "@/lib/jyxdi";
+import { getStoreArtworks } from "@/lib/jyxdiStore";
+
+export const revalidate = 3600;
 
 // Served as jyxdi.modevz.ca/sitemap.xml (rewritten in src/middleware.ts).
 const PAGES = [
@@ -9,10 +12,10 @@ const PAGES = [
   { path: "/bio", priority: 0.6, changefreq: "yearly" },
 ];
 
-export function GET() {
+export async function GET() {
   const urls = [
     ...PAGES,
-    ...SITE.artworks.map((artwork) => ({ path: `/art/${artwork.slug}`, priority: 0.7, changefreq: "monthly" })),
+    ...(await getStoreArtworks()).map((artwork) => ({ path: `/art/${artwork.slug}`, priority: 0.7, changefreq: "monthly" })),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

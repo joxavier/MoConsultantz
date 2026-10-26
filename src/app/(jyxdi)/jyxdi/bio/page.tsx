@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE } from "@/lib/jyxdi";
+import { getStoreSettings } from "@/lib/jyxdiStore";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Bio",
@@ -8,12 +11,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/bio" },
 };
 
-export default function BioPage() {
+export default async function BioPage() {
+  const { bio } = await getStoreSettings();
   return (
     <div className="mx-auto max-w-3xl px-4 pt-12 sm:px-6 sm:pt-16">
-      <h1 className="jx-serif text-4xl sm:text-5xl">Bio</h1>
+      <h1 className="jx-serif text-4xl sm:text-5xl">Biography &amp; Achievements</h1>
       <div className="mt-6 space-y-5 text-lg leading-relaxed">
-        {SITE.bio.map((paragraph) => (
+        {bio.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
       </div>

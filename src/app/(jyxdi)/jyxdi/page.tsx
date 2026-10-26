@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE } from "@/lib/jyxdi";
+import { getStoreArtworks } from "@/lib/jyxdiStore";
 import { ArtCard, EmptyCatalog } from "./_components/ArtGrid";
 
 export const metadata: Metadata = {
@@ -13,8 +14,11 @@ const PATHS = [
   { href: "/live-painting", title: "Book live painting", text: "Your wedding, birthday or event painted on canvas as it happens." },
 ];
 
-export default function JyxdiHome() {
-  const featured = SITE.artworks.filter((artwork) => !artwork.sold).slice(0, 6);
+// Products are edited in /admin; re-read them at most once a minute.
+export const revalidate = 60;
+
+export default async function JyxdiHome() {
+  const featured = (await getStoreArtworks()).filter((artwork) => !artwork.sold).slice(0, 6);
 
   return (
     <>

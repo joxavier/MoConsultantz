@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ARTWORK_TYPE_LABELS, SITE, artworkJsonLd, formatPrice, getArtwork, jsonLdScript } from "@/lib/jyxdi";
+import { ARTWORK_TYPE_LABELS, artworkJsonLd, formatPrice, jsonLdScript } from "@/lib/jyxdi";
+import { getStoreArtwork, getStoreSettings } from "@/lib/jyxdiStore";
+import PaymentOptions from "../../_components/PaymentOptions";
 
-export function generateStaticParams() {
-  return SITE.artworks.map((artwork) => ({ slug: artwork.slug }));
-}
+// Products are added in /admin, so pages render on demand and refresh at most
+// once a minute (saving in /admin refreshes them immediately).
+export const revalidate = 60;
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const artwork = getArtwork(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const artwork = await getStoreArtwork(params.slug);
   if (!artwork) return {};
   return {
     title: artwork.title,
@@ -18,8 +20,8 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function ArtworkPage({ params }: { params: { slug: string } }) {
-  const artwork = getArtwork(params.slug);
+export default async function ArtworkPage({ params }: { params: { slug: string } }) {
+  const [artwork, settings] = await Promise.all([getStoreArtwork(params.slug), getStoreSettings()]);
   if (!artwork) notFound();
 
   return (
@@ -58,6 +60,7 @@ export default function ArtworkPage({ params }: { params: { slug: string } }) {
               </Link>
             )}
           </div>
+          {!artwork.sold && !artwork.checkoutUrl && <PaymentOptions payments={settings} pieceTitle={artwork.title} />}
         </div>
       </div>
     </div>
