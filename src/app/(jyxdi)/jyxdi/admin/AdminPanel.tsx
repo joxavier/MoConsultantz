@@ -127,7 +127,7 @@ export default function AdminPanel({ email, initialProducts, initialSettings }: 
       </div>
 
       {message && (
-        <div role="status" className={`mt-6 rounded-lg px-4 py-3 text-sm ${message.kind === "ok" ? "bg-[#e3e8d9] text-[#3f4a31]" : "bg-[#f6d8cc] text-[#7a2e14]"}`}>
+        <div role="status" className={`mt-6 rounded-lg px-4 py-3 text-sm ${message.kind === "ok" ? "bg-[var(--jx-ok-bg)] text-[var(--jx-ok-ink)]" : "bg-[var(--jx-error-bg)] text-[var(--jx-error-ink)]"}`}>
           {message.text}
         </div>
       )}
@@ -160,7 +160,7 @@ export default function AdminPanel({ email, initialProducts, initialSettings }: 
                   <button onClick={() => { setEditing({ form: toForm(artwork), originalSlug: artwork.slug }); setMessage(null); }} className="text-sm font-medium underline underline-offset-2">
                     Edit
                   </button>
-                  <button onClick={() => removeProduct(artwork)} disabled={busy} className="text-sm text-[#a03a1b] underline underline-offset-2">
+                  <button onClick={() => removeProduct(artwork)} disabled={busy} className="text-sm text-[var(--jx-error-ink)] underline underline-offset-2">
                     Delete
                   </button>
                 </li>

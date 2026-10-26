@@ -25,7 +25,7 @@ export default async function JyxdiHome() {
       {/* Header artwork */}
       {SITE.headerImage && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={SITE.headerImage} alt={`Artwork by ${SITE.shortName}`} className="block max-h-[75vh] w-full object-cover" />
+        <img src={SITE.headerImage} alt={`${SITE.shortName} with her paintings`} width={2000} height={939} className="block h-auto w-full" />
       )}
 
       {/* Hero */}
@@ -35,7 +35,7 @@ export default async function JyxdiHome() {
           className="pointer-events-none absolute inset-0 opacity-70"
           style={{
             background:
-              "radial-gradient(40% 50% at 15% 20%, var(--jx-accent-soft), transparent 70%), radial-gradient(35% 45% at 85% 30%, #e3e8d9, transparent 70%), radial-gradient(45% 40% at 60% 90%, #f3e1d2, transparent 70%)",
+              "radial-gradient(40% 50% at 15% 20%, var(--jx-accent-soft), transparent 70%), radial-gradient(35% 45% at 85% 30%, var(--jx-blue-soft), transparent 70%), radial-gradient(45% 40% at 60% 90%, var(--jx-gold-soft), transparent 70%)",
           }}
         />
         <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-24 sm:pt-24">
