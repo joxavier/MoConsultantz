@@ -6,36 +6,30 @@ import { getPoolReserves } from "@/lib/treasury/raydium";
 import { discoverPools } from "@/lib/treasury/pools";
 import { getAllTokenBalances, getSolBalance } from "@/lib/treasury/solana";
 import type { BaseCurrency } from "@/lib/treasury/types";
-import { readClientsSheet, type SheetClient } from "@/lib/clientsSheet";
+import { readClientsSheet, readLedgerSheet, type LedgerEntry, type SheetClient } from "@/lib/clientsSheet";
 
 // Client accounts (username, email, wallets) come from the "Clients" tab of
-// the Google Sheet — see clientsSheet.ts. src/data/clients.json only holds
-// recorded deposits, keyed by the same username. A signed-in user sees the
-// clients whose sheet row has their email; treasury managers
-// (TREASURY_MANAGER_EMAILS) see every client.
+// the Google Sheet and their transactions from its "Ledger" tab — see
+// clientsSheet.ts. A signed-in user sees the clients whose Clients row has
+// their email; treasury managers (TREASURY_MANAGER_EMAILS) see every client.
+// src/data/clients.json only names the tokens the ledger can refer to.
 
 export type TokenName = keyof typeof clientsData.tokens;
 
-export type ClientDeposit = { token: TokenName; quantity: number; date: string };
-
-// A client is valued from recorded deposits, scans of Solana wallets, or both.
+// A client is valued from its ledger balance, scans of Solana wallets, or both.
 export type ClientConfig = {
   id: string;
   name: string;
   preferredCurrency: BaseCurrency;
-  deposits?: ClientDeposit[];
-  walletAddresses?: string[];
+  transactions: LedgerEntry[];
+  walletAddresses: string[];
 };
 
-type DepositRecord = { id: string; name?: string; preferredCurrency?: BaseCurrency; deposits?: ClientDeposit[] };
-
 export type Holding = {
-  source: "deposit" | "wallet";
+  source: "ledger" | "wallet";
   label: string;
   symbol: string;
   quantity: number;
-  // Deposit month (YYYY-MM); absent for live wallet balances.
-  date?: string;
   mint?: string;
   wallet?: string;
   priceUsd: number | null;
@@ -43,7 +37,7 @@ export type Holding = {
   priceError?: string;
 };
 
-export type ClientView = Omit<ClientConfig, "deposits"> & {
+export type ClientView = ClientConfig & {
   holdings: Holding[];
   totalUsd: number;
   walletError?: string;
@@ -58,37 +52,39 @@ export type ClientsResponse = {
   pricedAt: string;
 };
 
-const depositRecords = clientsData.clients as DepositRecord[];
+// Newest first; dates the sheet formats unusually keep their sheet order.
+function sortByDateDesc(entries: LedgerEntry[]) {
+  return entries
+    .map((entry, index) => ({ entry, index, time: Date.parse(entry.date) }))
+    .sort((a, b) => (Number.isNaN(b.time) || Number.isNaN(a.time) ? b.index - a.index : b.time - a.time || b.index - a.index))
+    .map(({ entry }) => entry);
+}
 
-// Sheet rows and deposit records, joined on username. A username can appear on
-// several sheet rows (e.g. two people sharing a portfolio); its wallets are
-// combined.
-function buildClients(rows: SheetClient[]): ClientConfig[] {
+// Clients and ledger rows, joined on username (case-insensitive). A username
+// can appear on several Clients rows (e.g. two people sharing a portfolio);
+// its wallets are combined.
+function buildClients(rows: SheetClient[], ledger: LedgerEntry[]): ClientConfig[] {
   const byId = new Map<string, ClientConfig>();
   const get = (id: string) => {
     const key = id.toLowerCase();
-    if (!byId.has(key)) byId.set(key, { id, name: id, preferredCurrency: "CAD", walletAddresses: [] });
+    if (!byId.has(key)) byId.set(key, { id, name: id, preferredCurrency: "CAD", transactions: [], walletAddresses: [] });
     return byId.get(key)!;
   };
 
-  for (const record of depositRecords) {
-    Object.assign(get(record.id), {
-      name: record.name || record.id,
-      deposits: record.deposits,
-      ...(record.preferredCurrency && { preferredCurrency: record.preferredCurrency }),
-    });
-  }
   for (const row of rows) {
     const client = get(row.username);
     if (row.preferredCurrency) client.preferredCurrency = row.preferredCurrency;
-    client.walletAddresses = Array.from(new Set([...(client.walletAddresses || []), ...row.walletAddresses]));
+    client.walletAddresses = Array.from(new Set([...client.walletAddresses, ...row.walletAddresses]));
   }
+  for (const entry of ledger) get(entry.username).transactions.push(entry);
+  byId.forEach((client) => (client.transactions = sortByDateDesc(client.transactions)));
+
   return Array.from(byId.values());
 }
 
 export async function getVisibleClients(session: Session | null): Promise<{ isManager: boolean; clients: ClientConfig[] }> {
-  const rows = await cached("clients-sheet", readClientsSheet);
-  const clients = buildClients(rows);
+  const [rows, ledger] = await Promise.all([cached("clients-sheet", readClientsSheet), cached("ledger-sheet", readLedgerSheet)]);
+  const clients = buildClients(rows, ledger);
 
   if (isTreasuryManagerSession(session)) return { isManager: true, clients };
 
@@ -186,25 +182,64 @@ async function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
 
 type Price = { priceUsd: number | null; error?: string };
 
-async function priceNamedTokens(): Promise<Record<TokenName, Price>> {
-  const tokens = Object.keys(clientsData.tokens) as TokenName[];
-  const entries = await Promise.all(
-    tokens.map(async (token): Promise<[TokenName, Price]> => {
-      try {
-        const mint = await resolveMint(token);
-        if (mint === treasuryConfig.mocoin.mintAddress) {
-          const priceUsd = await getMoCoinPriceUsd();
-          if (priceUsd !== null) return [token, { priceUsd }];
-        }
-        const quote = (await getTokenQuotes([mint]))[mint];
-        return quote ? [token, { priceUsd: quote.priceUsd }] : [token, { priceUsd: null, error: `No priced pool found for ${mint}` }];
-      } catch (error: any) {
-        console.error(`Client pricing error for ${token}:`, error.message);
-        return [token, { priceUsd: null, error: error.message }];
+const MINT_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+
+// A ledger "Token" cell: a configured token's name or symbol, or a raw mint.
+function resolveLedgerToken(token: string): { name: TokenName } | { mint: string } | null {
+  const wanted = token.trim().toLowerCase();
+  const name = (Object.keys(clientsData.tokens) as TokenName[]).find(
+    (key) => key.toLowerCase() === wanted || clientsData.tokens[key].symbol.toLowerCase() === wanted
+  );
+  if (name) return { name };
+  return MINT_PATTERN.test(token.trim()) ? { mint: token.trim() } : null;
+}
+
+async function priceNamedToken(token: TokenName): Promise<Price & { mint?: string }> {
+  try {
+    const mint = await resolveMint(token);
+    if (mint === treasuryConfig.mocoin.mintAddress) {
+      const priceUsd = await getMoCoinPriceUsd();
+      if (priceUsd !== null) return { priceUsd, mint };
+    }
+    const quote = (await getTokenQuotes([mint]))[mint];
+    return quote ? { priceUsd: quote.priceUsd, mint } : { priceUsd: null, mint, error: `No priced pool found for ${mint}` };
+  } catch (error: any) {
+    console.error(`Client pricing error for ${token}:`, error.message);
+    return { priceUsd: null, error: error.message };
+  }
+}
+
+// Net ledger balance per token, priced. Tokens that net to zero are dropped.
+async function ledgerHoldings(transactions: LedgerEntry[]): Promise<Holding[]> {
+  const balances = new Map<string, { label: string; quantity: number }>();
+  for (const entry of transactions) {
+    const resolved = resolveLedgerToken(entry.token);
+    const key = resolved ? ("name" in resolved ? `name:${resolved.name}` : `mint:${resolved.mint}`) : `raw:${entry.token.toLowerCase()}`;
+    const current = balances.get(key) || { label: resolved && "name" in resolved ? resolved.name : entry.token, quantity: 0 };
+    current.quantity += entry.quantity;
+    balances.set(key, current);
+  }
+
+  const held = Array.from(balances.entries()).filter(([, b]) => Math.abs(b.quantity) > 1e-9);
+  const mints = held.filter(([key]) => key.startsWith("mint:")).map(([key]) => key.slice(5));
+  const quotes = mints.length ? await cached(`quotes:${mints.sort().join(",")}`, () => getTokenQuotes(mints)).catch(() => ({} as Record<string, TokenQuote>)) : {};
+
+  return Promise.all(
+    held.map(async ([key, { label, quantity }]): Promise<Holding> => {
+      if (key.startsWith("name:")) {
+        const name = key.slice(5) as TokenName;
+        const { priceUsd, mint, error } = await cached(`named:${name}`, () => priceNamedToken(name));
+        return priced({ source: "ledger", label: name, symbol: clientsData.tokens[name].symbol, quantity, mint, priceUsd, priceError: error });
       }
+      if (key.startsWith("mint:")) {
+        const mint = key.slice(5);
+        const quote = quotes[mint];
+        const symbol = quote?.symbol || `${mint.slice(0, 4)}…${mint.slice(-4)}`;
+        return priced({ source: "ledger", label: symbol, symbol, quantity, mint, priceUsd: quote?.priceUsd ?? null, priceError: quote ? undefined : "No priced Solana pool found for this token" });
+      }
+      return priced({ source: "ledger", label, symbol: label, quantity, priceUsd: null, priceError: `"${label}" isn't a known token name or mint address` });
     })
   );
-  return Object.fromEntries(entries) as Record<TokenName, Price>;
 }
 
 function priced(holding: Omit<Holding, "valueUsd">): Holding {
@@ -253,33 +288,19 @@ async function scanWallet(address: string): Promise<Holding[]> {
 }
 
 export async function priceClients(visible: ClientConfig[]) {
-  const [prices, fx] = await Promise.all([
-    visible.some((client) => client.deposits?.length) ? cached("named-prices", priceNamedTokens) : Promise.resolve({} as Record<TokenName, Price>),
-    cached("usd-cad", getUsdCadRate),
-  ]);
+  const fx = await cached("usd-cad", getUsdCadRate);
 
   const views = await Promise.all(
-    visible.map(async ({ deposits = [], ...client }): Promise<ClientView> => {
-      const holdings: Holding[] = deposits.map((deposit) => {
-        const { priceUsd, error } = prices[deposit.token] || { priceUsd: null, error: "Unknown token" };
-        return priced({
-          source: "deposit",
-          label: deposit.token,
-          symbol: clientsData.tokens[deposit.token].symbol,
-          quantity: deposit.quantity,
-          date: deposit.date,
-          priceUsd,
-          priceError: error,
-        });
-      });
+    visible.map(async (client): Promise<ClientView> => {
+      const holdings = await ledgerHoldings(client.transactions);
 
       let walletError: string | undefined;
       const scans = await Promise.allSettled(
-        (client.walletAddresses || []).map((address) => cached(`wallet:${address}`, () => scanWallet(address)))
+        client.walletAddresses.map((address) => cached(`wallet:${address}`, () => scanWallet(address)))
       );
       scans.forEach((scan, i) => {
         if (scan.status === "fulfilled") return holdings.push(...scan.value);
-        console.error(`Wallet scan error for ${client.id} (${client.walletAddresses![i]}):`, scan.reason?.message);
+        console.error(`Wallet scan error for ${client.id} (${client.walletAddresses[i]}):`, scan.reason?.message);
         walletError = "Couldn't read some on-chain balances right now.";
       });
 

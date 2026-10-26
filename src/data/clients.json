@@ -8,24 +8,5 @@
       "symbol": "MP",
       "mintAddress": null
     }
-  },
-  "clients": [
-    {
-      "id": "tacticalGrape",
-      "name": "tacticalGrape",
-      "preferredCurrency": "CAD",
-      "deposits": [
-        {
-          "token": "MoCoin",
-          "quantity": 500,
-          "date": "2020-05"
-        },
-        {
-          "token": "Metaparlour",
-          "quantity": 300,
-          "date": "2026-01"
-        }
-      ]
-    }
-  ]
+  }
 }

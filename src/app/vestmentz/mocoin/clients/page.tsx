@@ -9,9 +9,13 @@ const CURRENCIES: BaseCurrency[] = ['CAD', 'USD'];
 const formatMoney = (value: number, currency: BaseCurrency) =>
   new Intl.NumberFormat('en-CA', { style: 'currency', currency, maximumFractionDigits: value !== 0 && Math.abs(value) < 1 ? 6 : 2 }).format(value);
 
-const formatMonth = (date: string) => {
-  const [year, month] = date.split('-').map(Number);
-  return new Date(year, (month || 1) - 1).toLocaleDateString('en-CA', { year: 'numeric', month: 'long' });
+// Ledger dates come from the sheet as typed; tidy the ISO forms, show the rest as-is.
+const formatDate = (date: string) => {
+  const month = /^(\d{4})-(\d{2})$/.exec(date);
+  if (month) return new Date(+month[1], +month[2] - 1).toLocaleDateString('en-CA', { year: 'numeric', month: 'long' });
+  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (day) return new Date(+day[1], +day[2] - 1, +day[3]).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
+  return date || '—';
 };
 
 const shortAddress = (address: string) => `${address.slice(0, 6)}…${address.slice(-6)}`;
@@ -153,14 +157,14 @@ export default function ClientsPage() {
                 <thead className="text-left text-gray-500">
                   <tr>
                     <th className="px-6 py-3 font-medium">Holding</th>
-                    <th className="px-6 py-3 font-medium">Date</th>
+                    <th className="px-6 py-3 font-medium">Source</th>
                     <th className="px-6 py-3 font-medium text-right">Price</th>
                     <th className="px-6 py-3 font-medium text-right">Value</th>
                   </tr>
                 </thead>
                 <tbody>
                   {client.holdings.map((holding) => (
-                    <tr key={`${holding.source}-${holding.mint || holding.label}-${holding.date || ''}`} className="border-t border-gray-200 dark:border-white/10">
+                    <tr key={`${holding.source}-${holding.wallet || ''}-${holding.mint || holding.label}`} className="border-t border-gray-200 dark:border-white/10">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-semibold">{holding.quantity.toLocaleString('en-CA', { maximumFractionDigits: 6 })} {holding.label}</div>
                         <div className="text-xs text-gray-500">
@@ -168,7 +172,7 @@ export default function ClientsPage() {
                           {holding.wallet && (client.walletAddresses?.length || 0) > 1 && <span className="font-mono"> · {shortAddress(holding.wallet)}</span>}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">{holding.date ? formatMonth(holding.date) : 'On-chain'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{holding.source === 'ledger' ? 'Ledger' : 'On-chain'}</td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
                         {holding.priceUsd === null ? '—' : formatMoney(convert(holding.priceUsd), currency)}
                       </td>
@@ -192,6 +196,37 @@ export default function ClientsPage() {
                 </tbody>
               </table>
             </div>
+            {client.transactions.length > 0 && (
+              <details className="border-t border-gray-200 dark:border-white/10">
+                <summary className="px-6 py-4 text-sm font-semibold cursor-pointer select-none">
+                  Transactions ({client.transactions.length})
+                </summary>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-left text-gray-500">
+                      <tr>
+                        <th className="px-6 py-3 font-medium">Date</th>
+                        <th className="px-6 py-3 font-medium">Type</th>
+                        <th className="px-6 py-3 font-medium text-right">Amount</th>
+                        <th className="px-6 py-3 font-medium">Note</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {client.transactions.map((entry, index) => (
+                        <tr key={index} className="border-t border-gray-200 dark:border-white/10">
+                          <td className="px-6 py-3 whitespace-nowrap">{formatDate(entry.date)}</td>
+                          <td className="px-6 py-3 whitespace-nowrap">{entry.type}</td>
+                          <td className={`px-6 py-3 text-right whitespace-nowrap font-semibold ${entry.quantity > 0 ? 'text-emerald-600 dark:text-emerald-400' : entry.quantity < 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-500'}`}>
+                            {entry.quantity > 0 ? '+' : ''}{entry.quantity.toLocaleString('en-CA', { maximumFractionDigits: 6 })} {entry.token}
+                          </td>
+                          <td className="px-6 py-3 text-gray-500">{entry.note || ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            )}
           </section>
         ))}
       </div>
