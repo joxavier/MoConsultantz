@@ -1,0 +1,21 @@
+{
+  "brand": "Art by Jyxdi",
+  "shortName": "Jyxdi",
+  "siteUrl": "https://jyxdi.modevz.ca",
+  "email": "artbyjyxdi@gmail.com",
+  "instagram": "https://www.instagram.com/jyxdi/",
+  "tagline": "Digital art, original canvas paintings and live event painting.",
+  "description": "Art by Jyxdi offers digital artwork, original canvas paintings, custom commissions and live painting for weddings, birthdays and other events.",
+  "location": {
+    "city": null,
+    "region": null,
+    "country": null,
+    "serviceArea": []
+  },
+  "bio": [
+    "Jyxdi is an artist working across digital illustration and paint on canvas.",
+    "Alongside finished pieces and custom commissions, Jyxdi paints live at weddings, birthdays and other events, capturing the day on canvas as it happens."
+  ],
+  "currency": "CAD",
+  "artworks": []
+}
