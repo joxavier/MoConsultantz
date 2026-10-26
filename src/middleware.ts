@@ -11,6 +11,12 @@ export const config = {
      * 5. /products routes
      */
     "/((?!api/|_next/|_static/|examples/|[\\w-]+\\.\\w+|products/|icons/|qualifications/).*)",
+    // Excluded above, but the Art by Jyxdi site needs its own copies of
+    // these and redirects for old Shopify product links.
+    "/sitemap.xml",
+    "/robots.txt",
+    "/llms.txt",
+    "/products/:path*",
   ],
 };
 
@@ -32,6 +38,18 @@ export default async function middleware(req: NextRequest) {
       ? hostname
         .replace(`.moconsultantz.com`, "").replace(`.modevz.com`, "").replace(`.modevz.ca`, "")
       : hostname.replace(`.localhost:3000`, "");
+
+  // Art by Jyxdi, a client storefront migrated from Shopify. Also answers on
+  // jyxdi.com so the old domain can be pointed here later.
+  if (currentHost === "jyxdi" || hostname === "jyxdi.com" || hostname === "www.jyxdi.com") {
+    return jyxdiResponse(req, path);
+  }
+
+  // The paths added to the matcher for Jyxdi keep their normal behaviour
+  // everywhere else.
+  if (["/sitemap.xml", "/robots.txt", "/llms.txt"].includes(path) || path.startsWith("/products/")) {
+    return NextResponse.next();
+  }
 
   if (path.startsWith("/feed") || path.startsWith("/moos")) {
       return NextResponse.rewrite(new URL(`${path}`, req.url));
@@ -117,4 +135,39 @@ export default async function middleware(req: NextRequest) {
   return NextResponse.rewrite(
     new URL(`/consultantz/${currentHost}${path}`, req.url)
   );
+}
+
+// Old Shopify URLs mapped to their new pages, so existing links and search
+// results keep working (permanent redirects pass ranking to the new URL).
+const JYXDI_REDIRECTS: Record<string, string> = {
+  "/collections/art": "/art",
+  "/collections/all": "/art",
+  "/collections/frontpage": "/art",
+  "/collections": "/art",
+  "/pages/contact": "/commissions",
+  "/pages/bio": "/bio",
+};
+
+function jyxdiResponse(req: NextRequest, path: string) {
+  const normalised = path.length > 1 ? path.replace(/\/+$/, "") : path;
+
+  const redirectTo =
+    JYXDI_REDIRECTS[normalised] ??
+    // Product handles are kept as artwork slugs.
+    (normalised.startsWith("/products/") ? `/art/${normalised.slice("/products/".length)}` : undefined);
+  if (redirectTo) {
+    const target = req.nextUrl.clone();
+    target.pathname = redirectTo;
+    target.search = "";
+    return NextResponse.redirect(target, 308);
+  }
+
+  const files: Record<string, string> = {
+    "/sitemap.xml": "/api/jyxdi/sitemap",
+    "/robots.txt": "/api/jyxdi/robots",
+    "/llms.txt": "/api/jyxdi/llms",
+  };
+  const target = req.nextUrl.clone();
+  target.pathname = files[normalised] ?? `/jyxdi${normalised === "/" ? "" : normalised}`;
+  return NextResponse.rewrite(target);
 }

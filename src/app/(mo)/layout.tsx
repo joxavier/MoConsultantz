@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { GoogleTagManager } from '@next/third-parties/google'
-import "./globals.css";
+import "../globals.css";
 import { Providers } from './providers'
 import Header from './components/Header';
 import Footer from "./components/Footer";
