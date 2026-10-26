@@ -53,7 +53,7 @@ export default function ProductBuy({ artwork }: { artwork: Artwork }) {
           </Link>
         ) : artwork.checkoutUrl ? (
           <a href={artwork.checkoutUrl} className="block rounded-full bg-[var(--jx-ink)] px-7 py-3.5 text-center font-medium text-[var(--jx-bg)] sm:inline-block">
-            Buy now
+            {/^https:\/\/(www\.)?opensea\.io\//.test(artwork.checkoutUrl) ? "Buy on OpenSea" : "Buy now"}
           </a>
         ) : (
           <Link

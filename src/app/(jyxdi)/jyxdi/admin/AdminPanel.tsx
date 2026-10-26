@@ -200,7 +200,7 @@ export default function AdminPanel({ email, initialProducts, initialSettings }: 
             <Field label="Options (optional)" hint='One per line, e.g. "Size: 16x20, 24x30" then "Style: Poster, Canvas". The price above becomes the starting price.'>
               <textarea rows={3} maxLength={1000} value={editing.form.options} onChange={(e) => setForm({ options: e.target.value })} placeholder={"Size: 16x20, 24x30, 30x40\nStyle: Poster, Canvas"} className={inputClass} />
             </Field>
-            <Field label="Checkout link (optional)" hint='A Stripe or Shopify payment link. Without one, buyers get a "Request this piece" button and your payment details.'>
+            <Field label="Checkout link (optional)" hint='A Stripe, Shopify or OpenSea link (OpenSea links show "Buy on OpenSea"). Without one, buyers get a "Request this piece" button and your payment details.'>
               <input type="url" value={editing.form.checkoutUrl} onChange={(e) => setForm({ checkoutUrl: e.target.value })} placeholder="https://buy.stripe.com/…" className={inputClass} />
             </Field>
             <label className="flex items-center gap-3">
@@ -280,7 +280,7 @@ export default function AdminPanel({ email, initialProducts, initialSettings }: 
 
       {tab === "bio" && (
         <form className="mt-6 max-w-2xl space-y-4" onSubmit={(e) => { e.preventDefault(); saveSettings({ ...settings, bio: splitParagraphs(bioText) }, "Bio saved."); }}>
-          <Field label="Bio" hint="Leave a blank line between paragraphs.">
+          <Field label="Bio" hint="Leave a blank line between paragraphs. To add a link, write [text](https://link), e.g. [OVO40](https://www.instagram.com/ovo40/).">
             <textarea required rows={16} maxLength={6000} value={bioText} onChange={(e) => setBioText(e.target.value)} className={`${inputClass} leading-relaxed`} />
           </Field>
           <button type="submit" disabled={busy} className={primaryButton}>{busy ? "Saving…" : "Save bio"}</button>
