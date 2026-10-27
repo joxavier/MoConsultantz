@@ -1,0 +1,23 @@
+{
+  "publications": [
+    {
+      "id": "amiralventures",
+      "name": "Amiral Ventures",
+      "handle": "amiralvc",
+      "feedUrl": "https://amiralventures.substack.com/feed",
+      "tags": ["Venture Capital", "Technology", "Innovation"],
+      "limit": 10
+    }
+  ],
+  "pinned": [
+    {
+      "publication": "amiralventures",
+      "url": "https://www.amiral.info/p/i-was-there-at-the-spark-the-sophie",
+      "title": "I Was There at the Spark - The Sophie Forest Story",
+      "excerpt": "Amiral Ventures profiles Sophie Forest, from waiting tables in Quebec's Eastern Townships to helping build one of the province's first venture capital arms in the early 1990s. It follows her bet on Mark Skapinker's Balisoft through the dot-com crash, and the Brightspark partnership behind early investments in Radian6 and Hopper.",
+      "date": "2026-10-27",
+      "tags": ["Venture Capital", "Canada", "Technology", "Innovation"],
+      "sharedBy": { "name": "@nectarios", "url": "https://x.com/nectarios/status/2114897768309268747" }
+    }
+  ]
+}

@@ -1,11 +1,12 @@
 // pages/feed.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import articlesData from "./articles.json";
+import { pinnedPosts, type SharedBy, type SubstackPost } from "@/lib/substack";
 
 interface NewsPost {
   id: string;
@@ -17,25 +18,49 @@ interface NewsPost {
   date: string;
   tags: string[];
   imageUrl?: string;
+  readTime?: string;
+  // Who shared an outside article, e.g. the post that pointed us to it.
+  sharedBy?: SharedBy;
 }
 
 // Use the imported articles as your posts
 const mockNewsPosts: NewsPost[] = articlesData as NewsPost[];
 
+const isSubstack = (post: NewsPost) => post.id.startsWith("substack-");
+
 const Feed: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string>("All");
+  // Pinned Substack posts show straight away; the API then replaces them
+  // with the full list read from each publication's RSS feed.
+  const [posts, setPosts] = useState<NewsPost[]>(() => [...mockNewsPosts, ...pinnedPosts()]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/feed/substack")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { posts: SubstackPost[] } | null) => {
+        if (cancelled || !data?.posts?.length) return;
+        setPosts((current) => [...current.filter((post) => !isSubstack(post)), ...data.posts]);
+      })
+      .catch(() => {
+        // Keep the pinned posts if the feed can't be loaded.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Get all unique tags
   const allTags = [
     "All",
-    ...Array.from(new Set(mockNewsPosts.flatMap((post) => post.tags))),
+    ...Array.from(new Set(posts.flatMap((post) => post.tags))),
   ];
 
   // Filter posts by selected tag
   const filteredPosts =
     selectedTag === "All"
-      ? mockNewsPosts
-      : mockNewsPosts.filter((post) => post.tags.includes(selectedTag));
+      ? posts
+      : posts.filter((post) => post.tags.includes(selectedTag));
 
   // Sort posts by date (newest first)
   const sortedPosts = [...filteredPosts].sort(
@@ -158,7 +183,7 @@ const Feed: React.FC = () => {
                     {/* Meta & CTA */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
                       {/* Author & Date */}
-                      <div className="flex items-center gap-4 text-gray-400 dark:text-gray-500">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-gray-400 dark:text-gray-500">
                         <div className="flex items-center gap-2">
                           <svg
                             className="w-5 h-5"
@@ -177,6 +202,26 @@ const Feed: React.FC = () => {
                             {post.author}
                           </span>
                         </div>
+                        {post.sharedBy && (
+                          <>
+                            <span className="text-gray-600 dark:text-gray-700">•</span>
+                            <span>
+                              Shared by{" "}
+                              {post.sharedBy.url ? (
+                                <a
+                                  href={post.sharedBy.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-medium text-purple-300 hover:text-purple-200"
+                                >
+                                  {post.sharedBy.name}
+                                </a>
+                              ) : (
+                                <span className="font-medium text-gray-300">{post.sharedBy.name}</span>
+                              )}
+                            </span>
+                          </>
+                        )}
                         <span className="text-gray-600 dark:text-gray-700">
                           •
                         </span>
