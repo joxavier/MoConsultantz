@@ -4,7 +4,13 @@
   "siteUrl": "https://jyxdi.modevz.ca",
   "email": "artbyjyxdi@gmail.com",
   "instagram": "https://www.instagram.com/jyxdi/",
+  "opensea": {
+    "collection": "https://opensea.io/collection/spiritgates",
+    "collectionSlug": "spiritgates",
+    "profile": "https://opensea.io/0x4a5ab7a444f92254123bdaedbefec6a2218b22c0"
+  },
   "tagline": "Digital art, original canvas paintings and live event painting.",
+  "headerImage": "/jyxdi-header.webp",
   "description": "Art by Jyxdi offers digital artwork, original canvas paintings, custom commissions and live painting for weddings, birthdays and other events.",
   "location": {
     "city": null,
@@ -13,9 +19,45 @@
     "serviceArea": []
   },
   "bio": [
-    "Jyxdi is an artist working across digital illustration and paint on canvas.",
-    "Alongside finished pieces and custom commissions, Jyxdi paints live at weddings, birthdays and other events, capturing the day on canvas as it happens."
+    "Meet Jyxdi, a visionary painter, educator, and creator of the groundbreaking [Spirit Gates](https://opensea.io/collection/spiritgates) fandom. With a passion for storytelling through art, Jyxdi has captivated audiences worldwide with her stunning paintings, each piece a testament to her boundless creativity and unique perspective.",
+    "Beyond her artistic endeavors, Jyxdi is also a dedicated art educator, sharing her knowledge and expertise with aspiring artists of all ages. Her teaching has inspired countless individuals to explore their creativity and unlock their artistic potential. She is also a contributor to [Metaparlour](https://metaparlour.io).",
+    "Jyxdi has collaborated with a diverse range of notable figures, including acclaimed actor [Michael B. Jordan](https://en.wikipedia.org/wiki/Michael_B._Jordan), COACH, XO and [OVO40](https://www.instagram.com/ovo40/), bringing her artistry to new heights of recognition and acclaim.",
+    "Not content with traditional mediums, Jyxdi has ventured into the digital realm, launching her own NFT collection through the [Spirit Gates](https://opensea.io/collection/spiritgates) fandom. Volume 1 has already captured the imagination of fans, with more volumes set to follow, showcasing her innovative approach to art and technology. Collect her digital work on [OpenSea](https://opensea.io/0x4a5ab7a444f92254123bdaedbefec6a2218b22c0).",
+    "With each brushstroke, Jyxdi continues to push the boundaries of art, inviting us to see the world through her eyes and explore the limitless possibilities of creativity."
   ],
   "currency": "CAD",
-  "artworks": []
+  "artworks": [
+    {
+      "slug": "krishna-radha",
+      "title": "Radha Krishna",
+      "type": "canvas",
+      "price": 90,
+      "description": "Radha Krishna by Jyxdi, available as a poster or canvas print in four sizes.",
+      "image": "/jyxdi-radha-krishna.webp",
+      "options": [
+        {
+          "name": "Size",
+          "values": [
+            "16x20",
+            "24x30",
+            "30x40",
+            "48x60"
+          ]
+        },
+        {
+          "name": "Style",
+          "values": [
+            "Poster",
+            "Canvas"
+          ]
+        },
+        {
+          "name": "Material",
+          "values": [
+            "Classic UV"
+          ]
+        }
+      ]
+    }
+  ]
 }

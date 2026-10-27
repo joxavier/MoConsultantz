@@ -21,7 +21,12 @@ export type Artwork = {
   // a "Request this piece" button that opens the commission form instead.
   checkoutUrl?: string;
   sold?: boolean;
+  // Choices the buyer picks before requesting, e.g. Size and Style. When a
+  // product has options, `price` is shown as the starting price.
+  options?: ProductOption[];
 };
+
+export type ProductOption = { name: string; values: string[] };
 
 export type Location = {
   city: string | null;
@@ -48,6 +53,45 @@ export const ARTWORK_TYPE_LABELS: Record<ArtworkType, string> = {
 export function getArtwork(slug: string) {
   return SITE.artworks.find((artwork) => artwork.slug === slug);
 }
+
+export const formatArtworkPrice = (artwork: Artwork) =>
+  `${artwork.options?.length ? "From " : ""}${formatPrice(artwork.price)}`;
+
+// Options as edited in /admin and stored in the sheet: one per line,
+// "Name: value, value, value".
+export function parseOptions(text: string): ProductOption[] {
+  return text
+    .split(/\n/)
+    .map((line) => {
+      const colon = line.indexOf(":");
+      if (colon < 0) return { name: "", values: [] };
+      const values = line.slice(colon + 1).split(",").map((v) => v.trim()).filter(Boolean);
+      return { name: line.slice(0, colon).trim(), values };
+    })
+    .filter((option) => option.name && option.values.length);
+}
+
+export const formatOptions = (options: ProductOption[] = []) => options.map((o) => `${o.name}: ${o.values.join(", ")}`).join("\n");
+
+// Bio text can hold links written as [label](https://...). Only https links
+// become links; anything else is left as plain text.
+export type TextPart = { text: string; href?: string };
+// URLs may contain one level of brackets, as Wikipedia's often do: _(actor).
+const LINK_PATTERN = /\[([^\]\n]+)\]\((https:\/\/(?:[^\s()]|\([^\s()]*\))+)\)/g;
+
+export function splitLinks(text: string): TextPart[] {
+  const parts: TextPart[] = [];
+  let last = 0;
+  for (const match of Array.from(text.matchAll(LINK_PATTERN))) {
+    if (match.index! > last) parts.push({ text: text.slice(last, match.index) });
+    parts.push({ text: match[1], href: match[2] });
+    last = match.index! + match[0].length;
+  }
+  if (last < text.length) parts.push({ text: text.slice(last) });
+  return parts;
+}
+
+export const stripLinks = (text: string) => splitLinks(text).map((part) => part.text).join("");
 
 export function formatPrice(amount: number) {
   return new Intl.NumberFormat("en-CA", { style: "currency", currency: SITE.currency }).format(amount);
@@ -86,7 +130,7 @@ export function siteJsonLd() {
         url: SITE.siteUrl,
         email: SITE.email,
         description: SITE.description,
-        sameAs: [SITE.instagram],
+        sameAs: [SITE.instagram, SITE.opensea.collection, SITE.opensea.profile],
         address: postalAddress(),
         areaServed: areaServed(),
       },

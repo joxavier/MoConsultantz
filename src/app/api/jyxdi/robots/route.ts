@@ -6,6 +6,7 @@ export function GET() {
   const body = `User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin
 
 User-agent: OAI-SearchBot
 Allow: /
