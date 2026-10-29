@@ -25,6 +25,9 @@ export default function SiteFooter() {
           <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" className="block text-[var(--jx-muted)] hover:text-[var(--jx-ink)]">
             Instagram @{SITE.shortName.toLowerCase()}
           </a>
+          <a href={SITE.opensea.collection} target="_blank" rel="noopener" className="block text-[var(--jx-muted)] hover:text-[var(--jx-ink)]">
+            Spirit Gates on OpenSea
+          </a>
         </div>
       </div>
       <p className="pb-8 text-center text-xs text-[var(--jx-muted)]">

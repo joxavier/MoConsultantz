@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f1ea",
+  themeColor: "#f3f4f3",
 };
 
 export default function JyxdiLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -39,18 +39,26 @@ export default function JyxdiLayout({ children }: Readonly<{ children: React.Rea
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="stylesheet" href={FONTS} />
-        {/* Brand colours live here so the whole palette can be matched to
-            the Instagram feed in one place. */}
+        {/* Brand colours live here so the whole palette can be changed in
+            one place. Taken from the header photos: cool gallery whites,
+            saffron from the Durga painting, Shiva blue and brass gold. */}
         <style>{`
           :root {
-            --jx-bg: #f7f1ea;
-            --jx-surface: #fffaf4;
-            --jx-ink: #241c18;
-            --jx-muted: #6f625a;
-            --jx-line: #e7dbcf;
-            --jx-accent: #b4532a;
-            --jx-accent-soft: #f1d9c8;
-            --jx-sage: #7d8b6a;
+            --jx-bg: #f3f4f3;
+            --jx-surface: #ffffff;
+            --jx-ink: #1b1d1c;
+            --jx-muted: #5b6466;
+            --jx-line: #dcdfe0;
+            --jx-accent: #a6470b;
+            --jx-accent-soft: #fbe6d4;
+            --jx-blue: #1d5a80;
+            --jx-blue-soft: #dbe8f1;
+            --jx-gold: #c4915f;
+            --jx-gold-soft: #f1e6d6;
+            --jx-ok-bg: #dcefe2;
+            --jx-ok-ink: #1d4d2c;
+            --jx-error-bg: #fbe1d6;
+            --jx-error-ink: #8a2c0c;
           }
           .jx-serif { font-family: Fraunces, Georgia, serif; }
         `}</style>
