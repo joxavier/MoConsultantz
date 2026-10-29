@@ -1,4 +1,4 @@
-import { SITE, absoluteUrl } from "@/lib/jyxdi";
+import { SITE, absoluteUrl, stripLinks } from "@/lib/jyxdi";
 
 // Served as jyxdi.modevz.ca/llms.txt (rewritten in src/middleware.ts): a
 // plain-text summary for AI assistants and generative search.
@@ -20,11 +20,24 @@ ${place ? `\nBased in ${place}.` : ""}${areas ? `\nLive painting available in: $
 - ${absoluteUrl("/live-painting")} — Live Paint: book a live painter for weddings, birthdays and events.
 - ${absoluteUrl("/bio")} — About the artist.
 
+## About the artist
+
+${SITE.bio.map(stripLinks).join("\n\n")}
+
+## Links
+
+- Spirit Gates NFT collection: ${SITE.opensea.collection}
+- OpenSea profile: ${SITE.opensea.profile}
+- Metaparlour: https://metaparlour.io
+- Michael B. Jordan: https://en.wikipedia.org/wiki/Michael_B._Jordan
+- OVO40: https://www.instagram.com/ovo40/
+
 ## Booking and contact
 
 - Live painting and commission requests: use the forms at ${absoluteUrl("/live-painting")} and ${absoluteUrl("/commissions")}.
 - Email: ${SITE.email}
 - Instagram: ${SITE.instagram}
+- OpenSea: ${SITE.opensea.profile}
 `;
   return new Response(body, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }

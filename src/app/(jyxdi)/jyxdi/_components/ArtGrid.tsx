@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ARTWORK_TYPE_LABELS, SITE, formatPrice, type Artwork, type ArtworkType } from "@/lib/jyxdi";
+import { ARTWORK_TYPE_LABELS, SITE, formatArtworkPrice, type Artwork, type ArtworkType } from "@/lib/jyxdi";
 
 export function ArtCard({ artwork }: { artwork: Artwork }) {
   return (
@@ -24,7 +24,7 @@ export function ArtCard({ artwork }: { artwork: Artwork }) {
           <p className="truncate font-medium">{artwork.title}</p>
           <p className="text-sm text-[var(--jx-muted)]">{ARTWORK_TYPE_LABELS[artwork.type]}</p>
         </div>
-        <p className="shrink-0 text-sm tabular-nums">{formatPrice(artwork.price)}</p>
+        <p className="shrink-0 text-sm tabular-nums">{formatArtworkPrice(artwork)}</p>
       </div>
     </Link>
   );
