@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Highlights from "./Highlights";
 import { CredibilityBar } from "./CredibilityBar";
+import BookingModal from "../_shared/BookingModal";
+import FaqSection, { type Faq } from "../_shared/FaqSection";
 import {
   FaLinkedin,
   FaXTwitter,
@@ -23,18 +25,18 @@ import {
 
 interface PersonalPageClientProps {
   highlights: any; // Replace with your explicit type if available
+  faqs: Faq[];
 }
 
-export default function PersonalPageClient({ highlights }: PersonalPageClientProps) {
+const BOOKING_SERVICES = [
+  { value: "Free Consultation", label: "Free Consultation" },
+  { value: "Branding Strategy", label: "Branding Strategy" },
+  { value: "Web Development", label: "Web Development" },
+  { value: "Blockchain Integration", label: "Blockchain Integration" },
+];
+
+export default function PersonalPageClient({ highlights, faqs }: PersonalPageClientProps) {
   const [showBookingForm, setShowBookingForm] = useState(false);
-  const [bookingData, setBookingData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    time: "",
-    service: "consultation",
-  });
   const [showAllSocials, setShowAllSocials] = useState(false);
   const moreInfoRef = useRef<HTMLDivElement>(null);
   const { systemTheme } = useTheme();
@@ -64,22 +66,6 @@ END:VCARD`;
     link.download = "Josh-Xavier-MoDevz-contact.vcf";
     link.click();
     window.URL.revokeObjectURL(url);
-  };
-
-  const handleBookingSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const res = await fetch("/api/booking", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bookingData),
-    });
-
-    if (res.ok) {
-      alert("Booking request sent!");
-      setShowBookingForm(false);
-    } else {
-      alert("Something went wrong.");
-    }
   };
 
   const scrollToMoreInfo = () => {
@@ -342,7 +328,7 @@ END:VCARD`;
               textAlign: "center",
             }}
           >
-            📅 Book Now
+            📅 Book a Free Consultation
           </button>
 
           <button
@@ -473,69 +459,27 @@ END:VCARD`;
             </div>
           </div>
 
+          <FaqSection faqs={faqs} />
+
           <div style={{ marginTop: "50px", padding: "30px", background: "linear-gradient(45deg, rgba(138, 43, 226, 0.2), rgba(65, 105, 225, 0.2))", borderRadius: "20px", border: "1px solid rgba(138, 43, 226, 0.3)" }}>
             <h3 style={{ fontSize: "24px", marginBottom: "15px", color: "#ffffff" }}>🎯 Ready to Work Together?</h3>
-            <p style={{ color: "#cccccc", marginBottom: "20px", fontSize: "16px" }}>Mention "Free Consultation" in comments when booking</p>
+            <p style={{ color: "#cccccc", marginBottom: "20px", fontSize: "16px" }}>
+              Book a free consultation to talk through your project. Pick a time that suits you and get a calendar invite right away.
+            </p>
             <button onClick={() => setShowBookingForm(true)} style={{ padding: "16px 32px", borderRadius: "50px", border: "none", background: "linear-gradient(45deg, #8a2be2, #4169e1)", color: "#ffffff", fontSize: "16px", fontWeight: "600", cursor: "pointer", transition: "all 0.3s ease" }}>
-              Get Started Today
+              📅 Book a Free Consultation
             </button>
           </div>
         </div>
       </div>
 
-      {/* Booking Form Modal */}
-      {showBookingForm && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0, 0, 0, 0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
-          <div style={{ background: "linear-gradient(135deg, #1a1a1a, #2d1b69)", padding: "40px", borderRadius: "20px", width: "100%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", border: "1px solid rgba(138, 43, 226, 0.3)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-              <h2 style={{ color: "#ffffff", fontSize: "24px", margin: 0 }}>Book Consultation</h2>
-              <button onClick={() => setShowBookingForm(false)} style={{ background: "none", border: "none", color: "#ffffff", fontSize: "24px", cursor: "pointer", padding: "5px" }}>✕</button>
-            </div>
-
-            <form onSubmit={handleBookingSubmit}>
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", color: "#ffffff", marginBottom: "8px", fontSize: "14px", fontWeight: "600" }}>Name *</label>
-                <input type="text" required value={bookingData.name} onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })} style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid rgba(138, 43, 226, 0.3)", background: "rgba(255, 255, 255, 0.1)", color: "#ffffff", fontSize: "16px", boxSizing: "border-box" }} />
-              </div>
-
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", color: "#ffffff", marginBottom: "8px", fontSize: "14px", fontWeight: "600" }}>Email *</label>
-                <input type="email" required value={bookingData.email} onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })} style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid rgba(138, 43, 226, 0.3)", background: "rgba(255, 255, 255, 0.1)", color: "#ffffff", fontSize: "16px", boxSizing: "border-box" }} />
-              </div>
-
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", color: "#ffffff", marginBottom: "8px", fontSize: "14px", fontWeight: "600" }}>Phone</label>
-                <input type="tel" value={bookingData.phone} onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })} style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid rgba(138, 43, 226, 0.3)", background: "rgba(255, 255, 255, 0.1)", color: "#ffffff", fontSize: "16px", boxSizing: "border-box" }} />
-              </div>
-
-              <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", color: "#ffffff", marginBottom: "8px", fontSize: "14px", fontWeight: "600" }}>Date *</label>
-                  <input type="date" required value={bookingData.date} onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })} style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid rgba(138, 43, 226, 0.3)", background: "rgba(255, 255, 255, 0.1)", color: "#ffffff", fontSize: "16px", boxSizing: "border-box" }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: "block", color: "#ffffff", marginBottom: "8px", fontSize: "14px", fontWeight: "600" }}>Time *</label>
-                  <input type="time" required value={bookingData.time} onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })} style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid rgba(138, 43, 226, 0.3)", background: "rgba(255, 255, 255, 0.1)", color: "#ffffff", fontSize: "16px", boxSizing: "border-box" }} />
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "30px" }}>
-                <label style={{ display: "block", color: "#ffffff", marginBottom: "8px", fontSize: "14px", fontWeight: "600" }}>Service Type</label>
-                <select value={bookingData.service} onChange={(e) => setBookingData({ ...bookingData, service: e.target.value })} style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid rgba(138, 43, 226, 0.3)", background: "rgba(255, 255, 255, 0.1)", color: "#ffffff", fontSize: "16px", boxSizing: "border-box" }}>
-                  <option value="consultation">Free Consultation</option>
-                  <option value="branding">Branding Strategy</option>
-                  <option value="web-dev">Web Development</option>
-                  <option value="blockchain">Blockchain Integration</option>
-                </select>
-              </div>
-
-              <button type="submit" style={{ width: "100%", padding: "16px", borderRadius: "50px", border: "none", background: "linear-gradient(45deg, #8a2be2, #4169e1)", color: "#ffffff", fontSize: "16px", fontWeight: "600", cursor: "pointer", transition: "all 0.3s ease" }}>
-                Book & Pay Now
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      <BookingModal
+        open={showBookingForm}
+        onClose={() => setShowBookingForm(false)}
+        host="joxavier"
+        hostName="Joshua Xavier"
+        services={BOOKING_SERVICES}
+      />
     </div>
   );
 }

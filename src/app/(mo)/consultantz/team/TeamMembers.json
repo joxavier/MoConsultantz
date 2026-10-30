@@ -1,41 +1,25 @@
 [
     {
         "id": "limelight",
-        "displayPicture": "https://scontent-yyz1-1.cdninstagram.com/v/t51.2885-19/355236255_1310249376595760_4641976245514595781_n.jpg?_nc_ht=scontent-yyz1-1.cdninstagram.com&_nc_cat=108&_nc_oc=Q6cZ2QHAO9iMbuFAF-BayNlsaeHAF2c6KVIoLT3nLHkvIF5rUMeMITpeUsdYOed6G-uc3QQ&_nc_ohc=p_X6nYmtLfoQ7kNvwFpOyaw&_nc_gid=GgKs71HwHCSzTGAuucy1gg&edm=ALGbJPMBAAAA&ccb=7-5&oh=00_AfNtipLOlfxU4lCJCZemu8ieoYt_JoqcZ-J4FtmFFV8t9A&oe=6852B1C6&_nc_sid=7d3ac5",
-        "name": "Emil",
-        "company": "Where Small Business Happens",
-        "email": "mo@modevz.ca",
-        "phone": "+1-XXX-XXX-XXXX",
-        "website": "https://josh.modevz.ca",
-        "role": "Wealth Management Consultant",
-        "tagline": "Where Small Business Happens",
+        "displayPicture": null,
+        "name": "Emil Kirbua",
+        "company": "Mo — Where Small Business Happens",
+        "website": "https://limelight.modevz.ca",
+        "role": "Actor",
+        "tagline": "@limelight4444",
         "bio": [
-            "I am an entrepreneurial innovator with a keen eye for detail and a commitment to excellence. My experience spans high-fashion branding, where I develop exclusive, luxury-focused projects, to strategic leadership in the music industry, creating platforms that empower artists through technology and creative services.",
-            "With a strong foundation in web development and tech solutions, I craft interactive, client-centric digital experiences using the latest frameworks. I am deeply invested in community building and mentorship, exploring ways to drive blockchain adoption by integrating it into business operations to create efficiencies and enhance customer loyalty.",
-            "Known for my strategic foresight, I create impactful plans that blend business acumen with technological integration. Guided by an ambitious vision, I consistently pursue unique opportunities that push the boundaries of innovation and align with long-term success."
+            "Emil Kirbua is an actor. Follow his latest work on Instagram at @limelight4444 and on his Metaparlour page."
         ],
-        "education": "2+ Degrees in entrepreneurial innovation with expertise in high-fashion branding and strategic leadership.",
-        "experience": "Years of experience spanning web development, music industry platforms, and blockchain integration.",
         "socialLinks": [
             {
-                "name": "LinkedIn",
-                "url": "#",
-                "icon": "💼"
-            },
-            {
-                "name": "Twitter",
-                "url": "#",
-                "icon": "🐦"
-            },
-            {
                 "name": "Instagram",
-                "url": "#",
+                "url": "https://www.instagram.com/limelight4444/",
                 "icon": "📸"
             },
             {
-                "name": "Email",
-                "url": "mailto:mo@modevz.ca",
-                "icon": "✉️"
+                "name": "Metaparlour",
+                "url": "https://limelight.metaparlour.io/",
+                "icon": "🌐"
             }
         ]
     },
@@ -79,7 +63,7 @@
             }
         ]
     },
-        {
+    {
         "id": "kellman",
         "displayPicture": "/kellmanHero.jpg",
         "name": "Kellman",
