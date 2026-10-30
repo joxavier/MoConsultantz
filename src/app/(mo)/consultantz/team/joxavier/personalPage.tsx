@@ -427,6 +427,12 @@ END:VCARD`;
               <p style={{ color: "#cccccc", lineHeight: "1.6" }}>
                 Dual degrees in Business Administration and Computer Science with specialization across core technical matrices.
               </p>
+              <h4 style={{ color: "#ffffff", margin: "20px 0 10px", fontSize: "15px", fontWeight: 600 }}>Key courses</h4>
+              <ul style={{ display: "inline-block", textAlign: "left", color: "#cccccc", lineHeight: "1.6", paddingLeft: "20px", listStyleType: "disc" }}>
+                {["Cybersecurity for Web3", "Environmental Economics", "Game Theory and Digital Marketing"].map((course) => (
+                  <li key={course}>{course}</li>
+                ))}
+              </ul>
             </div>
 
             <div id="experience" style={{ background: "rgba(65, 105, 225, 0.1)", padding: "30px", borderRadius: "20px", border: "1px solid rgba(65, 105, 225, 0.3)" }}>
