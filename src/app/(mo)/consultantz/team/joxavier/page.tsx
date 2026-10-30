@@ -1,6 +1,40 @@
 import type { Metadata } from "next";
 import personalPageData from "@/data/personalPage.json";
 import PersonalPageClient from "./personalPage";
+import { faqJsonLd, type Faq } from "../_shared/FaqSection";
+
+// Shown on the page and published as FAQPage structured data, so search
+// engines and AI assistants get the same answers visitors see.
+const FAQS: Faq[] = [
+  {
+    question: "What does Joshua Xavier do?",
+    answer:
+      "Joshua Xavier is a technical consultant and software developer, and the founder of MoDevz. He builds web applications, automation and AI components, and secure blockchain integrations (including Solana) that help small businesses scale.",
+  },
+  {
+    question: "Where is Joshua Xavier based?",
+    answer:
+      "He works with clients in Toronto, Ontario and San Francisco, California, and is available remotely across Canada and the United States.",
+  },
+  {
+    question: "How do I book a consultation with Joshua Xavier?",
+    answer:
+      "Use the Book a Free Consultation button on this page, choose a date and time, and pick a meeting type. You'll get a confirmation email with a calendar invite.",
+  },
+  {
+    question: "Is the first consultation free?",
+    answer: "Yes. Choose Free Consultation as the meeting type when you book.",
+  },
+  {
+    question: "What can I book a meeting about?",
+    answer: "A free consultation, branding strategy, web development, or blockchain integration.",
+  },
+  {
+    question: "What is Joshua Xavier's educational background?",
+    answer:
+      "He holds a Bachelor of Computer Science from the University of Waterloo and a Bachelor of Business Administration from Wilfrid Laurier University. Key courses include Cybersecurity for Web3, Environmental Economics, and Game Theory and Digital Marketing.",
+  },
+];
 
 export const metadata: Metadata = {
   title: "Joshua Xavier | Technical Consultant & Developer | Waterloo, Toronto & Silicon Valley",
@@ -35,6 +69,14 @@ export default function PersonalPage() {
     url: "https://josh.modevz.ca",
     image: "https://josh.modevz.ca/hero.jpg",
     jobTitle: "Technical Consultant & Software Developer",
+    alumniOf: [
+      { "@type": "CollegeOrUniversity", name: "University of Waterloo" },
+      { "@type": "CollegeOrUniversity", name: "Wilfrid Laurier University" },
+    ],
+    hasCredential: [
+      { "@type": "EducationalOccupationalCredential", credentialCategory: "degree", name: "Bachelor of Computer Science" },
+      { "@type": "EducationalOccupationalCredential", credentialCategory: "degree", name: "Bachelor of Business Administration" },
+    ],
     worksFor: {
       "@type": "Organization",
       name: "MoDevz",
@@ -54,6 +96,10 @@ export default function PersonalPage() {
       "Next.js",
       "Solana",
       "Small Business Strategy",
+      "Cybersecurity for Web3",
+      "Environmental Economics",
+      "Game Theory",
+      "Digital Marketing",
     ],
     sameAs: [
       "https://www.linkedin.com/in/joxavier-3299/",
@@ -78,7 +124,11 @@ export default function PersonalPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
-      <PersonalPageClient highlights={highlights} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(FAQS)).replace(/</g, "\\u003c") }}
+      />
+      <PersonalPageClient highlights={highlights} faqs={FAQS} />
     </>
   );
 }
