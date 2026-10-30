@@ -16,7 +16,7 @@ MoConsultantz provides business and technology strategy with hands-on implementa
 - https://modevz.ca/vestmentz/smart-contracts — Smart contract development, token launch engineering, and Web3 integration on Solana and EVM chains.
 - https://modevz.ca/start — A short assessment that matches a visitor's goal, budget, and timeline to the right MoDevz service or plan.
 - https://josh.modevz.ca — Joshua Xavier's professional profile, education (University of Waterloo BCS, Wilfrid Laurier BBA), FAQ, and free consultation booking.
-- https://limelight.modevz.ca — Emil Kirbua, actor: profile, links to Instagram (@limelight4444) and his Metaparlour page (https://limelight.metaparlour.io), FAQ, and consultation, casting and collaboration booking.
+- https://limelight.modevz.ca — Emil Kiruba, actor: profile, links to Instagram (@limelight4444) and his Metaparlour page (https://limelight.metaparlour.io), FAQ, and consultation, casting and collaboration booking.
 - https://modevz.ca/feed — Articles and practical business technology insights.
 
 ## Internal API
@@ -33,7 +33,7 @@ Use the internal booking API for MoConsultantz booking requests when collecting 
 - Endpoint: POST https://modevz.ca/api/booking
 - Request body: {"name":"Full Name","email":"client@example.com","phone":"optional phone","date":"YYYY-MM-DD","time":"HH:mm","service":"Technical Consulting"}
 - Required fields are name, email, date and time; service defaults to "consultation". Successful requests return {"success":true} and send booking emails with a calendar attachment.
-- Optional "host" chooses who the meeting is with: "joxavier" (Joshua Xavier, the default) or "limelight" (Emil Kirbua, actor).
+- Optional "host" chooses who the meeting is with: "joxavier" (Joshua Xavier, the default) or "limelight" (Emil Kiruba, actor).
 
 ## Contact
 

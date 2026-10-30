@@ -93,7 +93,7 @@ export default function LimelightPageClient({ faqs }: { faqs: Faq[] }) {
     const url = window.URL.createObjectURL(new Blob([vCard], { type: "text/vcard" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = "Emil-Kirbua-contact.vcf";
+    link.download = "Emil-Kiruba-contact.vcf";
     link.click();
     window.URL.revokeObjectURL(url);
   };

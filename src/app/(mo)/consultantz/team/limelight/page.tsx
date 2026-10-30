@@ -4,7 +4,7 @@ import { stripLinks } from "@/lib/linkedText";
 import LimelightPageClient from "./LimelightPage";
 import { faqJsonLd, type Faq } from "../_shared/FaqSection";
 
-// Emil Kirbua's page, served at limelight.modevz.ca (see the "limelight" host
+// Emil Kiruba's page, served at limelight.modevz.ca (see the "limelight" host
 // rewrite in src/middleware.ts). Content lives in src/data/limelightPage.json.
 
 const description = `${profile.name} is an actor. See his work on Instagram (@${profile.instagram.handle}) and his Metaparlour page, and book a consultation, casting inquiry or collaboration meeting.`;
@@ -12,7 +12,7 @@ const description = `${profile.name} is an actor. See his work on Instagram (@${
 export const metadata: Metadata = {
   title: `${profile.name} | ${profile.role}`,
   description,
-  keywords: [profile.name, "Emil Kirbua actor", "actor", "Limelight", `@${profile.instagram.handle}`, "casting", "Metaparlour"],
+  keywords: [profile.name, "Emil Kiruba actor", "actor", "Limelight", `@${profile.instagram.handle}`, "casting", "Metaparlour"],
   alternates: { canonical: profile.siteUrl },
   openGraph: { title: `${profile.name} | ${profile.role}`, description, url: profile.siteUrl, type: "profile" },
   twitter: { card: "summary", title: `${profile.name} | ${profile.role}`, description },

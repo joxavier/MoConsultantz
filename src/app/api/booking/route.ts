@@ -11,7 +11,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // email; `from` is who the client's confirmation comes from.
 const HOSTS = {
   joxavier: { name: "Joshua Xavier", notify: "josh@modevz.ca", from: "Joshua Xavier <josh@modevz.ca>" },
-  limelight: { name: "Emil Kirbua", notify: "josh@modevz.ca", from: "Mo Bookings <bookings@modevz.ca>" },
+  limelight: { name: "Emil Kiruba", notify: "josh@modevz.ca", from: "Mo Bookings <bookings@modevz.ca>" },
 } as const;
 
 type HostKey = keyof typeof HOSTS;
