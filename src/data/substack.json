@@ -6,7 +6,8 @@
       "handle": "amiralvc",
       "feedUrl": "https://amiralventures.substack.com/feed",
       "tags": ["Venture Capital", "Technology", "Innovation"],
-      "limit": 0
+      "limit": 10,
+      "pinnedOnly": true
     }
   ],
   "pinned": [

@@ -3,7 +3,9 @@ import { PUBLICATIONS, mergeSubstackPosts, parseSubstackRss, pinnedPosts, type S
 
 // Substack posts for the Vibes feed: every publication in
 // src/data/substack.json, merged with the pinned posts. Feeds are cached
-// for an hour; a feed that fails is skipped so the rest still show.
+// for an hour; a feed that fails is skipped so the rest still show. A
+// publication marked "pinnedOnly" shows just its pinned posts: its feed is
+// still read so those cards get the real cover image, date and reading time.
 export const revalidate = 3600;
 
 async function fetchPublication(publication: (typeof PUBLICATIONS)[number]): Promise<SubstackPost[]> {
@@ -13,7 +15,10 @@ async function fetchPublication(publication: (typeof PUBLICATIONS)[number]): Pro
       next: { revalidate },
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return parseSubstackRss(await response.text(), publication);
+    const posts = parseSubstackRss(await response.text(), publication);
+    if (!publication.pinnedOnly) return posts;
+    const pinnedIds = new Set(pinnedPosts().map((post) => post.id));
+    return posts.filter((post) => pinnedIds.has(post.id));
   } catch (error: any) {
     console.error(`Substack feed ${publication.id} failed:`, error.message);
     return [];
