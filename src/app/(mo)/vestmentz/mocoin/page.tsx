@@ -1,5 +1,26 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { MOCOIN_CRUMBS, MOCOIN_FAQS, MOCOIN_MINT, MOCOIN_POOL, breadcrumbJsonLd, faqJsonLd, jsonLdScript } from "@/lib/mocoinSeo";
+
+// Live MoCoin market data, from the same endpoint as the Strategic Reserve.
+type MoCoinMarket = {
+  priceUsd: number | null;
+  marketCap: number | null;
+  volume24h: number | null;
+  liquidity: number | null;
+  pairUrl?: string | null;
+};
+
+const formatUsd = (value: number | null | undefined, compact = true) => {
+  if (value == null || !Number.isFinite(value)) return "—";
+  if (!compact) {
+    const digits = value >= 1 ? 4 : Math.min(10, Math.max(4, 2 - Math.floor(Math.log10(value)) + 2));
+    return `$${value.toLocaleString("en-US", { maximumFractionDigits: digits })}`;
+  }
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 }).format(value);
+};
 
 const TypewriterEffect = ({ strings, className, speed = 70 }: { strings: string[]; className?: string; speed?: number }) => {
   const [currentStringIndex, setCurrentStringIndex] = useState(0);
@@ -64,11 +85,45 @@ export default function MoCoin() {
     );
   };
 
-  const marketData = {
-    marketCap: "$21.33M",
-    tvl: "$12.8k",
-    holders: "27",
-  };
+  const [market, setMarket] = useState<MoCoinMarket | null>(null);
+  const [change1d, setChange1d] = useState<number | null>(null);
+  const [marketStatus, setMarketStatus] = useState<"loading" | "ready" | "error">("loading");
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const response = await fetch("/api/market-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ symbols: ["MOCOIN"], baseCurrency: "USD" }),
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        const quote = (await response.json()).MOCOIN;
+        if (!quote?.market) throw new Error("No MoCoin quote");
+        if (cancelled) return;
+        setMarket(quote.market);
+        setChange1d(typeof quote.change1d === "number" ? quote.change1d : null);
+        setMarketStatus("ready");
+      } catch {
+        if (!cancelled) setMarketStatus((status) => (status === "ready" ? status : "error"));
+      }
+    };
+    load();
+    const interval = setInterval(load, 5 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const tile = (value: string) => (marketStatus === "loading" ? "…" : value);
+  const marketTiles = [
+    { label: "Price", icon: "🪙", color: "#fcd34d", border: "rgba(234, 179, 8, 0.3)", value: tile(formatUsd(market?.priceUsd, false)), change: change1d },
+    { label: "Market Cap", icon: "📊", color: "#3ca5de", border: "rgba(60, 165, 222, 0.3)", value: tile(formatUsd(market?.marketCap)) },
+    { label: "Liquidity (TVL)", icon: "💵", color: "#8743f7", border: "rgba(135, 67, 247, 0.3)", value: tile(formatUsd(market?.liquidity)) },
+    { label: "24h Volume", icon: "🔁", color: "#86efac", border: "rgba(34, 197, 94, 0.3)", value: tile(formatUsd(market?.volume24h)) },
+  ];
 
   const tierData = [
     {
@@ -252,7 +307,7 @@ export default function MoCoin() {
 
   return (
     <div style={styles.container}>
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
         
         @keyframes pulse {
@@ -275,10 +330,20 @@ export default function MoCoin() {
         .link:hover {
           color: #8743f7;
         }
-      `}</style>
+      ` }} />
 
       {/* Hero Section */}
-      <section style={styles.heroSection}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript({ "@graph": [breadcrumbJsonLd(MOCOIN_CRUMBS), faqJsonLd(MOCOIN_FAQS)] }) }}
+      />
+      <Breadcrumbs
+        crumbs={MOCOIN_CRUMBS}
+        className="relative z-20 mx-auto max-w-6xl px-6 pt-28 text-sm text-gray-400 sm:pt-32"
+        linkClassName="hover:text-white"
+        currentClassName="font-semibold text-white"
+      />
+      <section style={{ ...styles.heroSection, paddingTop: '2rem' }}>
         <div style={styles.heroBg1}></div>
         <div style={styles.heroBg2}></div>
         
@@ -292,7 +357,7 @@ export default function MoCoin() {
           </h1>
           
           <h2 style={styles.h2}>
-            Backed by Strategic Reserve
+            Backed by the <Link href="/vestmentz/mocoin/strategicReserve" style={styles.link} className="link">Strategic Reserve</Link>
           </h2>
 
           <p style={styles.subtitle}>
@@ -483,35 +548,45 @@ export default function MoCoin() {
             Live Market Data
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-            <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))', borderRadius: '0.75rem', padding: '1.5rem', border: '1px solid rgba(60, 165, 222, 0.3)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#9ca3af' }}>Market Cap</span>
-                <span style={{ fontSize: '1.5rem' }}>📊</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            {marketTiles.map((entry) => (
+              <div key={entry.label} style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))', borderRadius: '0.75rem', padding: '1.5rem', border: `1px solid ${entry.border}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ color: '#9ca3af' }}>{entry.label}</span>
+                  <span style={{ fontSize: '1.5rem' }}>{entry.icon}</span>
+                </div>
+                <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: entry.color, fontVariantNumeric: 'tabular-nums' }}>{entry.value}</div>
+                {entry.change != null && (
+                  <div style={{ marginTop: '0.25rem', fontSize: '0.875rem', fontWeight: 600, color: entry.change >= 0 ? '#16c784' : '#ea3943' }}>
+                    {entry.change >= 0 ? '▲' : '▼'} {Math.abs(entry.change).toFixed(2)}% (24h)
+                  </div>
+                )}
               </div>
-              <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#3ca5de' }}>{marketData.marketCap}</div>
-            </div>
-
-            <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))', borderRadius: '0.75rem', padding: '1.5rem', border: '1px solid rgba(135, 67, 247, 0.3)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#9ca3af' }}>TVL</span>
-                <span style={{ fontSize: '1.5rem' }}>💵</span>
-              </div>
-              <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#8743f7' }}>{marketData.tvl}</div>
-            </div>
-
-            <div style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))', borderRadius: '0.75rem', padding: '1.5rem', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#9ca3af' }}>Holders</span>
-                <span style={{ fontSize: '1.5rem' }}>🪙</span>
-              </div>
-              <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#fcd34d' }}>{marketData.holders}</div>
-            </div>
+            ))}
           </div>
+          {marketStatus === 'error' && (
+            <p style={{ color: '#9ca3af', textAlign: 'center', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+              Live market data is unavailable right now. The chart below is still live.
+            </p>
+          )}
+
+          {/* Strategic Reserve */}
+          <Link
+            href="/vestmentz/mocoin/strategicReserve"
+            className="hover-scale"
+            style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', marginBottom: '3rem', padding: '1.5rem 2rem', borderRadius: '1rem', border: '2px solid rgba(60, 165, 222, 0.5)', background: 'linear-gradient(135deg, rgba(60, 165, 222, 0.15), rgba(135, 67, 247, 0.15))', color: '#fff', textDecoration: 'none', transition: 'all 0.3s' }}
+          >
+            <div>
+              <div style={{ fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#3ca5de', fontWeight: 700 }}>Backed by</div>
+              <div style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 'bold' }}>The Strategic Reserve</div>
+              <div style={{ color: '#9ca3af', marginTop: '0.25rem' }}>Every stock, crypto and cash position behind MoCoin at live prices, with reserve backing and related news.</div>
+            </div>
+            <span style={{ padding: '0.75rem 1.5rem', borderRadius: '9999px', background: 'linear-gradient(135deg, #3ca5de, #8743f7)', fontWeight: 'bold', whiteSpace: 'nowrap' }}>View reserve →</span>
+          </Link>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
             <button
-              onClick={() => window.open(chartLink, '_blank')}
+              onClick={() => window.open(market?.pairUrl || chartLink, '_blank')}
               style={{ padding: '1rem 2rem', borderRadius: '9999px', border: '2px solid #fff', background: '#000', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, transition: 'all 0.3s' }}
               className="hover-bg"
             >
@@ -584,6 +659,31 @@ export default function MoCoin() {
               })}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ: the same questions are sent as FAQPage structured data above. */}
+      <section id="faq" style={{ ...styles.section, background: '#000' }} aria-labelledby="mocoin-faq">
+        <div style={{ maxWidth: '48rem', margin: '0 auto' }}>
+          <h2 id="mocoin-faq" style={styles.sectionTitle}>
+            MoCoin FAQ
+          </h2>
+          <div style={{ marginTop: '2rem', borderRadius: '1rem', border: '1px solid #374151', overflow: 'hidden', background: 'linear-gradient(135deg, #111827, #000)' }}>
+            {MOCOIN_FAQS.map((faq, index) => (
+              <details key={faq.question} className="group" style={{ padding: '1.25rem 1.5rem', borderTop: index ? '1px solid #1f2937' : 'none' }}>
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>{faq.question}</h3>
+                  <span aria-hidden="true" className="transition-transform group-open:rotate-45" style={{ color: '#3ca5de', fontSize: '1.5rem' }}>+</span>
+                </summary>
+                <p style={{ marginTop: '0.75rem', color: '#d1d5db', lineHeight: 1.75, overflowWrap: 'anywhere' }}>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+          <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#9ca3af', fontSize: '0.875rem', overflowWrap: 'anywhere' }}>
+            Contract: <a href={`https://solscan.io/token/${MOCOIN_MINT}`} target="_blank" rel="noopener noreferrer" style={styles.link} className="link">{MOCOIN_MINT}</a>
+            {' · '}
+            <a href={`https://dexscreener.com/solana/${MOCOIN_POOL}`} target="_blank" rel="noopener noreferrer" style={styles.link} className="link">Pool</a>
+          </p>
         </div>
       </section>
 

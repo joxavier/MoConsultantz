@@ -5,6 +5,8 @@ import Link from 'next/link';
 import treasuryConfig from '@/data/treasuryConfig.json';
 import { localNews, newsByAsset, substackNews, type NewsItem } from '@/lib/assetNews';
 import { pinnedPosts, type SubstackPost } from '@/lib/substack';
+import { RAYDIUM_SWAP_URL, RESERVE_CRUMBS, RESERVE_FAQS, breadcrumbJsonLd, faqJsonLd, jsonLdScript } from '@/lib/mocoinSeo';
+import Breadcrumbs from '../../../components/Breadcrumbs';
 import type {
   Asset,
   AssetConfig,
@@ -450,21 +452,98 @@ function formatPointTime(t: number, period: TimePeriod) {
 }
 
 // ---------- presentational pieces ----------
-// Styled after CoinMarketCap's markets list: light surfaces, green/red
-// changes with sparklines, stat tiles and tabs.
+// Laid out like CoinMarketCap's markets list (stat tiles, tabs, rows with
+// green/red changes and sparklines). Dark by default, in the MoCoin page's
+// black with blue/purple; the light theme is CoinMarketCap's palette. Colours
+// are CSS variables set per theme on the page root (see THEME_CSS).
+
+type Theme = 'dark' | 'light';
+const THEME_STORAGE_KEY = 'strategicReserveTheme';
 
 const CMC = {
-  bg: '#f8fafd',
-  card: '#ffffff',
-  line: '#eff2f5',
-  ink: '#0d1421',
-  muted: '#58667e',
   green: '#16c784',
   red: '#ea3943',
-  blue: '#3861fb',
 };
 
-const changeText = (value: number) => (value > 0 ? 'text-[#16c784]' : value < 0 ? 'text-[#ea3943]' : 'text-[#58667e]');
+const THEME_CSS = `
+.sr-root[data-theme='dark'] {
+  color-scheme: dark;
+  --sr-bg: #000000;
+  --sr-card: #0b0e16;
+  --sr-subtle: #121623;
+  --sr-pill: #252b3d;
+  --sr-line: #1d2233;
+  --sr-ink: #ffffff;
+  --sr-muted: #9ca3af;
+  --sr-faint: #6b7280;
+  --sr-blue: #3ca5de;
+  --sr-blue-soft: rgba(60, 165, 222, 0.16);
+  --sr-blue-line: rgba(60, 165, 222, 0.4);
+  --sr-highlight: rgba(135, 67, 247, 0.1);
+  --sr-warn-bg: rgba(234, 179, 8, 0.1);
+  --sr-warn-line: rgba(234, 179, 8, 0.35);
+  --sr-warn-ink: #fde68a;
+  background-image: radial-gradient(ellipse at top, rgba(88, 28, 135, 0.28), transparent 55%),
+    radial-gradient(ellipse at top right, rgba(30, 58, 138, 0.22), transparent 50%);
+}
+.sr-root[data-theme='light'] {
+  color-scheme: light;
+  --sr-bg: #f8fafd;
+  --sr-card: #ffffff;
+  --sr-subtle: #f8fafd;
+  --sr-pill: #ffffff;
+  --sr-line: #eff2f5;
+  --sr-ink: #0d1421;
+  --sr-muted: #58667e;
+  --sr-faint: #a1a7bb;
+  --sr-blue: #3861fb;
+  --sr-blue-soft: rgba(56, 97, 251, 0.1);
+  --sr-blue-line: rgba(56, 97, 251, 0.3);
+  --sr-highlight: rgba(56, 97, 251, 0.04);
+  --sr-warn-bg: #fffbeb;
+  --sr-warn-line: #fcd34d;
+  --sr-warn-ink: #78350f;
+}
+.sr-root[data-theme='dark'] .sr-title {
+  background: linear-gradient(135deg, #3ca5de, #8743f7, #3ca5de);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+`;
+
+const CHART_TOOLTIP = {
+  backgroundColor: 'var(--sr-card)',
+  border: '1px solid var(--sr-line)',
+  borderRadius: 12,
+  color: 'var(--sr-ink)',
+};
+
+function ThemeToggle({ theme, onChange }: { theme: Theme; onChange: (theme: Theme) => void }) {
+  const next = theme === 'dark' ? 'light' : 'dark';
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(next)}
+      aria-label={`Switch to ${next} mode`}
+      title={`Switch to ${next} mode`}
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--sr-line)] text-[var(--sr-ink)]"
+    >
+      {theme === 'dark' ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+const changeText = (value: number) => (value > 0 ? 'text-[#16c784]' : value < 0 ? 'text-[#ea3943]' : 'text-[var(--sr-muted)]');
 
 function Change({ value, className = '' }: { value: number; className?: string }) {
   return (
@@ -505,8 +584,8 @@ function Sparkline({ points, width = 72, height = 28 }: { points?: PricePoint[];
 
 function StatTile({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="min-w-[9.5rem] flex-1 snap-start rounded-2xl border border-[#eff2f5] bg-white px-4 py-3 shadow-sm">
-      <p className="text-sm text-[#58667e]">{label}</p>
+    <div className="min-w-[9.5rem] flex-1 snap-start rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] px-4 py-3 shadow-sm">
+      <p className="text-sm text-[var(--sr-muted)]">{label}</p>
       <div className="mt-1">{children}</div>
     </div>
   );
@@ -530,9 +609,9 @@ function BackingGauge({ percent }: { percent: number | null }) {
           </linearGradient>
         </defs>
         <path d="M10 40 A30 30 0 0 1 70 40" fill="none" stroke="url(#gauge)" strokeWidth="7" strokeLinecap="round" />
-        {percent != null && <circle cx={x} cy={y} r="5" fill="white" stroke={CMC.ink} strokeWidth="2" />}
+        {percent != null && <circle cx={x} cy={y} r="5" fill="white" stroke="#0d1421" strokeWidth="2" />}
       </svg>
-      <span className="absolute inset-x-0 bottom-0 text-center text-lg font-bold tabular-nums text-[#0d1421]">
+      <span className="absolute inset-x-0 bottom-0 text-center text-lg font-bold tabular-nums text-[var(--sr-ink)]">
         {percent == null ? '—' : `${percent >= 1000 ? Math.round(percent) : percent.toFixed(0)}%`}
       </span>
     </div>
@@ -541,7 +620,7 @@ function BackingGauge({ percent }: { percent: number | null }) {
 
 function Pills<T extends string>({ options, value, onChange }: { options: { key: T; label: string }[]; value: T; onChange: (key: T) => void }) {
   return (
-    <div className="inline-flex rounded-xl bg-[#eff2f5] p-1">
+    <div className="inline-flex rounded-xl bg-[var(--sr-line)] p-1">
       {options.map((option) => (
         <button
           key={option.key}
@@ -549,7 +628,7 @@ function Pills<T extends string>({ options, value, onChange }: { options: { key:
           onClick={() => onChange(option.key)}
           aria-pressed={value === option.key}
           className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
-            value === option.key ? 'bg-white text-[#0d1421] shadow-sm' : 'text-[#58667e]'
+            value === option.key ? 'bg-[var(--sr-pill)] text-[var(--sr-ink)] shadow-sm' : 'text-[var(--sr-muted)]'
           }`}
         >
           {option.label}
@@ -569,20 +648,20 @@ function AssetBadge({ symbol, color }: { symbol: string; color: string }) {
 }
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-xl bg-[#eff2f5] ${className}`} />;
+  return <div className={`animate-pulse rounded-xl bg-[var(--sr-line)] ${className}`} />;
 }
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-2xl border border-[#eff2f5] bg-white p-4 shadow-sm sm:p-6 ${className}`}>{children}</section>;
+  return <section className={`rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] p-4 shadow-sm sm:p-6 ${className}`}>{children}</section>;
 }
 
 function NewsLink({ item, className = '' }: { item: NewsItem; className?: string }) {
   const inner = (
     <>
-      <p className="text-xs text-[#58667e]">
+      <p className="text-xs text-[var(--sr-muted)]">
         {item.source} · {new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
       </p>
-      <p className="mt-0.5 font-semibold leading-snug text-[#0d1421]">{item.title}</p>
+      <p className="mt-0.5 font-semibold leading-snug text-[var(--sr-ink)]">{item.title}</p>
     </>
   );
   return item.external ? (
@@ -604,11 +683,11 @@ const TABS: { key: Tab; label: string }[] = [
 
 // The featured MoCoin market row, separate from the treasury's own MoCoin holding.
 const MOCOIN_ROW = 'mocoin-market';
-const RAYDIUM_SWAP_URL = `https://raydium.io/swap/?inputMint=sol&outputMint=${treasuryConfig.mocoin.mintAddress}`;
 
 // ---------- page ----------
 
 export default function StrategicReserve() {
+  const [theme, setThemeState] = useState<Theme>('dark');
   const [view, setView] = useState<'asset' | 'industry'>('asset');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('1d');
   const [currency, setCurrency] = useState<DisplayCurrency>('CAD');
@@ -624,6 +703,20 @@ export default function StrategicReserve() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [showAllRebalance, setShowAllRebalance] = useState(false);
   const [substackPosts, setSubstackPosts] = useState<SubstackPost[]>(() => pinnedPosts());
+
+  // The chosen theme is remembered in this browser only; dark is the default.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === 'light' || saved === 'dark') setThemeState(saved);
+    } catch {}
+  }, []);
+  const setTheme = (next: Theme) => {
+    setThemeState(next);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch {}
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -832,30 +925,30 @@ export default function StrategicReserve() {
   }) => {
     const isOpen = expanded === options.key;
     return (
-      <li key={options.key} className={options.highlight ? 'bg-[#3861fb]/[0.04]' : ''}>
+      <li key={options.key} className={options.highlight ? 'bg-[var(--sr-highlight)]' : ''}>
         <button
           type="button"
           onClick={() => setExpanded(isOpen ? null : options.key)}
           aria-expanded={isOpen}
           className="grid w-full grid-cols-[1.25rem_2.25rem_minmax(0,1fr)_auto_4.5rem] items-center gap-x-2 px-2.5 py-3 text-left sm:gap-x-3 sm:px-4"
         >
-          <span className="text-center text-xs font-medium tabular-nums text-[#58667e]">{options.rank}</span>
+          <span className="text-center text-xs font-medium tabular-nums text-[var(--sr-muted)]">{options.rank}</span>
           {options.badge}
           <span className="min-w-0">
             <span className="flex items-center gap-1.5">
-              <span className="truncate font-semibold text-[#0d1421]">{options.title}</span>
+              <span className="truncate font-semibold text-[var(--sr-ink)]">{options.title}</span>
               {options.newsCount > 0 && (
-                <span className="shrink-0 rounded-full bg-[#3861fb]/10 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[#3861fb]">
+                <span className="shrink-0 rounded-full bg-[var(--sr-blue-soft)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[var(--sr-blue)]">
                   {options.newsCount} news
                 </span>
               )}
             </span>
-            <span className="block truncate text-sm tabular-nums text-[#58667e]">{options.subtitle}</span>
+            <span className="block truncate text-sm tabular-nums text-[var(--sr-muted)]">{options.subtitle}</span>
           </span>
-          <span className="text-right text-sm font-semibold tabular-nums text-[#0d1421]">{options.price}</span>
+          <span className="text-right text-sm font-semibold tabular-nums text-[var(--sr-ink)]">{options.price}</span>
           <span className="flex flex-col items-end">
             <Sparkline points={options.points} />
-            {options.change == null ? <span className="text-sm text-[#58667e]">—</span> : <Change value={options.change} className="text-sm" />}
+            {options.change == null ? <span className="text-sm text-[var(--sr-muted)]">—</span> : <Change value={options.change} className="text-sm" />}
           </span>
         </button>
         {isOpen && <div className="px-3 pb-4 sm:px-4">{options.details}</div>}
@@ -865,10 +958,10 @@ export default function StrategicReserve() {
 
   const newsPreview = (symbol: string) => {
     const items = newsMap[symbol] ?? [];
-    if (!items.length) return <p className="mt-3 text-sm text-[#58667e]">No related Vibes articles yet.</p>;
+    if (!items.length) return <p className="mt-3 text-sm text-[var(--sr-muted)]">No related Vibes articles yet.</p>;
     return (
       <div className="mt-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#58667e]">Related on Vibes</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--sr-muted)]">Related on Vibes</p>
         <ul className="mt-2 space-y-3">
           {items.slice(0, 3).map((item) => (
             <li key={item.id}>
@@ -877,7 +970,7 @@ export default function StrategicReserve() {
           ))}
         </ul>
         {items.length > 3 && (
-          <button type="button" onClick={() => setTab('news')} className="mt-3 text-sm font-semibold text-[#3861fb]">
+          <button type="button" onClick={() => setTab('news')} className="mt-3 text-sm font-semibold text-[var(--sr-blue)]">
             See all {items.length} articles
           </button>
         )}
@@ -886,23 +979,23 @@ export default function StrategicReserve() {
   };
 
   const assetDetails = (asset: Asset) => (
-    <div className="rounded-xl bg-[#f8fafd] p-4">
+    <div className="rounded-xl bg-[var(--sr-subtle)] p-4">
       <dl className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <dt className="text-[#58667e]">Holding</dt>
-          <dd className="font-medium text-[#0d1421]">{asset.holdingLabel || asset.name}</dd>
+          <dt className="text-[var(--sr-muted)]">Holding</dt>
+          <dd className="font-medium text-[var(--sr-ink)]">{asset.holdingLabel || asset.name}</dd>
         </div>
         <div>
-          <dt className="text-[#58667e]">Share of reserve</dt>
-          <dd className="font-medium tabular-nums text-[#0d1421]">{asset.currentAllocation.toFixed(2)}%</dd>
+          <dt className="text-[var(--sr-muted)]">Share of reserve</dt>
+          <dd className="font-medium tabular-nums text-[var(--sr-ink)]">{asset.currentAllocation.toFixed(2)}%</dd>
         </div>
         <div>
-          <dt className="text-[#58667e]">Target</dt>
-          <dd className="font-medium tabular-nums text-[#0d1421]">{asset.targetAllocation.toFixed(2)}%</dd>
+          <dt className="text-[var(--sr-muted)]">Target</dt>
+          <dd className="font-medium tabular-nums text-[var(--sr-ink)]">{asset.targetAllocation.toFixed(2)}%</dd>
         </div>
         <div>
-          <dt className="text-[#58667e]">Category</dt>
-          <dd className="font-medium text-[#0d1421]">{asset.category}</dd>
+          <dt className="text-[var(--sr-muted)]">Category</dt>
+          <dd className="font-medium text-[var(--sr-ink)]">{asset.category}</dd>
         </div>
       </dl>
       {newsPreview(asset.symbol)}
@@ -919,19 +1012,36 @@ export default function StrategicReserve() {
   const chartColor = chartUp ? CMC.green : CMC.red;
 
   return (
-    <main className="min-h-screen bg-[#f8fafd] pb-40 pt-28 text-[#0d1421] sm:pb-16 sm:pt-32">
+    <main data-theme={theme} className="sr-root min-h-screen bg-[var(--sr-bg)] pb-40 pt-28 text-[var(--sr-ink)] transition-colors sm:pb-16 sm:pt-32">
+      {/* Raw so React doesn't HTML-escape the quotes (a hydration mismatch). */}
+      <style dangerouslySetInnerHTML={{ __html: THEME_CSS }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript({ '@graph': [breadcrumbJsonLd(RESERVE_CRUMBS), faqJsonLd(RESERVE_FAQS)] }) }}
+      />
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+        <Breadcrumbs
+          crumbs={RESERVE_CRUMBS}
+          className="mb-4 text-sm text-[var(--sr-muted)]"
+          linkClassName="hover:text-[var(--sr-ink)]"
+          currentClassName="font-semibold text-[var(--sr-ink)]"
+        />
         {/* Title row */}
-        <header className="flex items-center justify-between gap-3">
+        <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Strategic Reserve</h1>
-            <p className="mt-1 text-sm text-[#58667e]">The assets backing MoCoin</p>
+            <h1 className="sr-title text-3xl font-extrabold tracking-tight sm:text-4xl">Strategic Reserve</h1>
+            <p className="mt-1 text-sm text-[var(--sr-muted)]">
+              The assets backing <Link href="/vestmentz/mocoin" className="font-semibold text-[var(--sr-blue)]">MoCoin</Link>
+            </p>
           </div>
-          <Pills
-            options={[{ key: 'CAD', label: 'C$' }, { key: 'USD', label: '$' }, { key: 'BTC', label: '₿' }]}
-            value={currency}
-            onChange={setCurrency}
-          />
+          <div className="flex items-center gap-2">
+            <Pills
+              options={[{ key: 'CAD', label: 'C$' }, { key: 'USD', label: '$' }, { key: 'BTC', label: '₿' }]}
+              value={currency}
+              onChange={setCurrency}
+            />
+            <ThemeToggle theme={theme} onChange={setTheme} />
+          </div>
         </header>
 
         {/* Stat tiles */}
@@ -976,14 +1086,15 @@ export default function StrategicReserve() {
           {[
             { href: mocoinMarket?.pairUrl || `https://dexscreener.com/solana/${treasuryConfig.mocoin.poolAddress}`, label: 'MoCoin chart', external: true },
             { href: RAYDIUM_SWAP_URL, label: 'Swap MoCoin', external: true },
+            { href: '/vestmentz/mocoin', label: 'About MoCoin', external: false },
             { href: '/feed', label: 'Vibes', external: false },
           ].map((chip) =>
             chip.external ? (
-              <a key={chip.label} href={chip.href} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-full border border-[#eff2f5] bg-white px-4 py-2 text-sm font-semibold shadow-sm">
+              <a key={chip.label} href={chip.href} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-full border border-[var(--sr-line)] bg-[var(--sr-card)] px-4 py-2 text-sm font-semibold shadow-sm">
                 {chip.label}
               </a>
             ) : (
-              <Link key={chip.label} href={chip.href} className="shrink-0 rounded-full border border-[#3861fb]/30 bg-white px-4 py-2 text-sm font-semibold text-[#3861fb] shadow-sm">
+              <Link key={chip.label} href={chip.href} className="shrink-0 rounded-full border border-[var(--sr-blue-line)] bg-[var(--sr-card)] px-4 py-2 text-sm font-semibold text-[var(--sr-blue)] shadow-sm">
                 {chip.label}
               </Link>
             ),
@@ -991,7 +1102,7 @@ export default function StrategicReserve() {
         </div>
 
         {(marketError || btcUnavailable || (marketData && fx.isFallback)) && (
-          <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="mt-4 rounded-xl border border-[var(--sr-warn-line)] bg-[var(--sr-warn-bg)] px-4 py-3 text-sm text-[var(--sr-warn-ink)]">
             {marketError
               ? `Live prices couldn't be loaded (${marketError}). Showing the last values received.`
               : btcUnavailable
@@ -1001,7 +1112,7 @@ export default function StrategicReserve() {
         )}
 
         {/* Tabs */}
-        <nav className="-mx-4 mt-6 overflow-x-auto border-b border-[#eff2f5] px-4 sm:mx-0 sm:px-0" aria-label="Reserve sections">
+        <nav className="-mx-4 mt-6 overflow-x-auto border-b border-[var(--sr-line)] px-4 sm:mx-0 sm:px-0" aria-label="Reserve sections">
           <ul className="flex gap-6">
             {TABS.map((entry) => (
               <li key={entry.key}>
@@ -1009,13 +1120,13 @@ export default function StrategicReserve() {
                   type="button"
                   onClick={() => setTab(entry.key)}
                   aria-current={tab === entry.key ? 'page' : undefined}
-                  className={`relative whitespace-nowrap pb-3 text-lg font-bold transition-colors ${tab === entry.key ? 'text-[#0d1421]' : 'text-[#a1a7bb]'}`}
+                  className={`relative whitespace-nowrap pb-3 text-lg font-bold transition-colors ${tab === entry.key ? 'text-[var(--sr-ink)]' : 'text-[var(--sr-faint)]'}`}
                 >
                   {entry.label}
                   {entry.key === 'news' && relatedItems.length > 0 && (
-                    <span className="ml-1 align-top text-xs font-semibold text-[#3861fb]">{relatedItems.length}</span>
+                    <span className="ml-1 align-top text-xs font-semibold text-[var(--sr-blue)]">{relatedItems.length}</span>
                   )}
-                  {tab === entry.key && <span className="absolute inset-x-0 bottom-0 h-[3px] rounded-full bg-[#3861fb]" />}
+                  {tab === entry.key && <span className="absolute inset-x-0 bottom-0 h-[3px] rounded-full bg-[var(--sr-blue)]" />}
                 </button>
               </li>
             ))}
@@ -1027,15 +1138,15 @@ export default function StrategicReserve() {
           {(tab === 'holdings' || tab === 'watchlist' || tab === 'overview') && (
             <Pills options={PERIODS.map((entry) => ({ key: entry.key, label: entry.label }))} value={timePeriod} onChange={setTimePeriod} />
           )}
-          <p className="hidden text-xs text-[#58667e] sm:block">
+          <p className="hidden text-xs text-[var(--sr-muted)] sm:block">
             {lastUpdate ? `Updated ${lastUpdate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : 'Loading live prices…'}
           </p>
         </div>
 
         <div className="mt-4">
           {tab === 'holdings' && (
-            <section className="overflow-hidden rounded-2xl border border-[#eff2f5] bg-white shadow-sm">
-              <div className="grid grid-cols-[1.25rem_2.25rem_minmax(0,1fr)_auto_4.5rem] gap-x-2 border-b border-[#eff2f5] px-3 py-2 text-xs font-semibold text-[#58667e] sm:gap-x-3 sm:px-4">
+            <section className="overflow-hidden rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] shadow-sm">
+              <div className="grid grid-cols-[1.25rem_2.25rem_minmax(0,1fr)_auto_4.5rem] gap-x-2 border-b border-[var(--sr-line)] px-3 py-2 text-xs font-semibold text-[var(--sr-muted)] sm:gap-x-3 sm:px-4">
                 <span className="text-center">#</span>
                 <span className="col-span-2">Value</span>
                 <span className="text-right">Price</span>
@@ -1046,13 +1157,13 @@ export default function StrategicReserve() {
                   {[0, 1, 2, 3, 4].map((index) => <Skeleton key={index} className="h-12" />)}
                 </div>
               ) : (
-                <ul className="divide-y divide-[#eff2f5]">
+                <ul className="divide-y divide-[var(--sr-line)]">
                   {renderRow({
                     key: MOCOIN_ROW,
                     rank: '★',
                     badge: (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src="/mo.svg" alt="" className="h-9 w-9 shrink-0 rounded-full border border-[#eff2f5] bg-white p-1" />
+                      <img src="/mo.svg" alt="" className="h-9 w-9 shrink-0 rounded-full border border-[var(--sr-line)] bg-white p-1" />
                     ),
                     title: 'MOCOIN',
                     subtitle: mocoinMarket?.marketCap != null ? formatCompact(mocoinMarket.marketCap) : 'MoCoin',
@@ -1062,7 +1173,7 @@ export default function StrategicReserve() {
                     newsCount: newsMap.MoCoin?.length ?? 0,
                     highlight: true,
                     details: (
-                      <div className="rounded-xl bg-[#f8fafd] p-4">
+                      <div className="rounded-xl bg-[var(--sr-subtle)] p-4">
                         <dl className="grid grid-cols-2 gap-3 text-sm">
                           {[
                             ['Market cap', mocoinMarket?.marketCap != null ? formatCompact(mocoinMarket.marketCap) : '—'],
@@ -1075,12 +1186,12 @@ export default function StrategicReserve() {
                             ['Reserve backing', backingPercent != null ? `${backingPercent.toFixed(1)}% of market cap` : '—'],
                           ].map(([label, value]) => (
                             <div key={label}>
-                              <dt className="text-[#58667e]">{label}</dt>
-                              <dd className="font-medium tabular-nums text-[#0d1421]">{value}</dd>
+                              <dt className="text-[var(--sr-muted)]">{label}</dt>
+                              <dd className="font-medium tabular-nums text-[var(--sr-ink)]">{value}</dd>
                             </div>
                           ))}
                         </dl>
-                        <p className="mt-3 text-xs text-[#58667e]">
+                        <p className="mt-3 text-xs text-[var(--sr-muted)]">
                           Circulating supply excludes MoCoin held by the treasury. Market data from DexScreener and GeckoTerminal.
                         </p>
                         {newsPreview('MoCoin')}
@@ -1103,21 +1214,21 @@ export default function StrategicReserve() {
                   )}
                 </ul>
               )}
-              <p className="border-t border-[#eff2f5] px-4 py-3 text-xs text-[#58667e]">
+              <p className="border-t border-[var(--sr-line)] px-4 py-3 text-xs text-[var(--sr-muted)]">
                 Holdings as of {new Date(`${HOLDINGS_AS_OF}T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}. Tap a row for details and related news.
               </p>
             </section>
           )}
 
           {tab === 'watchlist' && (
-            <section className="overflow-hidden rounded-2xl border border-[#eff2f5] bg-white shadow-sm">
-              <p className="border-b border-[#eff2f5] px-4 py-3 text-sm text-[#58667e]">Assets with a target allocation that the reserve doesn&apos;t hold yet.</p>
-              <ul className="divide-y divide-[#eff2f5]">
+            <section className="overflow-hidden rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] shadow-sm">
+              <p className="border-b border-[var(--sr-line)] px-4 py-3 text-sm text-[var(--sr-muted)]">Assets with a target allocation that the reserve doesn&apos;t hold yet.</p>
+              <ul className="divide-y divide-[var(--sr-line)]">
                 {notHeldAssets.map((asset) =>
                   renderRow({
                     key: asset.symbol,
                     rank: '',
-                    badge: <AssetBadge symbol={asset.symbol} color={CMC.muted} />,
+                    badge: <AssetBadge symbol={asset.symbol} color="#8a94a6" />,
                     title: asset.symbol,
                     subtitle: `Target ${asset.targetAllocation.toFixed(2)}%`,
                     price: priceLabel(asset),
@@ -1132,33 +1243,33 @@ export default function StrategicReserve() {
           )}
 
           {tab === 'markets' && (
-            <section className="overflow-hidden rounded-2xl border border-[#eff2f5] bg-white shadow-sm">
-              <p className="border-b border-[#eff2f5] px-4 py-3 text-sm text-[#58667e]">Pools trading MoCoin, and pools of the tokens it pairs with.</p>
+            <section className="overflow-hidden rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] shadow-sm">
+              <p className="border-b border-[var(--sr-line)] px-4 py-3 text-sm text-[var(--sr-muted)]">Pools trading MoCoin, and pools of the tokens it pairs with.</p>
               {!treasury ? (
                 <div className="space-y-3 p-4">
                   {[0, 1].map((index) => <Skeleton key={index} className="h-12" />)}
                 </div>
               ) : treasury.pools.length === 0 ? (
-                <p className="px-4 py-10 text-center text-sm text-[#58667e]">
+                <p className="px-4 py-10 text-center text-sm text-[var(--sr-muted)]">
                   {treasury.poolsError ? `Pool scan unavailable (${treasury.poolsError}).` : 'No pools found.'}
                 </p>
               ) : (
-                <ul className="divide-y divide-[#eff2f5]">
+                <ul className="divide-y divide-[var(--sr-line)]">
                   {treasury.pools.map((pool, index) => {
                     const position = treasury.lpPositions?.find((entry) => entry.pairAddress === pool.pairAddress);
                     return (
                       <li key={pool.pairAddress}>
                         <a href={pool.url} target="_blank" rel="noopener noreferrer" className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-3 px-3 py-3 sm:px-4">
-                          <span className="text-center text-sm text-[#58667e]">{index + 1}</span>
+                          <span className="text-center text-sm text-[var(--sr-muted)]">{index + 1}</span>
                           <span className="min-w-0">
                             <span className="block truncate font-semibold">{pool.label}</span>
-                            <span className="block truncate text-sm text-[#58667e]">
+                            <span className="block truncate text-sm text-[var(--sr-muted)]">
                               <span className="capitalize">{pool.dexId}</span> · {pool.hop === 0 ? 'MoCoin pair' : 'Paired token'}
                             </span>
                           </span>
                           <span className="text-right">
                             <span className="block font-semibold tabular-nums">{formatCompact(convert(pool.liquidityUsd, 'USD', currency, rates))}</span>
-                            <span className="block text-xs text-[#58667e]">{position ? `Treasury ${(position.poolShare * 100).toFixed(2)}%` : 'liquidity'}</span>
+                            <span className="block text-xs text-[var(--sr-muted)]">{position ? `Treasury ${(position.poolShare * 100).toFixed(2)}%` : 'liquidity'}</span>
                           </span>
                         </a>
                       </li>
@@ -1173,20 +1284,20 @@ export default function StrategicReserve() {
             <section className="space-y-3">
               {relatedItems.length === 0 ? (
                 <Card>
-                  <p className="text-center text-sm text-[#58667e]">No Vibes articles mention the reserve&apos;s assets yet.</p>
+                  <p className="text-center text-sm text-[var(--sr-muted)]">No Vibes articles mention the reserve&apos;s assets yet.</p>
                 </Card>
               ) : (
                 relatedItems.map(({ item, symbols }) => (
                   <Card key={item.id} className="!p-4">
                     <NewsLink item={item} />
-                    {item.excerpt && <p className="mt-1 line-clamp-2 text-sm text-[#58667e]">{item.excerpt}</p>}
+                    {item.excerpt && <p className="mt-1 line-clamp-2 text-sm text-[var(--sr-muted)]">{item.excerpt}</p>}
                     <div className="mt-3 flex flex-wrap gap-2">
                       {symbols.map((symbol) => (
                         <button
                           key={symbol}
                           type="button"
                           onClick={() => openAsset(symbol)}
-                          className="rounded-full bg-[#eff2f5] px-3 py-1 text-xs font-semibold text-[#0d1421]"
+                          className="rounded-full bg-[var(--sr-line)] px-3 py-1 text-xs font-semibold text-[var(--sr-ink)]"
                         >
                           {symbol === 'MoCoin' ? 'MOCOIN' : symbol}
                         </button>
@@ -1195,8 +1306,8 @@ export default function StrategicReserve() {
                   </Card>
                 ))
               )}
-              <p className="text-center text-xs text-[#58667e]">
-                Articles from <Link href="/feed" className="font-semibold text-[#3861fb]">Vibes</Link> that mention an asset in the reserve.
+              <p className="text-center text-xs text-[var(--sr-muted)]">
+                Articles from <Link href="/feed" className="font-semibold text-[var(--sr-blue)]">Vibes</Link> that mention an asset in the reserve.
               </p>
             </section>
           )}
@@ -1206,7 +1317,7 @@ export default function StrategicReserve() {
               {/* Reserve value chart */}
               <Card className="!px-2 sm:!px-4">
                 <div className="px-2">
-                  <p className="text-sm text-[#58667e]">Reserve value · {period.description}</p>
+                  <p className="text-sm text-[var(--sr-muted)]">Reserve value · {period.description}</p>
                   <p className="mt-1 text-2xl font-bold tabular-nums">{formatMoney(totalValue)}</p>
                   <p className={`text-sm font-semibold tabular-nums ${changeText(totalMoneyChange)}`}>
                     {totalMoneyChange >= 0 ? '+' : '-'}{formatMoney(Math.abs(totalMoneyChange))} ({formatPercent(totalChange)})
@@ -1227,7 +1338,7 @@ export default function StrategicReserve() {
                         <XAxis dataKey="t" hide />
                         <YAxis hide domain={['dataMin', 'dataMax']} />
                         <Tooltip
-                          contentStyle={{ backgroundColor: '#fff', border: `1px solid ${CMC.line}`, borderRadius: 12, color: CMC.ink }}
+                          contentStyle={CHART_TOOLTIP}
                           labelFormatter={(t: any) => formatPointTime(Number(t), timePeriod)}
                           formatter={(value: any) => [formatMoney(Number(value)), 'Value']}
                         />
@@ -1236,7 +1347,7 @@ export default function StrategicReserve() {
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <p className="px-2 py-12 text-center text-sm text-[#58667e]">Price history unavailable right now.</p>
+                  <p className="px-2 py-12 text-center text-sm text-[var(--sr-muted)]">Price history unavailable right now.</p>
                 )}
               </Card>
 
@@ -1261,7 +1372,7 @@ export default function StrategicReserve() {
                       </PieChart>
                     </ResponsiveContainer>
                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-xs text-[#58667e]">{view === 'asset' ? `${heldAssets.length} held` : `${pieRows.length} categories`}</span>
+                      <span className="text-xs text-[var(--sr-muted)]">{view === 'asset' ? `${heldAssets.length} held` : `${pieRows.length} categories`}</span>
                       <span className="text-lg font-bold tabular-nums">{formatCompact(totalValue)}</span>
                     </div>
                   </div>
@@ -1271,7 +1382,7 @@ export default function StrategicReserve() {
                     <li key={row.key} className="flex items-center gap-2">
                       <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
                       <span className="min-w-0 flex-1 truncate">{row.name}</span>
-                      <span className="tabular-nums text-[#58667e]">{row.current.toFixed(1)}%</span>
+                      <span className="tabular-nums text-[var(--sr-muted)]">{row.current.toFixed(1)}%</span>
                     </li>
                   ))}
                 </ul>
@@ -1280,15 +1391,15 @@ export default function StrategicReserve() {
               {/* Projected allocation */}
               <Card>
                 <h2 className="text-lg font-bold">Projected allocation</h2>
-                <p className="mt-1 text-sm text-[#58667e]">Where the reserve is now, where its targets put it, and how each mix would grow.</p>
+                <p className="mt-1 text-sm text-[var(--sr-muted)]">Where the reserve is now, where its targets put it, and how each mix would grow.</p>
                 <div className="mt-4 space-y-3">
                   {[
                     { label: 'Now', key: 'current' as const },
                     { label: 'Target', key: 'target' as const },
                   ].map((bar) => (
                     <div key={bar.label}>
-                      <div className="mb-1 text-xs font-semibold text-[#58667e]">{bar.label}</div>
-                      <div className="flex h-3 w-full overflow-hidden rounded-full bg-[#eff2f5]">
+                      <div className="mb-1 text-xs font-semibold text-[var(--sr-muted)]">{bar.label}</div>
+                      <div className="flex h-3 w-full overflow-hidden rounded-full bg-[var(--sr-line)]">
                         {categoryRows
                           .filter((row) => row[bar.key] > 0)
                           .map((row) => (
@@ -1305,16 +1416,16 @@ export default function StrategicReserve() {
                       <li key={row.key} className="flex items-center gap-2">
                         <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
                         <span className="min-w-0 flex-1 truncate">{row.name}</span>
-                        <span className="tabular-nums text-[#58667e]">
+                        <span className="tabular-nums text-[var(--sr-muted)]">
                           {row.current.toFixed(1)}% → {row.target.toFixed(1)}%
                         </span>
                       </li>
                     ))}
                   {unallocatedTarget > 0.01 && (
                     <li className="flex items-center gap-2">
-                      <span className="h-2 w-2 shrink-0 rounded-full border border-dashed border-[#a1a7bb]" />
-                      <span className="min-w-0 flex-1 truncate text-[#58667e]">Unallocated target</span>
-                      <span className="tabular-nums text-[#58667e]">{unallocatedTarget.toFixed(1)}%</span>
+                      <span className="h-2 w-2 shrink-0 rounded-full border border-dashed border-[var(--sr-faint)]" />
+                      <span className="min-w-0 flex-1 truncate text-[var(--sr-muted)]">Unallocated target</span>
+                      <span className="tabular-nums text-[var(--sr-muted)]">{unallocatedTarget.toFixed(1)}%</span>
                     </li>
                   )}
                 </ul>
@@ -1325,8 +1436,8 @@ export default function StrategicReserve() {
                     <LineChart data={projectionData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                       <XAxis dataKey="horizon" stroke="#a1a7bb" tickLine={false} axisLine={false} fontSize={12} />
                       <YAxis hide domain={['auto', 'auto']} />
-                      <Tooltip formatter={(value: any, name: any) => [formatMoney(Number(value)), name]} />
-                      <Line type="monotone" dataKey="Current mix" stroke={CMC.blue} strokeWidth={2.5} dot={{ r: 3 }} />
+                      <Tooltip contentStyle={CHART_TOOLTIP} formatter={(value: any, name: any) => [formatMoney(Number(value)), name]} />
+                      <Line type="monotone" dataKey="Current mix" stroke={MO_COLORS.blue} strokeWidth={2.5} dot={{ r: 3 }} />
                       <Line type="monotone" dataKey="Target mix" stroke={MO_COLORS.purple} strokeWidth={2.5} dot={{ r: 3 }} />
                     </LineChart>
                   </ResponsiveContainer>
@@ -1337,13 +1448,13 @@ export default function StrategicReserve() {
                     { label: 'Target mix, 1Y', value: idealProjectedGain, note: `${formatPercent(idealMonthly)} / month` },
                     { label: 'Rebalancing difference', value: rebalanceUplift, note: 'Target minus current' },
                   ].map((stat) => (
-                    <div key={stat.label} className="flex items-center justify-between rounded-xl bg-[#f8fafd] px-4 py-3 sm:block">
-                      <div className="text-xs text-[#58667e]">{stat.label}</div>
+                    <div key={stat.label} className="flex items-center justify-between rounded-xl bg-[var(--sr-subtle)] px-4 py-3 sm:block">
+                      <div className="text-xs text-[var(--sr-muted)]">{stat.label}</div>
                       <div className="text-right sm:mt-1 sm:text-left">
                         <div className={`font-semibold tabular-nums ${changeText(stat.value)}`}>
                           {stat.value > 0 ? '+' : ''}{formatMoney(stat.value)}
                         </div>
-                        <div className="text-xs tabular-nums text-[#58667e]">{stat.note}</div>
+                        <div className="text-xs tabular-nums text-[var(--sr-muted)]">{stat.note}</div>
                       </div>
                     </div>
                   ))}
@@ -1359,18 +1470,18 @@ export default function StrategicReserve() {
                       <li key={asset.symbol}>
                         <div className="flex items-baseline justify-between gap-3">
                           <span className="truncate text-sm font-semibold">{asset.symbol}</span>
-                          <span className={`shrink-0 text-sm font-semibold tabular-nums ${isAdd ? 'text-[#16c784]' : isReduce ? 'text-[#ea3943]' : 'text-[#58667e]'}`}>
+                          <span className={`shrink-0 text-sm font-semibold tabular-nums ${isAdd ? 'text-[#16c784]' : isReduce ? 'text-[#ea3943]' : 'text-[var(--sr-muted)]'}`}>
                             {asset.action === 'Hold' ? 'Hold' : `${asset.action} ${formatMoney(asset.estimatedValue)}`}
                           </span>
                         </div>
-                        <div className="relative mt-2 h-1.5 overflow-hidden rounded-full bg-[#eff2f5]">
-                          <div className="absolute left-1/2 top-0 h-full w-px bg-[#a1a7bb]" />
+                        <div className="relative mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--sr-line)]">
+                          <div className="absolute left-1/2 top-0 h-full w-px bg-[var(--sr-faint)]" />
                           <div
-                            className={`absolute top-0 h-full rounded-full ${isAdd ? 'bg-[#16c784]' : isReduce ? 'bg-[#ea3943]' : 'bg-[#a1a7bb]'}`}
+                            className={`absolute top-0 h-full rounded-full ${isAdd ? 'bg-[#16c784]' : isReduce ? 'bg-[#ea3943]' : 'bg-[var(--sr-faint)]'}`}
                             style={{ width: barWidth, left: isAdd ? '50%' : undefined, right: isReduce ? '50%' : undefined }}
                           />
                         </div>
-                        <div className="mt-1 flex justify-between text-xs tabular-nums text-[#58667e]">
+                        <div className="mt-1 flex justify-between text-xs tabular-nums text-[var(--sr-muted)]">
                           <span>Now {asset.currentAllocation.toFixed(1)}%</span>
                           <span>Target {asset.targetAllocation.toFixed(1)}%</span>
                         </div>
@@ -1382,12 +1493,12 @@ export default function StrategicReserve() {
                   <button
                     type="button"
                     onClick={() => setShowAllRebalance((value) => !value)}
-                    className="mt-4 w-full rounded-xl bg-[#eff2f5] py-2.5 text-sm font-semibold"
+                    className="mt-4 w-full rounded-xl bg-[var(--sr-line)] py-2.5 text-sm font-semibold"
                   >
                     {showAllRebalance ? 'Show less' : `Show all ${rebalanceActions.length}`}
                   </button>
                 )}
-                <p className="mt-4 text-xs text-[#58667e]">
+                <p className="mt-4 text-xs text-[var(--sr-muted)]">
                   Compounds each mix&apos;s trailing 1-month return. Ignores volatility, fees and changing markets. An illustration, not a forecast or investment advice.
                 </p>
               </Card>
@@ -1395,9 +1506,32 @@ export default function StrategicReserve() {
           )}
         </div>
 
-        <div className="pt-8 text-center">
-          <Link href="/vestmentz" className="text-sm font-semibold text-[#3861fb]">
-            ← Back to MoVestmentz
+        {/* FAQ: the same questions are sent as FAQPage structured data above. */}
+        <section className="mt-10" aria-labelledby="reserve-faq">
+          <h2 id="reserve-faq" className="text-xl font-bold">
+            Frequently asked questions
+          </h2>
+          <div className="mt-3 divide-y divide-[var(--sr-line)] overflow-hidden rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] shadow-sm">
+            {RESERVE_FAQS.map((faq) => (
+              <details key={faq.question} className="group px-4 py-3 sm:px-6">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-semibold [&::-webkit-details-marker]:hidden">
+                  <h3 className="text-base">{faq.question}</h3>
+                  <span aria-hidden="true" className="text-[var(--sr-muted)] transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="pb-2 pt-1 text-sm leading-relaxed text-[var(--sr-muted)]">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 pt-8 text-center">
+          <Link href="/vestmentz/mocoin" className="text-sm font-semibold text-[var(--sr-blue)]">
+            ← About MoCoin
+          </Link>
+          <Link href="/vestmentz" className="text-sm font-semibold text-[var(--sr-blue)]">
+            MoVestmentz
           </Link>
         </div>
       </div>
