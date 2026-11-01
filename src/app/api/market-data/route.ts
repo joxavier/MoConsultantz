@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import treasuryConfig from '@/data/treasuryConfig.json';
+import { getAllTokenBalances, getTokenSupply, getTreasuryWalletAddress } from '@/lib/treasury/solana';
 
 const YAHOO_CHART_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
 const CRYPTO_SYMBOLS = new Set(['BTC', 'SOL', 'ADA', 'FIL', 'USDC', 'USDT']);
@@ -220,6 +222,123 @@ async function getFxChanges(baseCurrency: BaseCurrency) {
     };
 }
 
+// ---------- MoCoin ----------
+// MoCoin isn't on Yahoo. Its price, volume and liquidity come from
+// DexScreener (every Solana pool containing the mint), its price history
+// from GeckoTerminal's candles for the main pool, and its supply from Solana.
+// The result has the same shape as any other quote, plus a `market` block.
+const MOCOIN_SYMBOL = 'MOCOIN';
+const DEXSCREENER_TOKENS_URL = 'https://api.dexscreener.com/latest/dex/tokens';
+const GECKO_POOLS_URL = 'https://api.geckoterminal.com/api/v2/networks/solana/pools';
+
+type DexPair = {
+    chainId: string;
+    url?: string;
+    pairAddress: string;
+    baseToken: { address: string };
+    quoteToken: { address: string };
+    priceUsd?: string;
+    priceNative?: string;
+    priceChange?: { h1?: number; h24?: number };
+    volume?: { h24?: number };
+    liquidity?: { usd?: number };
+};
+
+async function fetchJson(url: string) {
+    const response = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`${new URL(url).hostname} returned ${response.status}`);
+    return response.json();
+}
+
+// GeckoTerminal candles in the same shape as a Yahoo chart, so the change and
+// history helpers above work unchanged. Prices are in USD.
+async function fetchGeckoChart(pool: string, mint: string, timeframe: 'minute' | 'hour', aggregate: number, limit: number): Promise<YahooChartResult> {
+    const params = new URLSearchParams({ aggregate: String(aggregate), limit: String(limit), currency: 'usd', token: mint });
+    const data = await fetchJson(`${GECKO_POOLS_URL}/${pool}/ohlcv/${timeframe}?${params}`);
+    const candles: number[][] = data?.data?.attributes?.ohlcv_list || [];
+    const sorted = [...candles].sort((a, b) => a[0] - b[0]);
+    return { timestamp: sorted.map((candle) => candle[0]), indicators: { quote: [{ close: sorted.map((candle) => candle[4]) }] } };
+}
+
+// MoCoin's USD price in a pair, whichever side of the pair it is on.
+function pairPriceUsd(pair: DexPair, mint: string) {
+    const priceUsd = Number(pair.priceUsd);
+    if (!priceUsd) return 0;
+    if (pair.baseToken.address === mint) return priceUsd;
+    const native = Number(pair.priceNative);
+    return native ? priceUsd / native : 0;
+}
+
+async function treasuryMoCoinBalance(mint: string) {
+    const wallet = getTreasuryWalletAddress();
+    if (!wallet) return 0;
+    return (await getAllTokenBalances(wallet))[mint] || 0;
+}
+
+const EMPTY_CHART: YahooChartResult = {};
+
+async function fetchMoCoinQuote(baseCurrency: BaseCurrency, usdCadRate: number, usdCadRateIsFallback: boolean) {
+    const { mintAddress: mint, poolAddress: pool } = treasuryConfig.mocoin;
+    const [pairsResult, intradayResult, hourlyResult, supplyResult, treasuryResult] = await Promise.allSettled([
+        fetchJson(`${DEXSCREENER_TOKENS_URL}/${mint}`),
+        fetchGeckoChart(pool, mint, 'minute', 5, 300),
+        fetchGeckoChart(pool, mint, 'hour', 1, 721),
+        getTokenSupply(mint),
+        treasuryMoCoinBalance(mint),
+    ]);
+
+    const pairs: DexPair[] = pairsResult.status === 'fulfilled'
+        ? (pairsResult.value?.pairs || []).filter((pair: DexPair) => pair.chainId === 'solana')
+        : [];
+    const mainPair = [...pairs].sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
+    const intraday = intradayResult.status === 'fulfilled' ? intradayResult.value : EMPTY_CHART;
+    const hourly = hourlyResult.status === 'fulfilled' ? hourlyResult.value : EMPTY_CHART;
+
+    const priceUsd = (mainPair && pairPriceUsd(mainPair, mint)) || getLatestClose(intraday) || getLatestClose(hourly);
+    if (!priceUsd) {
+        const reason = pairsResult.status === 'rejected' ? pairsResult.reason?.message : 'no price found';
+        throw new Error(`No MoCoin price (${reason})`);
+    }
+
+    const toBase = (usd: number) => convertPrice(usd, 'USD', baseCurrency, usdCadRate);
+    const hasIntraday = getCloseSeries(intraday).length > 0;
+    // DexScreener's own changes describe the pair's base token, so they only
+    // stand in for missing candles when MoCoin is that base token.
+    const dexChanges = mainPair?.baseToken.address === mint ? mainPair.priceChange : undefined;
+
+    const totalSupply = supplyResult.status === 'fulfilled' ? supplyResult.value : 0;
+    const treasuryHeld = treasuryResult.status === 'fulfilled' ? treasuryResult.value : 0;
+    // Like CoinMarketCap, circulating supply leaves out what the treasury holds.
+    const circulatingSupply = totalSupply ? Math.max(0, totalSupply - treasuryHeld) : 0;
+
+    return {
+        c: toBase(priceUsd),
+        price: toBase(priceUsd),
+        baseCurrency,
+        nativeCurrency: 'USD',
+        sourceSymbol: MOCOIN_SYMBOL,
+        usdCadRate,
+        usdCadRateIsFallback,
+        history: buildHistory({ intraday, hourly }, toBase),
+        change1h: hasIntraday ? calculateChangeFromSeries(intraday, priceUsd, 60 * 60) : dexChanges?.h1 || 0,
+        change4h: hasIntraday ? calculateChangeFromSeries(intraday, priceUsd, 4 * 60 * 60) : 0,
+        change1d: hasIntraday ? calculateChangeFromSeries(intraday, priceUsd, 24 * 60 * 60) : dexChanges?.h24 || 0,
+        change7d: calculateChangeFromSeries(hourly, priceUsd, 7 * 24 * 60 * 60),
+        change1m: calculateChangeFromSeries(hourly, priceUsd, 30 * 24 * 60 * 60),
+        market: {
+            priceUsd,
+            marketCap: circulatingSupply ? toBase(priceUsd * circulatingSupply) : null,
+            fullyDilutedValue: totalSupply ? toBase(priceUsd * totalSupply) : null,
+            volume24h: pairs.length ? toBase(pairs.reduce((sum, pair) => sum + (pair.volume?.h24 || 0), 0)) : null,
+            liquidity: pairs.length ? toBase(pairs.reduce((sum, pair) => sum + (pair.liquidity?.usd || 0), 0)) : null,
+            circulatingSupply: circulatingSupply || null,
+            totalSupply: totalSupply || null,
+            treasuryHeld,
+            pairUrl: mainPair?.url || `https://dexscreener.com/solana/${pool}`,
+        },
+    };
+}
+
 type Purchase = { amount: number; currency: BaseCurrency; date: string };
 
 // Last daily close on or before the given date (YYYY-MM-DD). Weekends and
@@ -270,6 +389,11 @@ export async function POST(request: NextRequest) {
         for (const symbol of symbols) {
             try {
                 const normalizedSymbol = normalizeAssetSymbol(symbol);
+
+                if (symbol === MOCOIN_SYMBOL) {
+                    results[symbol] = await fetchMoCoinQuote(baseCurrency, usdCadRate, usdCadRateIsFallback);
+                    continue;
+                }
 
                 if (STABLECOINS.has(normalizedSymbol)) {
                     const stablePrice = convertPrice(1, 'USD', baseCurrency, usdCadRate);
