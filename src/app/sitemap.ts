@@ -13,6 +13,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/consultantz`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/devz`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${baseUrl}/vestmentz/smart-contracts`, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${baseUrl}/vestmentz/mocoin`, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${baseUrl}/vestmentz/mocoin/strategicReserve`, changeFrequency: "daily", priority: 0.8 },
     { url: `${baseUrl}/about`, changeFrequency: "yearly", priority: 0.6 },
     { url: `${baseUrl}/feed`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/feed/3`, changeFrequency: "yearly", priority: 0.6 },

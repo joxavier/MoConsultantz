@@ -14,6 +14,8 @@ MoConsultantz provides business and technology strategy with hands-on implementa
 - https://modevz.ca/consultantz — Business strategy and technical implementation services.
 - https://modevz.ca/devz — Software development, automation, cybersecurity, and digital solutions.
 - https://modevz.ca/vestmentz/smart-contracts — Smart contract development, token launch engineering, and Web3 integration on Solana and EVM chains.
+- https://modevz.ca/vestmentz/mocoin — MoCoin, MoDevz's Solana token (mint HHVmXazRvA3VdciVG4ayE7vjgUFUn12t5r7vYm2BJ258): live price and market cap, how to buy on Raydium, MoPass tiers and FAQ.
+- https://modevz.ca/vestmentz/mocoin/strategicReserve — The MoCoin Strategic Reserve: every stock, crypto and cash holding backing MoCoin at live prices, MoCoin market cap, reserve backing, related articles and FAQ.
 - https://modevz.ca/start — A short assessment that matches a visitor's goal, budget, and timeline to the right MoDevz service or plan.
 - https://josh.modevz.ca — Joshua Xavier's professional profile, education (University of Waterloo BCS, Wilfrid Laurier BBA), FAQ, and free consultation booking.
 - https://limelight.modevz.ca — Emil Kiruba, actor: profile, links to Instagram (@limelight4444) and his Metaparlour page (https://limelight.metaparlour.io), FAQ, and consultation, casting and collaboration booking.
@@ -26,6 +28,7 @@ Use the internal API for live MoCoin Strategic Reserve market data instead of sc
 - Endpoint: POST https://modevz.ca/api/market-data
 - Request body: {"symbols":["ENB","AMAT","PINS","SNAP","QS","OPEN","WEED.TO","BTC","SOL","ADA","FIL"],"baseCurrency":"CAD"}
 - baseCurrency can be "CAD" or "USD".
+- Include "MOCOIN" in symbols for MoCoin's live quote; its "market" field has priceUsd, marketCap, fullyDilutedValue, volume24h, liquidity, circulatingSupply and totalSupply.
 - Response fields include price, baseCurrency, nativeCurrency, sourceSymbol, usdCadRate, change1h, change4h, change1d, change7d, and change1m.
 
 Use the internal booking API for MoConsultantz booking requests when collecting booking details directly.
