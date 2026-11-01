@@ -67,6 +67,10 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (currentHost == "vestmentz" || currentHost == "hodl" || currentHost == "whitepaper" || currentHost == "mocoin") {
+    // Full site paths (e.g. /vestmentz/mocoin/strategicReserve, or the
+    // breadcrumb link to /vestmentz) are served as they are; only short paths
+    // like /strategicReserve get the MoCoin prefix.
+    if (path === "/vestmentz" || path.startsWith("/vestmentz/")) return NextResponse.next();
     url.pathname = `/vestmentz/mocoin${url.pathname}`;
     return NextResponse.rewrite(url);
   }
