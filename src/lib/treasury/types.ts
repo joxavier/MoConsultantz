@@ -28,6 +28,8 @@ export type AssetConfig = {
   // recorded as money spent on a date. The share count is worked out from
   // that day's close. An explicit `quantity` takes precedence.
   purchase?: { amount: number; currency: BaseCurrency; date: string };
+  // Extra words that link Vibes articles to this asset (see assetNews.ts).
+  newsKeywords?: string[];
 };
 
 export type Asset = AssetConfig & {
