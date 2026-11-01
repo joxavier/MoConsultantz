@@ -127,14 +127,23 @@ export default function TeamPage() {
                       overflow: "hidden",
                     }}
                   >
-                    <Image
-                      src={member.displayPicture}
-                      alt={`${member.name} profile picture`}
-                      fill
-                      style={{
-                        objectFit: "cover",
-                      }}
-                    />
+                    {member.displayPicture ? (
+                      <Image
+                        src={member.displayPicture}
+                        alt={`${member.name} profile picture`}
+                        fill
+                        style={{
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <div
+                        aria-hidden="true"
+                        style={{ width: "100%", height: "100%", background: "#1f1633", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", fontWeight: 700 }}
+                      >
+                        {member.name.split(" ").map((part: string) => part[0]).join("").slice(0, 2)}
+                      </div>
+                    )}
                   </div>
                 </div>
 

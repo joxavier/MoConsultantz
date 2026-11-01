@@ -76,6 +76,11 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  else if (currentHost === "limelight" || currentHost === "emil") {
+    url.pathname = `/consultantz/team/limelight${path}`;
+    return NextResponse.rewrite(url);
+  }
+
   else if (currentHost == "kellman") {
     url.pathname = `/consultantz/team/kellman/${url.pathname}`;
     return NextResponse.rewrite(url);
