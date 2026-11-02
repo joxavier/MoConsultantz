@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import {
   CHALLENGE_COOKIE,
+  LEGACY_SESSION_COOKIE,
   SESSION_COOKIE,
   SESSION_TTL_SECONDS,
   checkCode,
@@ -11,9 +12,12 @@ import {
   rateLimited,
   readChallenge,
 } from "@/lib/ankAuth";
+import { readSession as readMoSession } from "@/lib/moAuth";
 
-// Step 2 of Ank sign-in: check the emailed code and start a session.
+// Step 2 of Ank sign-in: check the emailed code and add the email to the
+// shared Mo ID session (keeping a wallet already linked to it).
 export async function POST(req: Request) {
+  const host = req.headers.get("host");
   const body = await req.json().catch(() => null);
   const code = typeof body?.code === "string" ? body.code.slice(0, 20) : "";
 
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
   // Five tries per code; after that a new code has to be requested.
   if (rateLimited(`verify:${challenge.i}`, 5, 15 * 60)) {
     const response = NextResponse.json({ error: "Too many tries. Please request a new code." }, { status: 429 });
-    response.cookies.set(CHALLENGE_COOKIE, "", cookieOptions(0));
+    response.cookies.set(CHALLENGE_COOKIE, "", cookieOptions(0, host));
     return response;
   }
 
@@ -34,7 +38,9 @@ export async function POST(req: Request) {
   }
 
   const response = NextResponse.json({ status: "signed-in" });
-  response.cookies.set(CHALLENGE_COOKIE, "", cookieOptions(0));
-  response.cookies.set(SESSION_COOKIE, createSession(challenge.e), cookieOptions(SESSION_TTL_SECONDS));
+  response.cookies.set(CHALLENGE_COOKIE, "", cookieOptions(0, host));
+  response.cookies.set(LEGACY_SESSION_COOKIE, "", cookieOptions(0));
+  const current = readMoSession(cookies().get(SESSION_COOKIE)?.value);
+  response.cookies.set(SESSION_COOKIE, createSession(challenge.e, current), cookieOptions(SESSION_TTL_SECONDS, host));
   return response;
 }

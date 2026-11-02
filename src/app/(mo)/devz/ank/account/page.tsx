@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { CheckCircle2, Mail, User } from "lucide-react";
+import { CheckCircle2, Mail, User, Wallet } from "lucide-react";
 import { SESSION_COOKIE, readSession } from "@/lib/ankAuth";
+import { readSession as readMoSession } from "@/lib/moAuth";
+import { WalletSignInButton } from "../../../components/moId";
 import AnkLogo from "../AnkLogo";
 import SignOutButton from "./SignOutButton";
 
@@ -14,7 +16,10 @@ export const metadata: Metadata = {
 };
 
 export default function AnkAccountPage() {
-  const account = readSession(cookies().get(SESSION_COOKIE)?.value);
+  const token = cookies().get(SESSION_COOKIE)?.value;
+  const account = readSession(token);
+  // Mo ID: the same sign-in can carry a Solana wallet, linked here or on MoOS.
+  const wallet = readMoSession(token)?.w;
   // Pages on ank.modevz.ca are rewritten under /devz/ank, so "/signin" here
   // is the Ank sign-in page.
   if (!account) redirect("/signin");
@@ -45,6 +50,17 @@ export default function AnkAccountPage() {
               <Mail className="w-4 h-4 text-gray-500" />
               <dt className="sr-only">Email</dt>
               <dd className="break-all">{account.email}</dd>
+            </div>
+            <div className="flex items-center gap-3 text-gray-300">
+              <Wallet className="w-4 h-4 text-gray-500" />
+              <dt className="sr-only">Wallet</dt>
+              <dd className="break-all">
+                {wallet ? (
+                  wallet
+                ) : (
+                  <WalletSignInButton reloadOnSuccess label="Link a Solana wallet" className="font-semibold text-emerald-300 hover:text-emerald-200" />
+                )}
+              </dd>
             </div>
           </dl>
 

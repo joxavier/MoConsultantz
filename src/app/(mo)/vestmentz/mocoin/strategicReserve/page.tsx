@@ -7,6 +7,7 @@ import { localNews, newsByAsset, substackNews, type NewsItem } from '@/lib/asset
 import { pinnedPosts, type SubstackPost } from '@/lib/substack';
 import { RAYDIUM_SWAP_URL, RESERVE_CRUMBS, RESERVE_FAQS, breadcrumbJsonLd, faqJsonLd, jsonLdScript } from '@/lib/mocoinSeo';
 import Breadcrumbs from '../../../components/Breadcrumbs';
+import { WalletSignInButton, isHolder, shortAddress, signOutOfMo, useMoSession, type MoSessionInfo } from '../../../components/moId';
 import type {
   Asset,
   AssetConfig,
@@ -673,6 +674,58 @@ function NewsLink({ item, className = '' }: { item: NewsItem; className?: string
 
 type Tab = 'holdings' | 'markets' | 'news' | 'watchlist' | 'overview';
 
+// Shown in place of a holder-only tab until a MoCoin wallet is signed in.
+function HolderGate({ session, loading }: { session: MoSessionInfo | null; loading: boolean }) {
+  const holder = session?.holder;
+  const buttonClass =
+    'w-full rounded-xl bg-gradient-to-r from-[#3ca5de] to-[#8743f7] px-6 py-3 text-base font-bold text-white shadow-sm disabled:opacity-60 sm:w-auto';
+  return (
+    <section className="rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] px-5 py-8 text-center shadow-sm sm:px-8">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[var(--sr-blue-soft)] text-[var(--sr-blue)]" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+      </div>
+      <h2 className="mt-4 text-xl font-bold">For MoCoin holders</h2>
+      {loading ? (
+        <p className="mt-2 text-sm text-[var(--sr-muted)]">Checking your sign-in…</p>
+      ) : !session?.configured ? (
+        <p className="mt-2 text-sm text-[var(--sr-muted)]">Holder sign-in isn&apos;t available right now.</p>
+      ) : !session.wallet ? (
+        <>
+          <p className="mx-auto mt-2 max-w-md text-sm text-[var(--sr-muted)]">
+            The Watchlist and Overview (targets, projections and rebalancing) are open to MoCoin holders. Sign in with the Solana wallet that holds your MoCoin. It&apos;s a signature, not a transaction, so it&apos;s free.
+          </p>
+          <div className="mt-5">
+            <WalletSignInButton className={buttonClass} label="Connect wallet" errorClassName="mt-3 text-sm text-[#ea3943]" />
+          </div>
+        </>
+      ) : holder && 'error' in holder ? (
+        <p className="mt-2 text-sm text-[var(--sr-muted)]">{holder.error} Please try again in a minute.</p>
+      ) : (
+        <>
+          <p className="mx-auto mt-2 max-w-md text-sm text-[var(--sr-muted)]">
+            {shortAddress(session.wallet)} holds {holder ? formatCount(holder.balance) : 0} MoCoin
+            {holder && holder.minimum > 0 ? `; holder pages need ${formatCount(holder.minimum)}.` : '. Any amount unlocks these pages.'}
+          </p>
+          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a href={RAYDIUM_SWAP_URL} target="_blank" rel="noopener noreferrer" className={buttonClass}>
+              Get MoCoin
+            </a>
+            <button type="button" onClick={() => signOutOfMo()} className="rounded-xl bg-[var(--sr-line)] px-6 py-3 text-sm font-semibold">
+              Use another wallet
+            </button>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+// Only MoCoin holders (checked on-chain via Mo ID) can open these tabs.
+const HOLDER_TABS: Tab[] = ['watchlist', 'overview'];
+
 const TABS: { key: Tab; label: string }[] = [
   { key: 'holdings', label: 'Holdings' },
   { key: 'markets', label: 'Markets' },
@@ -688,6 +741,8 @@ const MOCOIN_ROW = 'mocoin-market';
 
 export default function StrategicReserve() {
   const [theme, setThemeState] = useState<Theme>('dark');
+  const { session: moSession, loading: moLoading } = useMoSession();
+  const holderAccess = isHolder(moSession);
   const [view, setView] = useState<'asset' | 'industry'>('asset');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('1d');
   const [currency, setCurrency] = useState<DisplayCurrency>('CAD');
@@ -1123,6 +1178,12 @@ export default function StrategicReserve() {
                   className={`relative whitespace-nowrap pb-3 text-lg font-bold transition-colors ${tab === entry.key ? 'text-[var(--sr-ink)]' : 'text-[var(--sr-faint)]'}`}
                 >
                   {entry.label}
+                  {HOLDER_TABS.includes(entry.key) && !holderAccess && (
+                    <svg className="ml-1 inline-block align-[-1px]" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-label="holders only">
+                      <rect x="4" y="11" width="16" height="10" rx="2" />
+                      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                    </svg>
+                  )}
                   {entry.key === 'news' && relatedItems.length > 0 && (
                     <span className="ml-1 align-top text-xs font-semibold text-[var(--sr-blue)]">{relatedItems.length}</span>
                   )}
@@ -1135,7 +1196,7 @@ export default function StrategicReserve() {
 
         {/* Period selector for the tabs that show price changes */}
         <div className="mt-4 flex min-h-[2.75rem] items-center justify-between gap-3">
-          {(tab === 'holdings' || tab === 'watchlist' || tab === 'overview') && (
+          {(tab === 'holdings' || ((tab === 'watchlist' || tab === 'overview') && holderAccess)) && (
             <Pills options={PERIODS.map((entry) => ({ key: entry.key, label: entry.label }))} value={timePeriod} onChange={setTimePeriod} />
           )}
           <p className="hidden text-xs text-[var(--sr-muted)] sm:block">
@@ -1220,7 +1281,20 @@ export default function StrategicReserve() {
             </section>
           )}
 
-          {tab === 'watchlist' && (
+          {HOLDER_TABS.includes(tab) && !holderAccess && <HolderGate session={moSession} loading={moLoading} />}
+
+          {HOLDER_TABS.includes(tab) && holderAccess && moSession?.wallet && (
+            <p className="mb-3 flex items-center justify-between gap-3 text-xs text-[var(--sr-muted)]">
+              <span>
+                Holder view · signed in as <span className="font-semibold text-[var(--sr-ink)]">{shortAddress(moSession.wallet)}</span>
+              </span>
+              <button type="button" onClick={() => signOutOfMo()} className="font-semibold text-[var(--sr-blue)]">
+                Sign out
+              </button>
+            </p>
+          )}
+
+          {tab === 'watchlist' && holderAccess && (
             <section className="overflow-hidden rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] shadow-sm">
               <p className="border-b border-[var(--sr-line)] px-4 py-3 text-sm text-[var(--sr-muted)]">Assets with a target allocation that the reserve doesn&apos;t hold yet.</p>
               <ul className="divide-y divide-[var(--sr-line)]">
@@ -1312,7 +1386,7 @@ export default function StrategicReserve() {
             </section>
           )}
 
-          {tab === 'overview' && (
+          {tab === 'overview' && holderAccess && (
             <div className="space-y-4">
               {/* Reserve value chart */}
               <Card className="!px-2 sm:!px-4">
