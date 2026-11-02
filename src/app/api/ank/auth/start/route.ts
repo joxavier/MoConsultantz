@@ -65,6 +65,6 @@ export async function POST(req: Request) {
   }
 
   const response = NextResponse.json({ status: "code" });
-  response.cookies.set(CHALLENGE_COOKIE, token, cookieOptions(CODE_TTL_SECONDS));
+  response.cookies.set(CHALLENGE_COOKIE, token, cookieOptions(CODE_TTL_SECONDS, req.headers.get("host")));
   return response;
 }

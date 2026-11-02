@@ -7,6 +7,7 @@ import Image from "next/image";
 import Hero from "../devz/Hero";
 import { useTheme } from "next-themes";
 import articlesData from "../feed/articles.json";
+import { WalletSignInButton, isHolder, shortAddress, signOutOfMo, useMoSession } from "../components/moId";
 
 interface App {
   id: string;
@@ -41,6 +42,15 @@ const apps: App[] = [
     category: "ecosystem",
   },
   {
+    id: "2",
+    name: "Strategic Reserve",
+    description: "The assets backing MoCoin. Holders sign in for the Watchlist and Overview",
+    icon: "🏦",
+    link: "https://mocoin.modevz.ca/strategicReserve",
+    isActive: true,
+    category: "ecosystem",
+  },
+  {
     id: "1",
     name: "Metaparlour",
     description: "Wellness Platform",
@@ -71,7 +81,7 @@ const apps: App[] = [
 ];
 
 const MoOS: React.FC = () => {
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const { session: moSession, loading: moLoading } = useMoSession();
   const [articles, setArticles] = useState<Article[]>(articlesData);
   const [loading, setLoading] = useState(true);
 
@@ -83,9 +93,6 @@ const MoOS: React.FC = () => {
     
   }, []);
 
-  const handleSignIn = () => {
-    setIsSignedIn(!isSignedIn);
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -146,16 +153,40 @@ const MoOS: React.FC = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <button
-                  onClick={handleSignIn}
-                  className={`px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 hover:transform hover:scale-105 shadow-xl ${
-                    isSignedIn
-                      ? "bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 text-white hover:from-green-600 hover:to-emerald-700 dark:hover:from-green-700 dark:hover:to-emerald-800 shadow-green-500/50 dark:shadow-green-900/50"
-                      : "bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-500 dark:to-blue-500 text-white hover:from-purple-700 hover:to-blue-700 dark:hover:from-purple-600 dark:hover:to-blue-600 shadow-purple-500/50 dark:shadow-purple-900/50"
-                  }`}
-                >
-                  {isSignedIn ? "✓ Signed In" : "Sign In to Get Started"}
-                </button>
+                {/* Mo ID: one sign-in for MoOS, the Strategic Reserve and Ank (src/lib/moAuth.ts). */}
+                {moLoading ? (
+                  <span className="px-8 py-4 rounded-full font-semibold text-lg bg-gray-700/50 text-gray-300">Checking sign-in…</span>
+                ) : moSession?.signedIn ? (
+                  <div className="flex flex-col items-center gap-2 rounded-3xl border border-emerald-500/40 bg-emerald-500/10 px-6 py-4 text-left text-white">
+                    <p className="font-semibold text-emerald-300">✓ Signed in to Mo</p>
+                    {moSession.wallet && (
+                      <p className="text-sm text-gray-200">
+                        Wallet {shortAddress(moSession.wallet)}
+                        {isHolder(moSession) ? " · MoCoin holder" : " · no MoCoin yet"}
+                      </p>
+                    )}
+                    {moSession.ankAccount && <p className="text-sm text-gray-200">Ank: {moSession.ankAccount}</p>}
+                    <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
+                      {!moSession.wallet && (
+                        <WalletSignInButton label="Link a wallet" className="font-semibold text-blue-300 hover:text-blue-200" />
+                      )}
+                      <button type="button" onClick={() => signOutOfMo()} className="font-semibold text-gray-300 hover:text-white">
+                        Sign out everywhere
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <WalletSignInButton
+                      label="Sign in with your wallet"
+                      className="px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 shadow-purple-500/50 disabled:opacity-60"
+                      errorClassName="mt-3 max-w-xs text-center text-sm text-red-300"
+                    />
+                    <a href="https://ank.modevz.ca/signin" className="mt-3 text-sm text-gray-300 underline underline-offset-4 hover:text-white">
+                      Have an Ank account? Sign in with email
+                    </a>
+                  </div>
+                )}
                 
                 <Link 
                   href="/feed"
