@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { findAccount } from "@/lib/ankAuth";
+import { accountForSession } from "@/lib/ankAuth";
 import { SESSION_COOKIE, getHolderStatus, isAuthConfigured, readSession } from "@/lib/moAuth";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +13,7 @@ export async function GET() {
   const headers = { "Cache-Control": "no-store" };
   if (!session) return NextResponse.json({ configured: isAuthConfigured(), signedIn: false }, { headers });
 
-  const account = session.e ? await findAccount(session.e) : undefined;
+  const account = await accountForSession(session);
   return NextResponse.json(
     {
       configured: true,

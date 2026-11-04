@@ -18,8 +18,9 @@ export const metadata: Metadata = {
 export default async function AnkAccountPage() {
   const token = cookies().get(SESSION_COOKIE)?.value;
   const account = await readSession(token);
-  // Mo ID: the same sign-in can carry a Solana wallet, linked here or on MoOS.
-  const wallet = readMoSession(token)?.w;
+  // Web3 login: the account's saved wallet signs in to Ank through Mo ID.
+  const wallet = account?.wallet;
+  const sessionWallet = readMoSession(token)?.w;
   // Pages on ank.modevz.ca are rewritten under /devz/ank, so "/signin" here
   // is the Ank sign-in page.
   if (!account) redirect("/signin");
@@ -56,7 +57,17 @@ export default async function AnkAccountPage() {
               <dt className="sr-only">Wallet</dt>
               <dd className="break-all">
                 {wallet ? (
-                  wallet
+                  <>
+                    {wallet}
+                    <span className="block text-xs text-gray-500">Signs you in to Ank, MoOS and the Strategic Reserve.</span>
+                  </>
+                ) : sessionWallet ? (
+                  <>
+                    {sessionWallet}
+                    <span className="block text-xs text-gray-500">
+                      Connected for this session but not saved to your account; it may already be linked to another account.
+                    </span>
+                  </>
                 ) : (
                   <WalletSignInButton reloadOnSuccess label="Link a Solana wallet" className="font-semibold text-emerald-300 hover:text-emerald-200" />
                 )}
