@@ -115,12 +115,14 @@ export function WalletSignInButton({
   label = 'Connect wallet',
   errorClassName = 'mt-2 text-sm text-red-400',
   reloadOnSuccess = false,
+  onSignedIn,
 }: {
   className?: string;
   label?: string;
   errorClassName?: string;
   // For server-rendered pages that read the session themselves.
   reloadOnSuccess?: boolean;
+  onSignedIn?: () => void | Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +131,10 @@ export function WalletSignInButton({
     setBusy(true);
     setError(null);
     try {
-      if ((await signInWithWallet()) && reloadOnSuccess) window.location.reload();
+      if (await signInWithWallet()) {
+        if (onSignedIn) await onSignedIn();
+        if (reloadOnSuccess) window.location.reload();
+      }
     } catch (err: any) {
       // A wallet's "user rejected" error isn't worth showing.
       if (err?.code !== 4001) setError(err?.message || 'Sign-in failed. Please try again.');

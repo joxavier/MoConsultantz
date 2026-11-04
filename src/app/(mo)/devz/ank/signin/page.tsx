@@ -1,12 +1,15 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Info, Lock, Mail, ShieldCheck } from 'lucide-react';
 import AnkLogo from '../AnkLogo';
+import { WalletSignInButton, signOutOfMo, useMoSession } from '../../../components/moId';
 
-// Passwordless sign-in. An account holder (ANK_ACCOUNTS) gets a one-time
-// code by email; anyone else is added to the launch newsletter. See
-// src/lib/ankAuth.ts and /api/ank/auth/*.
+// Passwordless sign-in. An account holder (the "Ank Accounts" sheet tab) gets
+// a one-time code by email; anyone else is added to the launch newsletter.
+// Web3 login: a wallet linked to an account signs in through Mo ID, the
+// sign-in shared with MoOS and the Strategic Reserve. See src/lib/ankAuth.ts,
+// src/lib/moAuth.ts and /api/ank/auth/*.
 type Step = "email" | "code" | "waitlist";
 
 const inputClass =
@@ -30,6 +33,25 @@ export default function AnkSignInPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const { session, refresh } = useMoSession();
+  const [walletNotice, setWalletNotice] = useState<string | null>(null);
+
+  // Already signed in to an Ank account through Mo ID (email or wallet).
+  useEffect(() => {
+    if (session?.ankAccount) window.location.assign("/account");
+  }, [session?.ankAccount]);
+
+  const afterWalletSignIn = async () => {
+    const data = await fetch("/api/mo/session", { cache: "no-store" }).then((response) => response.json());
+    if (data.ankAccount) {
+      window.location.assign("/account");
+    } else {
+      setWalletNotice(
+        "That wallet isn't linked to an Ank account yet. Sign in with your email once and link it from your account page; after that the wallet signs you in.",
+      );
+      await refresh();
+    }
+  };
 
   const requestCode = async (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -165,6 +187,30 @@ export default function AnkSignInPage() {
                 </button>
               </form>
 
+              <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-widest text-gray-500">
+                <span className="h-px flex-1 bg-white/10" />
+                or
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+
+              <WalletSignInButton
+                label="Continue with wallet"
+                onSignedIn={afterWalletSignIn}
+                className="w-full inline-flex items-center justify-center gap-2 border border-white/20 text-white font-semibold py-3 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-60"
+                errorClassName="mt-3 text-sm text-red-300"
+              />
+              {walletNotice && (
+                <div role="status" className="mt-3 text-sm text-gray-300">
+                  <p>{walletNotice}</p>
+                  {session?.wallet && (
+                    <button type="button" onClick={() => signOutOfMo().then(() => setWalletNotice(null))} className="mt-2 text-emerald-300 hover:text-emerald-200">
+                      Use a different wallet
+                    </button>
+                  )}
+                </div>
+              )}
+              <p className="mt-3 text-center text-xs text-gray-500">Phantom, Solflare or Backpack. Same sign-in as MoOS and the MoCoin Strategic Reserve.</p>
+
               <div className="mt-8 pt-6 border-t border-white/10 flex items-start gap-3 text-sm text-gray-400">
                 <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <p>
@@ -177,7 +223,7 @@ export default function AnkSignInPage() {
 
         <div className="mt-8 flex items-center justify-center gap-6 text-xs text-gray-500">
           <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" />Encrypted connection</span>
-          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" />Email verification</span>
+          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" />Email or wallet verification</span>
         </div>
       </div>
     </div>
