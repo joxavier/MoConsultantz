@@ -15,9 +15,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AnkAccountPage() {
+export default async function AnkAccountPage() {
   const token = cookies().get(SESSION_COOKIE)?.value;
-  const account = readSession(token);
+  const account = await readSession(token);
   // Mo ID: the same sign-in can carry a Solana wallet, linked here or on MoOS.
   const wallet = readMoSession(token)?.w;
   // Pages on ank.modevz.ca are rewritten under /devz/ank, so "/signin" here

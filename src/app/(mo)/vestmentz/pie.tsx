@@ -2,15 +2,32 @@
 
 import React from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import treasuryConfig from "@/data/treasuryConfig.json";
+import Link from "next/link";
+import { useReserveConfig } from "./useReserveConfig";
 
 const CATEGORY_COLORS = ["#3ca5de", "#8743f7", "#f59e0b", "#10b981", "#ec4899", "#06b6d4"];
 
 // Target allocation of the MoCoin Strategic Reserve by category, from the
-// same config the Strategic Reserve dashboard uses.
+// same holdings the Strategic Reserve dashboard uses. Targets are for MoCoin
+// holders only.
 export default function PieComponent() {
+  const { config, failed } = useReserveConfig();
+  if (failed) return <p className="text-sm text-gray-400">The reserve&apos;s allocation couldn&apos;t be loaded right now.</p>;
+  if (!config) return <div className="mx-auto h-64 w-full max-w-xs animate-pulse rounded-full bg-white/5" />;
+  if (!config.targetsVisible) {
+    return (
+      <p className="mx-auto max-w-sm text-sm text-gray-400">
+        Target allocations are for MoCoin holders.{" "}
+        <Link href="/vestmentz/mocoin/strategicReserve" className="font-semibold text-[#3ca5de]">
+          Sign in on the Strategic Reserve
+        </Link>{" "}
+        with a wallet that holds MoCoin to see them.
+      </p>
+    );
+  }
+
   const totals = new Map<string, number>();
-  treasuryConfig.assets.forEach((asset) => {
+  config.assets.forEach((asset) => {
     totals.set(asset.category, (totals.get(asset.category) || 0) + asset.targetAllocation);
   });
   const data = Array.from(totals, ([name, value]) => ({ name, value })).filter((entry) => entry.value > 0);

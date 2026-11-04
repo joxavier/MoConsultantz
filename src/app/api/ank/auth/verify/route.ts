@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     return response;
   }
 
-  if (!checkCode(challenge, code) || !findAccount(challenge.e)) {
+  if (!checkCode(challenge, code) || !(await findAccount(challenge.e))) {
     return NextResponse.json({ error: "That code isn't right. Check the email and try again." }, { status: 400 });
   }
 

@@ -6,7 +6,7 @@ import type { SubstackPost } from "@/lib/substack";
 // "Bitcoin", "Canopy Growth") or its ticker in capitals (e.g. "SOL",
 // "$SNAP"). An article can also list its assets explicitly with
 // "assets": ["BTC", ...], and an asset can add search terms with
-// "newsKeywords" in treasuryConfig.json.
+// "News Keywords" in the "Reserve Holdings" sheet tab (see reserveHoldings.ts).
 
 export type NewsItem = {
   id: string;
