@@ -9,6 +9,7 @@ import {
   cookieOptions,
   createSession,
   findAccount,
+  linkWalletToAccount,
   rateLimited,
   readChallenge,
 } from "@/lib/ankAuth";
@@ -41,6 +42,10 @@ export async function POST(req: Request) {
   response.cookies.set(CHALLENGE_COOKIE, "", cookieOptions(0, host));
   response.cookies.set(LEGACY_SESSION_COOKIE, "", cookieOptions(0));
   const current = readMoSession(cookies().get(SESSION_COOKIE)?.value);
+  // A wallet already signed in to Mo ID gets saved to this account.
+  if (current?.w) {
+    await linkWalletToAccount(challenge.e, current.w).catch((error) => console.error("Linking wallet to Ank account failed:", error?.message || error));
+  }
   response.cookies.set(SESSION_COOKIE, createSession(challenge.e, current), cookieOptions(SESSION_TTL_SECONDS, host));
   return response;
 }

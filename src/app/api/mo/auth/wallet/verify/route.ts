@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { linkWalletToAccount } from "@/lib/ankAuth";
 import { cookies } from "next/headers";
 import {
   SESSION_COOKIE,
@@ -42,6 +43,11 @@ export async function POST(req: Request) {
   }
 
   const current = readSession(cookies().get(SESSION_COOKIE)?.value);
+  // Signed in by email too: save the wallet to that Ank account, so the
+  // wallet alone signs in to it next time (web3 login).
+  if (current?.e) {
+    await linkWalletToAccount(current.e, challenge.w).catch((error) => console.error("Linking wallet to Ank account failed:", error?.message || error));
+  }
   const response = NextResponse.json({ status: "signed-in", wallet: challenge.w, holder: await getHolderStatus(challenge.w) });
   response.cookies.set(WALLET_CHALLENGE_COOKIE, "", cookieOptions(0, host));
   response.cookies.set(SESSION_COOKIE, createSession(current, { wallet: challenge.w }), cookieOptions(SESSION_TTL_SECONDS, host));
