@@ -16,7 +16,7 @@ import { addToNewsletter } from "@/lib/newsletter";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Step 1 of Ank sign-in. An account email (ANK_ACCOUNTS) is sent a one-time
+// Step 1 of Ank sign-in. An account email (the "Ank Accounts" sheet tab or ANK_ACCOUNTS) is sent a one-time
 // code; any other email joins the launch newsletter.
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Too many attempts. Please wait a few minutes and try again." }, { status: 429 });
   }
 
-  const account = findAccount(email);
+  const account = await findAccount(email);
 
   if (!account) {
     try {

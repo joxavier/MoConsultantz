@@ -13,7 +13,7 @@ export async function GET() {
   const headers = { "Cache-Control": "no-store" };
   if (!session) return NextResponse.json({ configured: isAuthConfigured(), signedIn: false }, { headers });
 
-  const account = session.e ? findAccount(session.e) : undefined;
+  const account = session.e ? await findAccount(session.e) : undefined;
   return NextResponse.json(
     {
       configured: true,

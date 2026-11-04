@@ -1,12 +1,17 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from "crypto";
+import { getSheets, readTab } from "@/lib/googleSheets";
 import { SESSION_COOKIE as MO_SESSION_COOKIE, createSession as createMoSession, readSession as readMoSession, signToken, verifyToken, type MoSession } from "@/lib/moAuth";
 
 // Passwordless sign-in for Ank (ank.modevz.ca). An account holder enters
 // their email, gets a one-time code by email, and enters it to sign in.
 //
-// Accounts are set with ANK_ACCOUNTS, a comma-separated list such as
+// Accounts are the rows of the "Ank Accounts" tab (Name, Email) of the site's
+// Google Sheet (GOOGLE_SHEET_ID), plus any in ANK_ACCOUNTS, a comma-separated
+// list such as
 //   ANK_ACCOUNTS="Joshua <josh@modevz.ca>, Tactical Grapes <hello@example.com>"
-// Any other email that tries to sign in joins the launch newsletter instead.
+// The sheet is re-read at most once a minute, so adding or removing a row
+// takes effect within a minute. Any other email that tries to sign in joins
+// the launch newsletter instead.
 //
 // Nothing is stored server-side: the pending code lives in a signed, httpOnly
 // cookie. Signing in adds the email to the shared Mo ID session (see
@@ -27,23 +32,74 @@ const CODE_LENGTH = 8;
 
 export type AnkAccount = { name: string; email: string };
 
-export function getAccounts(): AnkAccount[] {
+export const ACCOUNTS_TAB = "Ank Accounts";
+const ACCOUNTS_HEADERS = ["Name", "Email"];
+// Written to a new, empty tab so the owner's account works straight away.
+const DEFAULT_ACCOUNTS: AnkAccount[] = [{ name: "Joshua", email: "josh@modevz.ca" }];
+const ACCOUNTS_CACHE_MS = 60_000;
+
+export const normalizeEmail = (email: string) => email.trim().toLowerCase();
+const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+function envAccounts(): AnkAccount[] {
   return (process.env.ANK_ACCOUNTS || "")
     .split(",")
     .map((entry) => entry.trim())
     .filter(Boolean)
     .map((entry) => {
       const match = entry.match(/^(.*?)\s*<\s*([^>]+?)\s*>$/);
-      const email = (match ? match[2] : entry).toLowerCase();
+      const email = normalizeEmail(match ? match[2] : entry);
       return { name: match?.[1]?.trim() || email, email };
     });
 }
 
-export const normalizeEmail = (email: string) => email.trim().toLowerCase();
+async function sheetAccounts(spreadsheetId: string): Promise<AnkAccount[]> {
+  const rows = await readTab(spreadsheetId, ACCOUNTS_TAB, ACCOUNTS_HEADERS);
+  if (rows.length <= 1) {
+    const seed = envAccounts().length ? envAccounts() : DEFAULT_ACCOUNTS;
+    await getSheets().spreadsheets.values.update({
+      spreadsheetId,
+      range: `${ACCOUNTS_TAB}!A1`,
+      valueInputOption: "RAW",
+      requestBody: { values: [ACCOUNTS_HEADERS, ...seed.map((account) => [account.name, account.email])] },
+    });
+    return seed;
+  }
+  return rows
+    .slice(1)
+    .map((row) => ({ name: String(row[0] ?? "").trim(), email: normalizeEmail(String(row[1] ?? "")) }))
+    .filter((account) => isEmail(account.email))
+    .map((account) => ({ ...account, name: account.name || account.email }));
+}
 
-export function findAccount(email: string) {
+let accountsCache: { accounts: AnkAccount[]; expires: number } | null = null;
+let lastSheetAccounts: AnkAccount[] = [];
+
+export async function getAccounts(): Promise<AnkAccount[]> {
+  if (accountsCache && accountsCache.expires > Date.now()) return accountsCache.accounts;
+
+  let fromSheet = lastSheetAccounts;
+  let ok = true;
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+  if (spreadsheetId && process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+    try {
+      fromSheet = lastSheetAccounts = await sheetAccounts(spreadsheetId);
+    } catch (error: any) {
+      ok = false;
+      console.error("Ank accounts: couldn't read the sheet:", error?.message || error);
+    }
+  }
+
+  const byEmail = new Map<string, AnkAccount>();
+  for (const account of [...envAccounts(), ...fromSheet]) if (!byEmail.has(account.email)) byEmail.set(account.email, account);
+  const accounts = Array.from(byEmail.values());
+  accountsCache = { accounts, expires: Date.now() + (ok ? ACCOUNTS_CACHE_MS : 15_000) };
+  return accounts;
+}
+
+export async function findAccount(email: string) {
   const wanted = normalizeEmail(email);
-  return getAccounts().find((account) => account.email === wanted);
+  return (await getAccounts()).find((account) => account.email === wanted);
 }
 
 function getSecret() {
@@ -94,11 +150,11 @@ export function createSession(email: string, current: MoSession | null) {
   return createMoSession(current, { email });
 }
 
-// The signed-in Ank account, or null. Also re-checks ANK_ACCOUNTS, so removing
-// an email there signs that account out straight away.
-export function readSession(token: string | undefined) {
+// The signed-in Ank account, or null. Also re-checks the account list, so removing
+// an email there signs that account out within a minute.
+export async function readSession(token: string | undefined) {
   const session = readMoSession(token);
-  return session?.e ? findAccount(session.e) ?? null : null;
+  return session?.e ? (await findAccount(session.e)) ?? null : null;
 }
 
 // Shared with Mo ID: cookies go on the parent domain so the challenge and

@@ -2,12 +2,15 @@
 
 import React from "react";
 import Link from "next/link";
-import treasuryConfig from "@/data/treasuryConfig.json";
+import { useReserveConfig } from "./useReserveConfig";
 
-// Target weights for each Strategic Reserve asset. Live values and current
+// Target weights for each Strategic Reserve asset (MoCoin holders), or the
+// held assets without targets (everyone else). Live values and current
 // weights are on the full Strategic Reserve dashboard.
 export default function AssetsTable() {
-  const assets = treasuryConfig.assets.filter((asset) => asset.targetAllocation > 0);
+  const { config } = useReserveConfig();
+  const showTargets = Boolean(config?.targetsVisible);
+  const assets = (config?.assets ?? []).filter((asset) => !showTargets || asset.targetAllocation > 0);
 
   return (
     <div className="mt-8 w-full text-left">
@@ -18,7 +21,7 @@ export default function AssetsTable() {
               <div className="truncate font-medium">{asset.symbol}</div>
               <div className="truncate text-sm text-gray-400">{asset.category}</div>
             </div>
-            <div className="shrink-0 tabular-nums">{asset.targetAllocation.toFixed(2)}%</div>
+            {showTargets && <div className="shrink-0 tabular-nums">{asset.targetAllocation.toFixed(2)}%</div>}
           </li>
         ))}
       </ul>

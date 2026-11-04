@@ -40,15 +40,20 @@ const MO_COLORS = {
   rose: '#fb7185',
 };
 
-const ASSET_CONFIG = treasuryConfig.assets as unknown as AssetConfig[];
-const HOLDINGS_AS_OF = treasuryConfig.holdingsAsOf;
-const MARKET_SYMBOLS = ASSET_CONFIG.filter((asset) => asset.kind === 'market').map((asset) => asset.symbol);
-// MoCoin's own market data (price, market cap, supply) comes from the same API.
-const FETCH_SYMBOLS = [...MARKET_SYMBOLS, 'MOCOIN'];
-// Positions recorded as an amount spent on a date (no share count given).
-const PURCHASES = Object.fromEntries(
-  ASSET_CONFIG.filter((asset) => asset.kind === 'market' && asset.quantity == null && asset.purchase).map((asset) => [asset.symbol, asset.purchase]),
-);
+// Holdings come from /api/treasury/config (the Google Sheet), never from a
+// bundled file: MoCoin holders get targets and the watchlist, everyone else
+// only the held positions.
+type ReserveConfig = { holdingsAsOf: string; assets: AssetConfig[]; source: 'sheet' | 'file'; targetsVisible: boolean };
+
+// What to ask /api/market-data for: every traded asset plus MoCoin's own
+// market data, and positions recorded as an amount spent on a date.
+function marketRequest(assets: AssetConfig[]) {
+  const symbols = [...assets.filter((asset) => asset.kind === 'market').map((asset) => asset.symbol), 'MOCOIN'];
+  const purchases = Object.fromEntries(
+    assets.filter((asset) => asset.kind === 'market' && asset.quantity == null && asset.purchase).map((asset) => [asset.symbol, asset.purchase]),
+  );
+  return JSON.stringify({ symbols, purchases });
+}
 const REFRESH_MS = 5 * 60 * 1000;
 const REBALANCE_PREVIEW = 6;
 
@@ -240,12 +245,13 @@ function toBtcView(data: MarketData): { data: MarketData; btcUsd: number } | nul
 }
 
 function buildAssets(
+  assetConfig: AssetConfig[],
   marketData: MarketData | null,
   treasury: TreasuryResponse | null,
   currency: DisplayCurrency,
   rates: Rates,
 ): Asset[] {
-  const assets: Asset[] = ASSET_CONFIG.map((config) => {
+  const assets: Asset[] = assetConfig.map((config) => {
     const base = { ...config, ...ZERO_CHANGES, price: 0, value: 0, currentAllocation: 0, isHeld: false };
 
     switch (config.kind) {
@@ -773,15 +779,45 @@ export default function StrategicReserve() {
     } catch {}
   };
 
+  // Holdings, re-fetched when the signed-in wallet or its holder status
+  // changes, since that decides whether targets and the watchlist come back.
+  const [reserve, setReserve] = useState<ReserveConfig | null>(null);
+  const [reserveError, setReserveError] = useState<string | null>(null);
+  const holderKey = `${moSession?.wallet ?? ''}:${holderAccess}`;
   useEffect(() => {
     let cancelled = false;
+    fetch('/api/treasury/config', { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Holdings request failed (${response.status})`);
+        return response.json();
+      })
+      .then((data: ReserveConfig) => {
+        if (cancelled) return;
+        setReserve(data);
+        setReserveError(null);
+      })
+      .catch((error: any) => {
+        if (!cancelled) setReserveError(error.message || 'Holdings unavailable');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [holderKey]);
+  const assetConfig = useMemo(() => reserve?.assets ?? [], [reserve]);
+  const targetsVisible = Boolean(reserve?.targetsVisible);
+  const marketRequestKey = reserve ? marketRequest(reserve.assets) : null;
+
+  useEffect(() => {
+    if (!marketRequestKey) return;
+    let cancelled = false;
+    const { symbols, purchases } = JSON.parse(marketRequestKey);
 
     const fetchPrices = async () => {
       try {
         const response = await fetch('/api/market-data', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ symbols: FETCH_SYMBOLS, baseCurrency: fetchCurrency, purchases: PURCHASES }),
+          body: JSON.stringify({ symbols, baseCurrency: fetchCurrency, purchases }),
         });
         if (!response.ok) throw new Error(`Market data request failed (${response.status})`);
         const data = await response.json();
@@ -801,7 +837,7 @@ export default function StrategicReserve() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [fetchCurrency]);
+  }, [fetchCurrency, marketRequestKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -840,7 +876,7 @@ export default function StrategicReserve() {
     };
   }, []);
 
-  const loading = !marketData && !marketError;
+  const loading = (!reserve && !reserveError) || (Boolean(reserve) && !marketData && !marketError);
   const formatMoney = useMemo(() => formatMoneyFor(currency), [currency]);
   const changeKey = CHANGE_KEYS[timePeriod];
   const period = PERIODS.find((entry) => entry.key === timePeriod)!;
@@ -852,9 +888,9 @@ export default function StrategicReserve() {
   const rates: Rates = { usdCad: fx.usdCadRate, btcUsd: btcView?.btcUsd || 0 };
 
   const assets = useMemo(
-    () => buildAssets(viewData, treasury, currency, rates),
+    () => buildAssets(assetConfig, viewData, treasury, currency, rates),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [viewData, treasury, currency, rates.usdCad, rates.btcUsd],
+    [assetConfig, viewData, treasury, currency, rates.usdCad, rates.btcUsd],
   );
 
   const totalValue = assets.reduce((sum, asset) => sum + asset.value, 0);
@@ -872,9 +908,9 @@ export default function StrategicReserve() {
 
 
   const assetColor = (symbol: string) =>
-    ASSET_COLORS[ASSET_CONFIG.findIndex((asset) => asset.symbol === symbol) % ASSET_COLORS.length];
+    ASSET_COLORS[assetConfig.findIndex((asset) => asset.symbol === symbol) % ASSET_COLORS.length];
 
-  const categories = Array.from(new Set(ASSET_CONFIG.map((asset) => asset.category)));
+  const categories = Array.from(new Set(assetConfig.map((asset) => asset.category)));
   const categoryRows = categories.map((name) => {
     const members = assets.filter((asset) => asset.category === name);
     return {
@@ -938,7 +974,7 @@ export default function StrategicReserve() {
   const backingPercent = mocoinMarket?.marketCap ? (totalValue / mocoinMarket.marketCap) * 100 : null;
 
   const newsItems = useMemo(() => [...localNews(), ...substackNews(substackPosts)], [substackPosts]);
-  const newsMap = useMemo(() => newsByAsset(newsItems, ASSET_CONFIG), [newsItems]);
+  const newsMap = useMemo(() => newsByAsset(newsItems, assetConfig), [newsItems, assetConfig]);
   const relatedItems = useMemo(() => {
     const seen = new Map<string, { item: NewsItem; symbols: string[] }>();
     for (const [symbol, items] of Object.entries(newsMap)) {
@@ -1046,7 +1082,7 @@ export default function StrategicReserve() {
         </div>
         <div>
           <dt className="text-[var(--sr-muted)]">Target</dt>
-          <dd className="font-medium tabular-nums text-[var(--sr-ink)]">{asset.targetAllocation.toFixed(2)}%</dd>
+          <dd className="font-medium tabular-nums text-[var(--sr-ink)]">{targetsVisible ? `${asset.targetAllocation.toFixed(2)}%` : 'Holders only'}</dd>
         </div>
         <div>
           <dt className="text-[var(--sr-muted)]">Category</dt>
@@ -1155,6 +1191,12 @@ export default function StrategicReserve() {
             ),
           )}
         </div>
+
+        {reserveError && !reserve && (
+          <div className="mt-4 rounded-xl border border-[var(--sr-warn-line)] bg-[var(--sr-warn-bg)] px-4 py-3 text-sm text-[var(--sr-warn-ink)]">
+            The reserve&apos;s holdings couldn&apos;t be loaded ({reserveError}). Please refresh to try again.
+          </div>
+        )}
 
         {(marketError || btcUnavailable || (marketData && fx.isFallback)) && (
           <div className="mt-4 rounded-xl border border-[var(--sr-warn-line)] bg-[var(--sr-warn-bg)] px-4 py-3 text-sm text-[var(--sr-warn-ink)]">
@@ -1276,7 +1318,7 @@ export default function StrategicReserve() {
                 </ul>
               )}
               <p className="border-t border-[var(--sr-line)] px-4 py-3 text-xs text-[var(--sr-muted)]">
-                Holdings as of {new Date(`${HOLDINGS_AS_OF}T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}. Tap a row for details and related news.
+                {reserve && `Holdings as of ${new Date(`${reserve.holdingsAsOf}T12:00:00Z`).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}. `}Tap a row for details and related news.
               </p>
             </section>
           )}

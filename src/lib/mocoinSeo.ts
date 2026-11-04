@@ -20,22 +20,6 @@ export const MOCOIN_CRUMBS: Crumb[] = [
 
 export const RESERVE_CRUMBS: Crumb[] = [...MOCOIN_CRUMBS, { name: "Strategic Reserve", path: "/vestmentz/mocoin/strategicReserve" }];
 
-type ConfigAsset = { name: string; kind: string; category: string };
-
-// "stocks such as Enbridge, NexGen Energy, …": built from the config so the
-// answer stays true when holdings change.
-function reserveHoldingsSummary() {
-  const assets = treasuryConfig.assets as ConfigAsset[];
-  const groups = new Map<string, string[]>();
-  for (const asset of assets) {
-    if (asset.kind === "onchain") continue;
-    const list = groups.get(asset.category) ?? [];
-    list.push(asset.name.replace(/\s*\(.*?\)/g, ""));
-    groups.set(asset.category, list);
-  }
-  return Array.from(groups, ([category, names]) => `${category}: ${names.join(", ")}`).join("; ");
-}
-
 export const MOCOIN_FAQS: Faq[] = [
   {
     question: "What is MoCoin?",
@@ -76,7 +60,8 @@ export const RESERVE_FAQS: Faq[] = [
   },
   {
     question: "What assets does the Strategic Reserve hold?",
-    answer: `${reserveHoldingsSummary()}. It also holds MoCoin and MoCoin liquidity pool positions on Solana.`,
+    answer:
+      "Stocks, crypto, US and Canadian dollar cash and a private pre-seed portfolio, plus MoCoin and MoCoin liquidity pool positions on Solana. The Holdings tab lists every position at live prices; target allocations and the watchlist are open to MoCoin holders.",
   },
   {
     question: "How is MoCoin's market cap calculated?",
