@@ -5,6 +5,11 @@
     "lpMintAddress": null
   },
   "poolScan": {
+    "_comment": "trackedPools: pools always shown and checked, even if no search finds them. The live list is the \"MoCoin Pools\" tab of the site's Google Sheet; this is its fallback and first contents.",
+    "trackedPools": [
+      "2mz5eNLTpCk2F6CvP1y9LWdUe6LUh1zqPa7bzPFYWns8",
+      "FLezorFykwX3Yv1cGxPtrztNB5TERHrPBXhBFrAAajQs"
+    ],
     "extraTokenMints": []
   },
   "treasuryWalletAddress": null

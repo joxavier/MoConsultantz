@@ -1360,7 +1360,7 @@ export default function StrategicReserve() {
 
           {tab === 'markets' && (
             <section className="overflow-hidden rounded-2xl border border-[var(--sr-line)] bg-[var(--sr-card)] shadow-sm">
-              <p className="border-b border-[var(--sr-line)] px-4 py-3 text-sm text-[var(--sr-muted)]">Pools trading MoCoin, and pools of the tokens it pairs with.</p>
+              <p className="border-b border-[var(--sr-line)] px-4 py-3 text-sm text-[var(--sr-muted)]">Pools trading MoCoin, and pools of the tokens it pairs with. Tracked pools are always checked.</p>
               {!treasury ? (
                 <div className="space-y-3 p-4">
                   {[0, 1].map((index) => <Skeleton key={index} className="h-12" />)}
@@ -1378,13 +1378,24 @@ export default function StrategicReserve() {
                         <a href={pool.url} target="_blank" rel="noopener noreferrer" className="grid grid-cols-[1.75rem_minmax(0,1fr)_auto] items-center gap-x-3 px-3 py-3 sm:px-4">
                           <span className="text-center text-sm text-[var(--sr-muted)]">{index + 1}</span>
                           <span className="min-w-0">
-                            <span className="block truncate font-semibold">{pool.label}</span>
+                            <span className="flex min-w-0 items-center gap-1.5">
+                              <span className="truncate font-semibold">{pool.label}</span>
+                              {pool.tracked && (
+                                <span className="shrink-0 rounded-full bg-[var(--sr-blue-soft)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[var(--sr-blue)]">Tracked</span>
+                              )}
+                            </span>
                             <span className="block truncate text-sm text-[var(--sr-muted)]">
-                              <span className="capitalize">{pool.dexId}</span> · {pool.hop === 0 ? 'MoCoin pair' : 'Paired token'}
+                              {pool.source === 'none' ? (
+                                'No market data yet'
+                              ) : (
+                                <>
+                                  <span className="capitalize">{pool.dexId}</span> · {pool.hop === 0 ? 'MoCoin pair' : 'Paired token'}
+                                </>
+                              )}
                             </span>
                           </span>
                           <span className="text-right">
-                            <span className="block font-semibold tabular-nums">{formatCompact(convert(pool.liquidityUsd, 'USD', currency, rates))}</span>
+                            <span className="block font-semibold tabular-nums">{pool.source === 'none' ? '—' : formatCompact(convert(pool.liquidityUsd, 'USD', currency, rates))}</span>
                             <span className="block text-xs text-[var(--sr-muted)]">{position ? `Treasury ${(position.poolShare * 100).toFixed(2)}%` : 'liquidity'}</span>
                           </span>
                         </a>
