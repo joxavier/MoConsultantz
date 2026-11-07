@@ -111,17 +111,22 @@ export function isWalletAddress(value: unknown): value is string {
 
 type WalletChallenge = { w: string; n: string; d: string; i: number; x: number };
 
-// The exact text the wallet signs, modelled on Sign-In With Solana. It is
-// rebuilt from the signed challenge cookie when checking the signature, so the
-// browser can't swap in a different message.
+// The exact text the wallet signs, in Sign-In With Solana format (EIP-4361
+// adapted for Solana). Phantom and other wallets parse a message that opens
+// with "... wants you to sign in" strictly and refuse to show it if any field
+// is off, so: Version 1, a Chain ID, an alphanumeric nonce, fields in order.
+// It is rebuilt from the signed challenge cookie when checking the signature,
+// so the browser can't swap in a different message.
 export function walletMessage(challenge: Omit<WalletChallenge, "x"> & { x: number }) {
   return [
     `${challenge.d} wants you to sign in with your Solana account:`,
     challenge.w,
     "",
-    "Sign in to Mo (MoOS, the MoCoin Strategic Reserve and Ank). This is not a transaction and costs nothing.",
+    "Sign in to Mo: MoOS, the MoCoin Strategic Reserve and Ank. This is not a transaction and costs nothing.",
     "",
     `URI: https://${challenge.d}`,
+    "Version: 1",
+    "Chain ID: mainnet",
     `Nonce: ${challenge.n}`,
     `Issued At: ${new Date(challenge.i * 1000).toISOString()}`,
     `Expiration Time: ${new Date(challenge.x * 1000).toISOString()}`,
@@ -132,7 +137,7 @@ export function createWalletChallenge(wallet: string, host: string | null | unde
   const issued = now();
   const challenge: WalletChallenge = {
     w: wallet,
-    n: randomBytes(16).toString("base64url"),
+    n: randomBytes(16).toString("hex"), // letters and digits only, as SIWS requires
     d: hostOf(host) || "modevz.ca",
     i: issued,
     x: issued + WALLET_CHALLENGE_TTL_SECONDS,
