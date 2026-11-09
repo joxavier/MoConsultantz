@@ -76,6 +76,11 @@ export type DiscoveredPool = {
   // Raydium standard-AMM LP mint, when known — needed to value the
   // treasury's share of the pool.
   lpMint: string | null;
+  // On the always-tracked list ("MoCoin Pools" sheet tab).
+  tracked?: boolean;
+  // Where the pool's data came from; "none" for a tracked pool that neither
+  // DexScreener nor GeckoTerminal knows (yet).
+  source?: "dexscreener" | "geckoterminal" | "none";
 };
 
 export type TreasuryLpPosition = {
